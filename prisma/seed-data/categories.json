@@ -1,0 +1,9 @@
+[
+  {
+    "wpId": 1,
+    "slug": "blog",
+    "name": "Blog",
+    "description": "Your blog category",
+    "parentWpId": null
+  }
+]

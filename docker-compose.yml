@@ -1,0 +1,33 @@
+# Local MySQL 8 for development.
+#
+#   docker compose up -d
+#   cp .env.example .env          # DATABASE_URL already matches these values
+#   npx prisma migrate deploy
+#   npx prisma db seed
+#   npm run dev
+#
+# Production runs MySQL wherever you host it — only DATABASE_URL changes.
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: knightscoaches-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: knightscoaches
+      MYSQL_USER: knights
+      MYSQL_PASSWORD: knights
+    ports:
+      - '3306:3306'
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - knights-mysql:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-uroot', '-proot']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  knights-mysql:

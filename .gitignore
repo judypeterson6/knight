@@ -1,0 +1,24 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+.env
+.env.local
+.env.*.local
+
+# NOTE: /public/uploads and /prisma/seed-data are deliberately NOT ignored.
+# They hold the migrated WordPress media and the migrated content snapshot, so a
+# fresh clone can run `prisma migrate deploy && prisma db seed` with no network.
+# Re-running `npm run migrate:wp` refreshes both in place.
+
+# Raw HTTP cache used by the migration script
+/scripts/.wp-cache/
+
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*

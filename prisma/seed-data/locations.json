@@ -1,0 +1,222 @@
+[
+  {
+    "slug": "washington-dc",
+    "city": "Washington",
+    "state": "DC",
+    "region": "Northeast",
+    "route": "/tour-bus-rental/washington-dc",
+    "isHub": true,
+    "order": 0,
+    "summary": "Knights Coaches runs tour bus rental out of Washington DC on Prevost H3-45 and X3-45 chassis, each with a CDL driver included, at $180 to $320 per day depending on bunk count and slide configuration. Pickup and drop happen anywhere across the capital region, from a Capital One Arena date in Chinatown to The Anthem at The Wharf and the legendary 9:30 Club on V Street. Each entertainer coach carries",
+    "image": "/uploads/2025/11/premium-prevost-entertainer-coach-leasing-700x467-1.jpg"
+  },
+  {
+    "slug": "seattle-wa",
+    "city": "Seattle",
+    "state": "WA",
+    "region": "West",
+    "route": "/tour-bus-rental/seattle-wa",
+    "isHub": false,
+    "order": 1,
+    "summary": "Knights Coaches runs tour bus rental out of Seattle on Prevost H3-45 and X3-45 chassis, each with a CDL driver included, at $180 to $320 per day depending on bunk count and slide configuration. Pickup and drop happen anywhere across the metro, from a Climate Pledge Arena date at Seattle Center to the WaMu Theater at Lumen Field and the historic Showbox on First Avenue. Each entertainer coach carri",
+    "image": "/uploads/2025/11/premium-prevost-entertainer-coach-leasing-700x467-1.jpg"
+  },
+  {
+    "slug": "san-francisco-ca",
+    "city": "San Francisco",
+    "state": "CA",
+    "region": "West",
+    "route": "/tour-bus-rental/san-francisco-ca",
+    "isHub": false,
+    "order": 2,
+    "summary": "Knights Coaches runs tour bus rental out of San Francisco on Prevost H3-45 and X3-45 chassis, each with a CDL driver included, at $180 to $320 per day depending on bunk count and slide configuration. Pickup and drop happen anywhere across the Bay Area, from a Chase Center arena date in Mission Bay to the legendary Fillmore and the Fox Theater across the bay in Oakland. Each entertainer coach carri",
+    "image": "/uploads/2025/11/premium-prevost-entertainer-coach-leasing-700x467-1.jpg"
+  },
+  {
+    "slug": "phoenix-az",
+    "city": "Phoenix",
+    "state": "AZ",
+    "region": "West",
+    "route": "/tour-bus-rental/phoenix-az",
+    "isHub": false,
+    "order": 3,
+    "summary": "Knights Coaches runs tour bus rental out of Phoenix on Prevost H3-45 and X3-45 chassis, each with a CDL driver included, at $180 to $320 per day depending on bunk count and slide configuration. Pickup and drop happen anywhere across the Valley of the Sun, from a Footprint Center arena date downtown to the Talking Stick Resort Amphitheatre and the historic Van Buren. Each entertainer coach carries ",
+    "image": "/uploads/2025/11/premium-prevost-entertainer-coach-leasing-700x467-1.jpg"
+  },
+  {
+    "slug": "philadelphia-pa",
+    "city": "Philadelphia",
+    "state": "PA",
+    "region": "Northeast",
+    "route": "/tour-bus-rental/philadelphia-pa",
+    "isHub": false,
+    "order": 4,
+    "summary": "Knights Coaches runs tour bus rental out of Philadelphia on Prevost H3-45 and X3-45 chassis, each with a CDL driver included, at $180 to $320 per day depending on bunk count and slide configuration. Pickup and drop happen anywhere across the Philly metro, from a Xfinity Mobile Arena date at the South Philadelphia sports complex to The Met on North Broad and The Fillmore in Fishtown. Each entertain",
+    "image": "/uploads/2025/11/premium-prevost-entertainer-coach-leasing-700x467-1.jpg"
+  },
+  {
+    "slug": "oklahoma-city",
+    "city": "Oklahoma City",
+    "state": "",
+    "region": null,
+    "route": "/tour-bus-rental/oklahoma-city",
+    "isHub": false,
+    "order": 5,
+    "summary": "Knights Coaches runs tour bus rental out of Oklahoma City on Prevost H3-45 and X3-45 chassis, each with a CDL driver included, at $180 to $320 per day depending on bunk count and slide configuration. Pickup and drop happen anywhere across the metro, from a Paycom Center arena date downtown to The Criterion in Bricktown and the historic Tower Theatre on the Plaza. Each entertainer coach carries 6 t",
+    "image": "/uploads/2025/11/premium-prevost-entertainer-coach-leasing-700x467-1.jpg"
+  },
+  {
+    "slug": "nyc",
+    "city": "New York City",
+    "state": "NY",
+    "region": null,
+    "route": "/tour-bus-rental/nyc",
+    "isHub": true,
+    "order": 6,
+    "summary": "A tour bus rental in NYC starts at $180 per day with Knights Coaches, runs on custom-converted Prevost H3-45 and X3-45 coaches, and includes a CDL-certified driver plus 24/7 dispatch on every booking. Our coaches carry 6 to 14 bunks, full galleys, private rear lounges, and onboard showers, so your crew sleeps between a Madison Square Garden date and the next city instead of fighting Manhattan hote",
+    "image": "/uploads/2025/11/premium-prevost-entertainer-coach-leasing-700x467-1.jpg"
+  },
+  {
+    "slug": "minneapolis-mn",
+    "city": "Minneapolis",
+    "state": "MN",
+    "region": "Midwest",
+    "route": "/tour-bus-rental/minneapolis-mn",
+    "isHub": false,
+    "order": 7,
+    "summary": "Knights Coaches runs tour bus rental out of Minneapolis on Prevost H3-45 and X3-45 chassis, each with a CDL driver included, at $180 to $320 per day depending on bunk count and slide configuration. Pickup and drop happen anywhere across the Twin Cities, from a Target Center date downtown to the legendary First Avenue and The Armory, plus the St. Paul venues across the river. Each entertainer coach",
+    "image": "/uploads/2025/11/premium-prevost-entertainer-coach-leasing-700x467-1.jpg"
+  },
+  {
+    "slug": "miami-fl",
+    "city": "Miami",
+    "state": "FL",
+    "region": "Southeast",
+    "route": "/tour-bus-rental/miami-fl",
+    "isHub": false,
+    "order": 8,
+    "summary": "Knights Coaches runs tour bus rental out of Miami on Prevost H3-45 and X3-45 chassis, each with a CDL driver included, at $180 to $320 per day depending on bunk count and slide configuration. Pickup and drop happen anywhere across South Florida, from the Kaseya Center downtown on Biscayne Bay to the Hard Rock Live up in Hollywood and the FPL Solar Amphitheater at Bayfront Park. Each entertainer co",
+    "image": "/uploads/2025/11/premium-prevost-entertainer-coach-leasing-700x467-1.jpg"
+  },
+  {
+    "slug": "los-angeles",
+    "city": "Los Angeles",
+    "state": "",
+    "region": null,
+    "route": "/tour-bus-rental/los-angeles",
+    "isHub": true,
+    "order": 9,
+    "summary": "A tour bus rental in Los Angeles starts at $180 per day with Knights Coaches, runs on custom-converted Prevost H3-45 and X3-45 coaches, and includes a CDL-certified driver plus 24/7 dispatch on every booking. We carry coaches with 6 to 14 bunks, full galleys, private rear lounges, and onboard showers, so your crew sleeps between LA and the next date instead of losing a night to a hotel run. Most L",
+    "image": "/uploads/2025/11/premium-prevost-entertainer-coach-leasing-700x467-1.jpg"
+  },
+  {
+    "slug": "las-vegas-nv",
+    "city": "Las Vegas",
+    "state": "NV",
+    "region": "West",
+    "route": "/tour-bus-rental/las-vegas-nv",
+    "isHub": false,
+    "order": 10,
+    "summary": "Knights Coaches runs tour bus rental out of Las Vegas on Prevost H3-45 and X3-45 chassis, each with a CDL driver included, at $180 to $320 per day depending on bunk count and slide configuration. Pickup and drop happen anywhere across the valley, from the Sphere and T-Mobile Arena on the Strip to Allegiant Stadium and the Dolby Live theater at Park MGM. Each entertainer coach carries 6 to 14 sleep",
+    "image": "/uploads/2025/11/premium-prevost-entertainer-coach-leasing-700x467-1.jpg"
+  },
+  {
+    "slug": "houston-tx",
+    "city": "Houston",
+    "state": "TX",
+    "region": "South Central",
+    "route": "/tour-bus-rental/houston-tx",
+    "isHub": false,
+    "order": 11,
+    "summary": "Knights Coaches runs tour bus rental out of Houston on Prevost H3-45 and X3-45 chassis, each with a CDL driver included, at $180 to $320 per day depending on bunk count and slide configuration. Pickup and drop happen anywhere across the Houston metro, from downtown load-ins at the Toyota Center to the 713 Music Hall at POST Houston, with the coach traveling the full run through Texas and beyond. E",
+    "image": "/uploads/2025/11/premium-prevost-entertainer-coach-leasing-700x467-1.jpg"
+  },
+  {
+    "slug": "detroit-mi",
+    "city": "Detroit",
+    "state": "MI",
+    "region": "Midwest",
+    "route": "/tour-bus-rental/detroit-mi",
+    "isHub": false,
+    "order": 12,
+    "summary": "Knights Coaches Luxury Entertainer runs tour bus rental out of Detroit on Prevost H3-45 and X3-45 chassis, each with a CDL driver included, at $180 to $320 per day depending on bunk count and slide configuration. Pickup and drop happen anywhere across the metro, from a Little Caesars Arena date in The District Detroit to the historic Fox Theatre and the legendary Saint Andrew’s Hall in Greektown. ",
+    "image": "/uploads/2025/11/premium-prevost-entertainer-coach-leasing-700x467-1.jpg"
+  },
+  {
+    "slug": "denver-co",
+    "city": "Denver",
+    "state": "CO",
+    "region": "West",
+    "route": "/tour-bus-rental/denver-co",
+    "isHub": false,
+    "order": 13,
+    "summary": "Knights Coaches runs tour bus rental out of Denver on Prevost H3-45 and X3-45 chassis, each with a CDL driver included, at $180 to $320 per day depending on bunk count and slide configuration. Pickup and drop happen anywhere across the Front Range, from a Red Rocks Amphitheatre date in Morrison to Ball Arena downtown and the Mission Ballroom in RiNo. Each entertainer coach carries 6 to 14 sleeping",
+    "image": "/uploads/2025/11/premium-prevost-entertainer-coach-leasing-700x467-1.jpg"
+  },
+  {
+    "slug": "branson-mo",
+    "city": "Branson",
+    "state": "MO",
+    "region": "Midwest",
+    "route": "/tour-bus-rental/branson-mo",
+    "isHub": false,
+    "order": 14,
+    "summary": "Knights Coaches runs tour bus rental and leasing into Branson on Prevost H3-45 and X3-45 chassis, each with a CDL driver included, at $180 to $320 per day depending on bunk count and slide configuration, with reduced rates on the longer terms that a Branson run usually calls for. Pickup and drop happen anywhere across the area, from the theaters lining the 76 Country Boulevard Strip to the Mansion",
+    "image": "/uploads/2025/11/premium-prevost-entertainer-coach-leasing-700x467-1.jpg"
+  },
+  {
+    "slug": "chicago-il",
+    "city": "Chicago",
+    "state": "IL",
+    "region": "Midwest",
+    "route": "/tour-bus-rental/chicago-il",
+    "isHub": true,
+    "order": 15,
+    "summary": "A tour bus rental in Chicago starts at $180 per day with Knights Coaches, runs on custom-converted Prevost H3-45 and X3-45 coaches, and includes a CDL-certified driver plus 24/7 dispatch on every booking. Our coaches carry 6 to 14 bunks, full galleys, private rear lounges, and onboard showers, so your crew sleeps between a House of Blues date and the next Midwest city instead of paying for a downt",
+    "image": "/uploads/2025/11/premium-prevost-entertainer-coach-leasing-700x467-1.jpg"
+  },
+  {
+    "slug": "boston-ma",
+    "city": "Boston",
+    "state": "MA",
+    "region": "Northeast",
+    "route": "/tour-bus-rental/boston-ma",
+    "isHub": true,
+    "order": 16,
+    "summary": "Knights Coaches runs tour bus rental out of Boston on Prevost H3-45 and X3-45 chassis, each with a CDL driver included, at $180 to $320 per day depending on bunk count and slide configuration. Pickup and drop happen anywhere across Greater Boston, from a TD Garden arena date at North Station to MGM Music Hall at Fenway and Roadrunner out in Allston-Brighton. Each entertainer coach carries 6 to 14 ",
+    "image": "/uploads/2025/11/premium-prevost-entertainer-coach-leasing-700x467-1.jpg"
+  },
+  {
+    "slug": "baltimore-md",
+    "city": "Baltimore",
+    "state": "MD",
+    "region": "Northeast",
+    "route": "/tour-bus-rental/baltimore-md",
+    "isHub": false,
+    "order": 17,
+    "summary": "Knights Coaches runs tour bus rental out of Baltimore on Prevost H3-45 and X3-45 chassis, each with a CDL driver included, at $180 to $320 per day depending on bunk count and slide configuration. Pickup and drop happen anywhere across the Charm City metro, from a CFG Bank Arena date downtown to Pier Six Pavilion at the Inner Harbor and Rams Head Live at Power Plant Live. Each entertainer coach car",
+    "image": "/uploads/2025/11/premium-prevost-entertainer-coach-leasing-700x467-1.jpg"
+  },
+  {
+    "slug": "austin-tx",
+    "city": "Austin",
+    "state": "TX",
+    "region": "South Central",
+    "route": "/tour-bus-rental/austin-tx",
+    "isHub": true,
+    "order": 18,
+    "summary": "Knights Coaches runs tour bus rental out of Austin on Prevost H3-45 and X3-45 chassis, each with a CDL driver included, at $180 to $320 per day depending on bunk count and slide configuration. Pickup and drop happen anywhere across the metro, from the Moody Center on the University of Texas campus to the Red River clubs and ACL Live at the Moody Theater downtown, with the coach traveling the full ",
+    "image": "/uploads/2025/11/premium-prevost-entertainer-coach-leasing-700x467-1.jpg"
+  },
+  {
+    "slug": "atlanta-ga",
+    "city": "Atlanta",
+    "state": "GA",
+    "region": "Southeast",
+    "route": "/tour-bus-rental/atlanta-ga",
+    "isHub": true,
+    "order": 19,
+    "summary": "An entertainer coach hire in Atlanta starts at $180 per day with Knights Coaches, runs on custom-converted Prevost H3-45 and X3-45 coaches, and includes a CDL-certified driver plus 24/7 dispatch on every booking. Our coaches carry 6 to 14 bunks, full galleys, private rear lounges, and onboard showers, so your crew sleeps between a Tabernacle date and the next Southeast city instead of booking a ho",
+    "image": "/uploads/2025/11/premium-prevost-entertainer-coach-leasing-700x467-1.jpg"
+  }
+]

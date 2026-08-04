@@ -1,0 +1,158 @@
+[
+  {
+    "slug": "outlaw",
+    "name": "Outlaw",
+    "className": "Elite",
+    "chassis": "Prevost X3-45",
+    "bunks": 12,
+    "slideOuts": "Double Slide",
+    "rearConfig": "Master Suite",
+    "amenities": [
+      "12 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": "Most Booked",
+    "description": "Outlaw is a custom Prevost X3-45 entertainer coach conversion configured with 12 bunks, a double slide layout and a master suite at the rear. It carries a full galley, a front lounge, a stand-up bathroom with an onboard shower, and sleeps the crew while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch.",
+    "images": [
+      "/uploads/2026/05/Outlaw-Tour-Bus-1024x691.png"
+    ],
+    "featured": true,
+    "displayOrder": 0
+  },
+  {
+    "slug": "atlas",
+    "name": "Atlas",
+    "className": "Premium",
+    "chassis": "Prevost H3-45",
+    "bunks": 10,
+    "slideOuts": "Single Slide",
+    "rearConfig": "Sofa Lounge",
+    "amenities": [
+      "10 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": "Best Value",
+    "description": "Atlas is a custom Prevost H3-45 entertainer coach conversion configured with 10 bunks, a single slide layout and a sofa lounge at the rear. It carries a full galley, a front lounge, a stand-up bathroom with an onboard shower, and sleeps the crew while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch.",
+    "images": [
+      "/uploads/2026/05/Atlas-Entertainer-Coach-Prevost-1024x691.png"
+    ],
+    "featured": true,
+    "displayOrder": 1
+  },
+  {
+    "slug": "thunder",
+    "name": "Thunder",
+    "className": "Premium",
+    "chassis": "Prevost H3-45",
+    "bunks": 12,
+    "slideOuts": "Double Slide",
+    "rearConfig": "Rear Lounge",
+    "amenities": [
+      "12 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": "Flagship",
+    "description": "Thunder is a custom Prevost H3-45 entertainer coach conversion configured with 12 bunks, a double slide layout and a rear lounge at the rear. It carries a full galley, a front lounge, a stand-up bathroom with an onboard shower, and sleeps the crew while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch.",
+    "images": [
+      "/uploads/2026/05/Thunder-Entertainer-Coach-Slide-1024x691.jpg"
+    ],
+    "featured": true,
+    "displayOrder": 2
+  },
+  {
+    "slug": "maverick",
+    "name": "Maverick",
+    "className": "Elite",
+    "chassis": "Prevost X3-45",
+    "bunks": 14,
+    "slideOuts": "Triple Slide",
+    "rearConfig": "Star Config",
+    "amenities": [
+      "14 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": "Star / VIP",
+    "description": "Maverick is a custom Prevost X3-45 entertainer coach conversion configured with 14 bunks, a triple slide layout and a star config at the rear. It carries a full galley, a front lounge, a stand-up bathroom with an onboard shower, and sleeps the crew while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch.",
+    "images": [
+      "/uploads/2026/05/Outlaw-Tour-Bus-1024x691.png"
+    ],
+    "featured": false,
+    "displayOrder": 3
+  },
+  {
+    "slug": "pioneer",
+    "name": "Pioneer",
+    "className": "Standard",
+    "chassis": "Prevost H3-45",
+    "bunks": 8,
+    "slideOuts": "Single Slide",
+    "rearConfig": "Rear Lounge",
+    "amenities": [
+      "8 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": "Crew Ready",
+    "description": "Pioneer is a custom Prevost H3-45 entertainer coach conversion configured with 8 bunks, a single slide layout and a rear lounge at the rear. It carries a full galley, a front lounge, a stand-up bathroom with an onboard shower, and sleeps the crew while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch.",
+    "images": [
+      "/uploads/2026/05/Atlas-Entertainer-Coach-Prevost-1024x691.png"
+    ],
+    "featured": false,
+    "displayOrder": 4
+  },
+  {
+    "slug": "summit",
+    "name": "Summit",
+    "className": "Premium",
+    "chassis": "Prevost H3-45",
+    "bunks": 12,
+    "slideOuts": "Double Slide",
+    "rearConfig": "Rear Suite",
+    "amenities": [
+      "12 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": "Executive",
+    "description": "Summit is a custom Prevost H3-45 entertainer coach conversion configured with 12 bunks, a double slide layout and a rear suite at the rear. It carries a full galley, a front lounge, a stand-up bathroom with an onboard shower, and sleeps the crew while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch.",
+    "images": [
+      "/uploads/2026/05/Thunder-Entertainer-Coach-Slide-1024x691.jpg"
+    ],
+    "featured": false,
+    "displayOrder": 5
+  }
+]

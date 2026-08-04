@@ -1,0 +1,42 @@
+{
+  "source": "https://knightscoaches.com",
+  "startedAt": "2026-08-04T10:07:26.121Z",
+  "finishedAt": "2026-08-04T10:13:30.274Z",
+  "pagesFound": 44,
+  "pagesMigrated": 44,
+  "postsFound": 5,
+  "postsMigrated": 5,
+  "categoriesMigrated": 1,
+  "imagesFound": 916,
+  "imagesDownloaded": 916,
+  "imagesFailed": [],
+  "redirectsCreated": 11,
+  "duplicatesFound": [
+    {
+      "url": "/entertainer-coach-rental/leasing/",
+      "canonical": "/entertainer-coach/leasing"
+    },
+    {
+      "url": "/entertainer-coach-rental/",
+      "canonical": "/entertainer-coach"
+    },
+    {
+      "url": "/nationwide-tour-bus-rentals/",
+      "canonical": "/tour-bus-rental/nationwide"
+    },
+    {
+      "url": "/nationwide-tour-bus-rental/",
+      "canonical": "/tour-bus-rental/nationwide"
+    },
+    {
+      "url": "/entertainer-coach/leasing-2/",
+      "canonical": "/entertainer-coach/leasing"
+    },
+    {
+      "url": "/tour-bus-rental/nationwide-2/",
+      "canonical": "/tour-bus-rental/nationwide"
+    }
+  ],
+  "discovery": "rest",
+  "warnings": []
+}

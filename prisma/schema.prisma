@@ -1,0 +1,703 @@
+// knightscoaches.com — data model
+//
+// Rules enforced here (see README "Data model"):
+//   * every content entity has slug (unique), status, createdAt, updatedAt, publishedAt
+//   * body fields use @db.Text / @db.LongText, block props use Json
+//   * every slug and every foreign key is indexed
+//   * cascade deletes only where the child cannot exist alone
+//   * NO tag model anywhere — blog uses categories only
+//   * NO meta keywords field anywhere — deprecated signal
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum Role {
+  ADMIN
+  EDITOR
+  AUTHOR
+}
+
+enum ContentStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum EntityType {
+  PAGE
+  POST
+  COACH
+  CATEGORY
+  LOCATION
+}
+
+enum RobotsDirective {
+  INDEX_FOLLOW
+  NOINDEX_FOLLOW
+  INDEX_NOFOLLOW
+  NOINDEX_NOFOLLOW
+}
+
+enum MenuLocation {
+  HEADER
+  FOOTER
+}
+
+enum MenuItemKind {
+  PAGE
+  POST
+  COACH
+  CATEGORY
+  CUSTOM
+  PHONE
+}
+
+enum FormFieldType {
+  TEXT
+  EMAIL
+  TEL
+  NUMBER
+  DATE
+  TEXTAREA
+  SELECT
+  CHECKBOX
+  FILE
+  HIDDEN
+}
+
+enum IndexingProvider {
+  INDEXNOW
+  GOOGLE
+  SITEMAP_PING
+}
+
+enum IndexingAction {
+  URL_UPDATED
+  URL_DELETED
+}
+
+enum IndexingStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum RedirectKind {
+  PERMANENT
+  TEMPORARY
+}
+
+// ---------------------------------------------------------------------------
+// Users & auth
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String    @db.VarChar(255)
+  role         Role      @default(AUTHOR)
+  bio          String?   @db.Text
+  active       Boolean   @default(true)
+  lastLoginAt  DateTime?
+
+  avatarId String?
+  avatar   Media?  @relation("UserAvatar", fields: [avatarId], references: [id], onDelete: SetNull)
+
+  resetToken       String?   @unique
+  resetTokenExpiry DateTime?
+
+  posts         Post[]
+  pageRevisions PageRevision[]
+  postRevisions PostRevision[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([role])
+  @@index([avatarId])
+}
+
+// ---------------------------------------------------------------------------
+// Media
+// ---------------------------------------------------------------------------
+
+model Media {
+  id        String  @id @default(cuid())
+  // Public path relative to the site root, e.g. /uploads/2026/05/Outlaw-Tour-Bus.png
+  path      String  @unique @db.VarChar(500)
+  // Original WordPress URL, retained so the migration is idempotent and auditable.
+  sourceUrl String? @unique @db.VarChar(600)
+
+  filename String @db.VarChar(255)
+  mimeType String @db.VarChar(120)
+  width    Int?
+  height   Int?
+  bytes    Int?
+
+  // Alt text is required at the API layer. Empty string is allowed only when
+  // `decorative` is explicitly true.
+  alt        String  @db.VarChar(500)
+  decorative Boolean @default(false)
+  title      String? @db.VarChar(255)
+  caption    String? @db.Text
+
+  coachImages   CoachImage[]
+  userAvatars   User[]        @relation("UserAvatar")
+  postsFeatured Post[]        @relation("PostFeatured")
+  pagesHero     Page[]        @relation("PageHero")
+  testimonials  Testimonial[]
+  locations     Location[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([mimeType])
+  @@index([createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Pages & blocks
+// ---------------------------------------------------------------------------
+
+model Page {
+  id     String        @id @default(cuid())
+  // Full route path without a trailing slash. Home is "/".
+  path   String        @unique @db.VarChar(300)
+  slug   String        @db.VarChar(200)
+  title  String        @db.VarChar(300)
+  status ContentStatus @default(DRAFT)
+
+  // Which of the Visual-Semantics layouts this page follows.
+  pageType String @default("service") @db.VarChar(40)
+
+  // Legacy WordPress identifiers, kept so re-running the migration updates
+  // rather than duplicates.
+  wpId  Int?    @unique
+  wpUrl String? @db.VarChar(600)
+
+  heroImageId String?
+  heroImage   Media?  @relation("PageHero", fields: [heroImageId], references: [id], onDelete: SetNull)
+
+  customCss String? @db.Text
+
+  blocks    PageBlock[]
+  revisions PageRevision[]
+
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([status])
+  @@index([pageType])
+  @@index([heroImageId])
+}
+
+model PageBlock {
+  id      String  @id @default(cuid())
+  pageId  String
+  page    Page    @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  // One of the fixed BlockType names — see src/lib/blocks/registry.ts
+  type    String  @db.VarChar(60)
+  order   Int
+  visible Boolean @default(true)
+  // Typed per-block props, validated with Zod on write.
+  props   Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([pageId, order])
+  @@index([type])
+}
+
+model PageRevision {
+  id     String @id @default(cuid())
+  pageId String
+  page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  // Full snapshot: { title, status, pageType, blocks: [...] }
+  snapshot Json
+  note     String? @db.VarChar(300)
+
+  authorId String?
+  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([pageId, createdAt])
+  @@index([authorId])
+}
+
+// ---------------------------------------------------------------------------
+// Blog — categories only, no tags
+// ---------------------------------------------------------------------------
+
+model Category {
+  id          String  @id @default(cuid())
+  slug        String  @unique @db.VarChar(200)
+  name        String  @db.VarChar(200)
+  description String? @db.Text
+  order       Int     @default(0)
+
+  wpId Int? @unique
+
+  parentId String?
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryTree")
+
+  posts Post[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([parentId])
+  @@index([order])
+}
+
+model Post {
+  id      String        @id @default(cuid())
+  slug    String        @unique @db.VarChar(200)
+  title   String        @db.VarChar(300)
+  excerpt String?       @db.Text
+  body    String        @db.LongText
+  status  ContentStatus @default(DRAFT)
+
+  wpId  Int?    @unique
+  wpUrl String? @db.VarChar(600)
+
+  authorId String?
+  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  featuredImageId String?
+  featuredImage   Media?  @relation("PostFeatured", fields: [featuredImageId], references: [id], onDelete: SetNull)
+
+  revisions PostRevision[]
+
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status, publishedAt])
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([featuredImageId])
+}
+
+model PostRevision {
+  id     String @id @default(cuid())
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  snapshot Json
+  note     String? @db.VarChar(300)
+
+  authorId String?
+  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([postId, createdAt])
+  @@index([authorId])
+}
+
+// ---------------------------------------------------------------------------
+// Fleet
+// ---------------------------------------------------------------------------
+
+model CoachClass {
+  id          String  @id @default(cuid())
+  slug        String  @unique @db.VarChar(120)
+  name        String  @db.VarChar(120)
+  description String? @db.Text
+  order       Int     @default(0)
+
+  coaches Coach[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([order])
+}
+
+model Coach {
+  id     String        @id @default(cuid())
+  slug   String        @unique @db.VarChar(200)
+  name   String        @db.VarChar(200)
+  status ContentStatus @default(DRAFT)
+
+  classId String?
+  class   CoachClass? @relation(fields: [classId], references: [id], onDelete: SetNull)
+
+  // Structured spec — every one of these renders as crawlable text in a <dl>/<table>,
+  // never baked into an image.
+  chassis     String  @db.VarChar(120) // "Prevost X3-45" / "Prevost H3-45"
+  bunks       Int
+  slideOuts   String  @db.VarChar(120) // "Single Slide" / "Double Slide" / "Triple Slide"
+  rearConfig  String  @db.VarChar(160) // "Master Suite" / "Rear Lounge" / "Star Config"
+  amenities   Json // string[]
+  description String  @db.LongText
+  tagline     String? @db.VarChar(160) // "Most Booked", "Best Value", ...
+
+  // Stored in whole USD. Nullable because "call for pricing" is a legitimate state
+  // and a fabricated price would be worse than none.
+  dailyPrice Int?
+  currency   String @default("USD") @db.VarChar(8)
+
+  available    Boolean @default(true)
+  featured     Boolean @default(false)
+  displayOrder Int     @default(0)
+
+  images CoachImage[]
+
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([classId])
+  @@index([status])
+  @@index([featured, displayOrder])
+  @@index([bunks])
+  @@index([available])
+}
+
+model CoachImage {
+  id      String  @id @default(cuid())
+  coachId String
+  coach   Coach   @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  mediaId String
+  media   Media   @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  order   Int     @default(0)
+  // Per-placement caption, rendered in <figcaption>.
+  caption String? @db.VarChar(400)
+
+  createdAt DateTime @default(now())
+
+  @@unique([coachId, mediaId])
+  @@index([coachId, order])
+  @@index([mediaId])
+}
+
+// ---------------------------------------------------------------------------
+// Locations, testimonials, FAQs — records, not HTML blobs
+// ---------------------------------------------------------------------------
+
+model Location {
+  id     String        @id @default(cuid())
+  slug   String        @unique @db.VarChar(200)
+  city   String        @db.VarChar(160)
+  state  String        @db.VarChar(80)
+  region String?       @db.VarChar(80)
+  status ContentStatus @default(DRAFT)
+
+  // Route path if this location has its own page, e.g. /tour-bus-rental/atlanta-ga
+  path String? @unique @db.VarChar(300)
+
+  isHub     Boolean @default(false)
+  isPrimary Boolean @default(false)
+  order     Int     @default(0)
+
+  summary String? @db.Text
+
+  imageId String?
+  image   Media?  @relation(fields: [imageId], references: [id], onDelete: SetNull)
+
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([state])
+  @@index([isHub, order])
+  @@index([imageId])
+  @@index([status])
+}
+
+model Testimonial {
+  id     String        @id @default(cuid())
+  slug   String        @unique @db.VarChar(200)
+  name   String        @db.VarChar(160)
+  role   String        @db.VarChar(160)
+  quote  String        @db.Text
+  // 1–5. Rendered as text plus an aria-label; never as stars alone.
+  rating Int           @default(5)
+  status ContentStatus @default(DRAFT)
+
+  avatarId String?
+  avatar   Media?  @relation(fields: [avatarId], references: [id], onDelete: SetNull)
+
+  order Int @default(0)
+
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([order])
+  @@index([avatarId])
+  @@index([status])
+}
+
+model FaqItem {
+  id       String        @id @default(cuid())
+  slug     String        @unique @db.VarChar(220)
+  question String        @db.VarChar(500)
+  answer   String        @db.Text
+  status   ContentStatus @default(PUBLISHED)
+
+  // Groups FAQs onto a page: "home", "entertainer-coach", "fleet", ...
+  group String @db.VarChar(120)
+  order Int    @default(0)
+
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([group, order])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// Menus
+// ---------------------------------------------------------------------------
+
+model Menu {
+  id       String       @id @default(cuid())
+  slug     String       @unique @db.VarChar(120)
+  name     String       @db.VarChar(160)
+  location MenuLocation
+
+  items MenuItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([location])
+}
+
+model MenuItem {
+  id     String @id @default(cuid())
+  menuId String
+  menu   Menu   @relation(fields: [menuId], references: [id], onDelete: Cascade)
+
+  parentId String?
+  parent   MenuItem?  @relation("MenuTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children MenuItem[] @relation("MenuTree")
+
+  kind  MenuItemKind @default(CUSTOM)
+  label String       @db.VarChar(200)
+  url   String       @db.VarChar(600)
+
+  // Footer column grouping (1-based). Null for header items.
+  column  Int?
+  order   Int     @default(0)
+  rel     String? @db.VarChar(120)
+  target  String? @db.VarChar(20)
+  visible Boolean @default(true)
+  // Renders the header phone CTA treatment.
+  isCta   Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([menuId, order])
+  @@index([parentId])
+}
+
+// ---------------------------------------------------------------------------
+// Settings, SEO, schema, redirects
+// ---------------------------------------------------------------------------
+
+model Setting {
+  key       String   @id @db.VarChar(120)
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+model SeoMeta {
+  id         String     @id @default(cuid())
+  entityType EntityType
+  entityId   String     @db.VarChar(60)
+
+  title       String? @db.VarChar(300)
+  description String? @db.Text
+  canonical   String? @db.VarChar(600)
+
+  ogTitle       String? @db.VarChar(300)
+  ogDescription String? @db.Text
+  ogImage       String? @db.VarChar(600)
+
+  robots            RobotsDirective @default(INDEX_FOLLOW)
+  schemaType        String?         @db.VarChar(80)
+  // Excludes this URL from the generated sitemap.
+  sitemapExclude    Boolean         @default(false)
+  sitemapPriority   Float?
+  sitemapChangefreq String?         @db.VarChar(20)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([entityType, entityId])
+  @@index([entityId])
+}
+
+model SchemaOverride {
+  id         String     @id @default(cuid())
+  entityType EntityType
+  entityId   String     @db.VarChar(60)
+  // Raw JSON-LD that replaces (or augments) the generated graph.
+  jsonLd     Json
+  // When true the generated graph is suppressed entirely for this entity.
+  replace    Boolean    @default(false)
+  enabled    Boolean    @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([entityType, entityId])
+  @@index([entityId])
+}
+
+model Redirect {
+  id      String       @id @default(cuid())
+  // Source path, always leading-slash, no trailing slash, no origin.
+  from    String       @unique @db.VarChar(600)
+  to      String       @db.VarChar(600)
+  kind    RedirectKind @default(PERMANENT)
+  enabled Boolean      @default(true)
+  note    String?      @db.VarChar(300)
+  hits    Int          @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([enabled])
+}
+
+// ---------------------------------------------------------------------------
+// Forms & messages
+// ---------------------------------------------------------------------------
+
+model Form {
+  id          String  @id @default(cuid())
+  slug        String  @unique @db.VarChar(120)
+  name        String  @db.VarChar(200)
+  description String? @db.Text
+
+  submitLabel  String @default("Send Request") @db.VarChar(120)
+  successTitle String @default("Request Received!") @db.VarChar(200)
+  successBody  String @db.Text
+
+  notifyEmail String? @db.VarChar(320)
+  enabled     Boolean @default(true)
+
+  fields      FormField[]
+  submissions FormSubmission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FormField {
+  id     String @id @default(cuid())
+  formId String
+  form   Form   @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  name        String        @db.VarChar(120)
+  label       String        @db.VarChar(300)
+  type        FormFieldType @default(TEXT)
+  placeholder String?       @db.VarChar(300)
+  helpText    String?       @db.VarChar(400)
+  required    Boolean       @default(false)
+  // SELECT options as string[]
+  options     Json?
+  order       Int           @default(0)
+  // Only shown when the named checkbox field is checked.
+  showWhen    String?       @db.VarChar(120)
+  // Half-width on desktop.
+  halfWidth   Boolean       @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([formId, name])
+  @@index([formId, order])
+}
+
+model FormSubmission {
+  id     String @id @default(cuid())
+  formId String
+  form   Form   @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  data       Json
+  ip         String? @db.VarChar(64)
+  userAgent  String? @db.VarChar(400)
+  // Whether the notification email actually went out. Submissions persist either way.
+  emailed    Boolean @default(false)
+  emailError String? @db.Text
+
+  read    Boolean @default(false)
+  starred Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([formId, createdAt])
+  @@index([read])
+}
+
+model ContactMessage {
+  id      String  @id @default(cuid())
+  name    String  @db.VarChar(200)
+  email   String  @db.VarChar(320)
+  phone   String? @db.VarChar(60)
+  subject String? @db.VarChar(300)
+  message String  @db.Text
+
+  ip        String? @db.VarChar(64)
+  userAgent String? @db.VarChar(400)
+
+  read    Boolean @default(false)
+  starred Boolean @default(false)
+  emailed Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([read, createdAt])
+  @@index([email])
+}
+
+// ---------------------------------------------------------------------------
+// Indexing
+// ---------------------------------------------------------------------------
+
+model IndexingLog {
+  id       String           @id @default(cuid())
+  url      String           @db.VarChar(600)
+  provider IndexingProvider
+  action   IndexingAction   @default(URL_UPDATED)
+  status   IndexingStatus   @default(PENDING)
+  // HTTP status or provider code.
+  code     Int?
+  response String?          @db.Text
+  attempts Int              @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([provider, createdAt])
+  @@index([status])
+  @@index([url])
+}

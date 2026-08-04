@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Bennett Miller",
+    "role": "IT Executive",
+    "rating": 5,
+    "quote": "Knights Coaches turned our corporate retreat into a five-star journey. Impressive fleet and impeccable service from the very first call to the final drop-off.",
+    "slug": "bennett-miller",
+    "avatar": "/uploads/2025/10/image-D2C59FF-150x150.jpg",
+    "order": 0
+  },
+  {
+    "name": "Audrey Stevenson",
+    "role": "Marketing Professional",
+    "rating": 5,
+    "quote": "Top-tier service, luxurious coaches, and truly caring staff. Knights Coaches sets the standard!",
+    "slug": "audrey-stevenson",
+    "avatar": "/uploads/2025/10/image-UDE7RNW-150x150.jpg",
+    "order": 1
+  },
+  {
+    "name": "Laura Ferguson",
+    "role": "Event Director",
+    "rating": 5,
+    "quote": "The most comfortable and reliable entertainer bus I’ve ever booked. Highly recommended!",
+    "slug": "laura-ferguson",
+    "avatar": "/uploads/2025/10/image-BYJDCJU-150x150.jpg",
+    "order": 2
+  },
+  {
+    "name": "Fred Dixon",
+    "role": "Artist Management",
+    "rating": 5,
+    "quote": "Reliable, luxurious and always on time. This is now the only company we call for entertainer coaches.",
+    "slug": "fred-dixon",
+    "avatar": "/uploads/2025/10/image-4SYRQ95-150x150.jpg",
+    "order": 3
+  }
+]

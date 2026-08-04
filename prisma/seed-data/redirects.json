@@ -1,0 +1,68 @@
+[
+  {
+    "from": "/entertainer-coach-rental/leasing",
+    "to": "/entertainer-coach/leasing",
+    "kind": "PERMANENT",
+    "note": "Duplicate topic URL consolidated onto one canonical route"
+  },
+  {
+    "from": "/entertainer-coach-rental",
+    "to": "/entertainer-coach",
+    "kind": "PERMANENT",
+    "note": "Duplicate topic URL consolidated onto one canonical route"
+  },
+  {
+    "from": "/nationwide-tour-bus-rentals",
+    "to": "/tour-bus-rental/nationwide",
+    "kind": "PERMANENT",
+    "note": "Duplicate topic URL consolidated onto one canonical route"
+  },
+  {
+    "from": "/nationwide-tour-bus-rental",
+    "to": "/tour-bus-rental/nationwide",
+    "kind": "PERMANENT",
+    "note": "Duplicate topic URL consolidated onto one canonical route"
+  },
+  {
+    "from": "/entertainer-coach/leasing-2",
+    "to": "/entertainer-coach/leasing",
+    "kind": "PERMANENT",
+    "note": "Duplicate topic URL consolidated onto one canonical route"
+  },
+  {
+    "from": "/tour-bus-rental/nationwide-2",
+    "to": "/tour-bus-rental/nationwide",
+    "kind": "PERMANENT",
+    "note": "Duplicate topic URL consolidated onto one canonical route"
+  },
+  {
+    "from": "/guides/route-tour-around-coach-drive-times",
+    "to": "/blog/route-tour-around-coach-drive-times",
+    "kind": "PERMANENT",
+    "note": "Blog post route"
+  },
+  {
+    "from": "/guides/entertainer-coach-replaces-hotel-nights",
+    "to": "/blog/entertainer-coach-replaces-hotel-nights",
+    "kind": "PERMANENT",
+    "note": "Blog post route"
+  },
+  {
+    "from": "/guides/entertainer-coach-age-mileage",
+    "to": "/blog/entertainer-coach-age-mileage",
+    "kind": "PERMANENT",
+    "note": "Blog post route"
+  },
+  {
+    "from": "/guides/day-rooms-showers-and-truck-stops-on-tour",
+    "to": "/blog/day-rooms-showers-and-truck-stops-on-tour",
+    "kind": "PERMANENT",
+    "note": "Blog post route"
+  },
+  {
+    "from": "/guides/bus-call-overnight-drives-day-sheets",
+    "to": "/blog/bus-call-overnight-drives-day-sheets",
+    "kind": "PERMANENT",
+    "note": "Blog post route"
+  }
+]
