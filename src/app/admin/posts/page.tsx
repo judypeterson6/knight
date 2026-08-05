@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { requireRole } from '@/lib/auth'
 import { isoDate } from '@/lib/utils'
+import { publishState } from '@/lib/publish'
 import { AdminPageHeader, EmptyState } from '@/components/admin/ui'
 import { PostsTable } from '@/components/admin/posts-table'
 
@@ -82,6 +83,7 @@ export default async function PostsList({ searchParams }: { searchParams: Promis
             slug: post.slug,
             title: post.title,
             status: post.status,
+            state: publishState(post),
             author: post.author?.name ?? '',
             category: post.category?.name ?? '',
             publishedAt: post.publishedAt ? isoDate(post.publishedAt) : null,

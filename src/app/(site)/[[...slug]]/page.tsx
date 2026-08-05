@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { publishedPageWhere } from '@/lib/publish'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getPage, breadcrumbsFor } from '@/lib/pages'
@@ -41,7 +42,7 @@ function routeFrom(slug: string[] | undefined): string {
 
 export async function generateStaticParams(): Promise<Params[]> {
   try {
-    const pages = await prisma.page.findMany({ where: { status: 'PUBLISHED' }, select: { path: true } })
+    const pages = await prisma.page.findMany({ where: publishedPageWhere(), select: { path: true } })
     return pages.map((page) => ({
       slug: page.path === '/' ? [] : page.path.split('/').filter(Boolean),
     }))

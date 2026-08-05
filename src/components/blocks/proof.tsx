@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { publishedTestimonialWhere } from '@/lib/publish'
 import { cn } from '@/lib/utils'
 import type { BlockPropsMap } from '@/lib/blocks/schema'
 import { Card, CtaButton, Grid, Section, SectionHeading, sectionHeadingId, SmartImage, SmartLink } from '@/components/ui/primitives'
@@ -200,7 +201,7 @@ export function ServiceCardsBlock({ props }: { props: BlockPropsMap['ServiceCard
 export async function TestimonialsBlock({ props }: { props: BlockPropsMap['Testimonials'] }) {
   const items = await prisma.testimonial
     .findMany({
-      where: { status: 'PUBLISHED' },
+      where: publishedTestimonialWhere(),
       orderBy: { order: 'asc' },
       take: props.limit,
       include: { avatar: true },

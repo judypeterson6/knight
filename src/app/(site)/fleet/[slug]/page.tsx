@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { isLive, publishedCoachWhere } from '@/lib/publish'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { buildMetadata } from '@/lib/seo'
@@ -31,7 +32,7 @@ async function loadCoach(slug: string) {
 
 export async function generateStaticParams() {
   try {
-    const coaches = await prisma.coach.findMany({ where: { status: 'PUBLISHED' }, select: { slug: true } })
+    const coaches = await prisma.coach.findMany({ where: publishedCoachWhere(), select: { slug: true } })
     return coaches.map((c) => ({ slug: c.slug }))
   } catch {
     return []
@@ -41,7 +42,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const coach = await loadCoach(slug)
-  if (!coach || coach.status !== 'PUBLISHED') return { title: 'Coach not found' }
+  if (!coach || !isLive(coach)) return { title: 'Coach not found' }
 
   const price = formatPrice(coach.dailyPrice, coach.currency)
   return buildMetadata({
@@ -67,13 +68,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CoachPage({ params }: Props) {
   const { slug } = await params
   const coach = await loadCoach(slug)
-  if (!coach || coach.status !== 'PUBLISHED') notFound()
+  if (!coach || !isLive(coach)) notFound()
 
   const [{ organization }, similar, faqs] = await Promise.all([
     getSettings(),
     prisma.coach
       .findMany({
-        where: { status: 'PUBLISHED', NOT: { id: coach.id }, classId: coach.classId },
+        where: { ...publishedCoachWhere(), NOT: { id: coach.id }, classId: coach.classId },
         orderBy: { displayOrder: 'asc' },
         take: 3,
         include: { class: true, images: { orderBy: { order: 'asc' }, take: 1, include: { media: true } } },

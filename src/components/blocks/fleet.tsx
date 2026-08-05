@@ -1,4 +1,5 @@
 import type { Prisma } from '@prisma/client'
+import { publishedCoachWhere } from '@/lib/publish'
 import { prisma } from '@/lib/prisma'
 import { cn } from '@/lib/utils'
 import type { BlockPropsMap } from '@/lib/blocks/schema'
@@ -45,7 +46,7 @@ export function readFilters(searchParams: BlockContext['searchParams']): FleetFi
 }
 
 function whereFor(filters: FleetFilters, props: BlockPropsMap['FleetGrid']): Prisma.CoachWhereInput {
-  const where: Prisma.CoachWhereInput = { status: 'PUBLISHED' }
+  const where: Prisma.CoachWhereInput = { ...publishedCoachWhere() }
   const classSlug = filters.coachClass || props.filterClass
   if (classSlug) where.class = { slug: classSlug }
   if (props.filterFeatured) where.featured = true
@@ -83,8 +84,8 @@ export async function FleetGridBlock({
     props.showFilters
       ? prisma.coachClass.findMany({ orderBy: { order: 'asc' } }).catch(() => [])
       : Promise.resolve([]),
-    prisma.coach.count({ where: { status: 'PUBLISHED' } }).catch(() => 0),
-    prisma.coach.count({ where: { status: 'PUBLISHED', NOT: { dailyPrice: null } } }).catch(() => 0),
+    prisma.coach.count({ where: publishedCoachWhere() }).catch(() => 0),
+    prisma.coach.count({ where: { ...publishedCoachWhere(), NOT: { dailyPrice: null } } }).catch(() => 0),
   ])
 
   const headingId = sectionHeadingId(props)
@@ -300,7 +301,7 @@ export async function CoachSpecTableBlock({ props }: { props: BlockPropsMap['Coa
           orderBy: { order: 'asc' },
           include: {
             coaches: {
-              where: { status: 'PUBLISHED' },
+              where: publishedCoachWhere(),
               orderBy: { displayOrder: 'asc' },
               select: { name: true, slug: true, chassis: true, bunks: true, slideOuts: true, rearConfig: true, dailyPrice: true, currency: true },
             },

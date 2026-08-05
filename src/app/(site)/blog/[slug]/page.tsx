@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { isLive, publishedPostWhere } from '@/lib/publish'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { buildMetadata } from '@/lib/seo'
@@ -26,7 +27,7 @@ async function loadPost(slug: string) {
 
 export async function generateStaticParams() {
   try {
-    const posts = await prisma.post.findMany({ where: { status: 'PUBLISHED' }, select: { slug: true } })
+    const posts = await prisma.post.findMany({ where: publishedPostWhere(), select: { slug: true } })
     return posts.map((p) => ({ slug: p.slug }))
   } catch {
     return []
@@ -36,7 +37,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const post = await loadPost(slug)
-  if (!post || post.status !== 'PUBLISHED') return { title: 'Post not found' }
+  if (!post || !isLive(post)) return { title: 'Post not found' }
 
   return buildMetadata({
     entityType: 'POST',
@@ -62,7 +63,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function BlogPost({ params }: Props) {
   const { slug } = await params
   const post = await loadPost(slug)
-  if (!post || post.status !== 'PUBLISHED') notFound()
+  if (!post || !isLive(post)) notFound()
 
   const lede = post.excerpt || excerptFrom(post.body, 320)
 

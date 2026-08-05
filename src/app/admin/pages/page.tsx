@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { requireRole } from '@/lib/auth'
 import { formatDate } from '@/lib/utils'
+import { publishState } from '@/lib/publish'
 import { AdminPageHeader, Badge, Cell, DataTable, EmptyState, Row } from '@/components/admin/ui'
 
 export const dynamic = 'force-dynamic'
@@ -44,7 +45,14 @@ export default async function PagesList() {
               <Cell className="text-muted">{page.pageType}</Cell>
               <Cell>{page._count.blocks}</Cell>
               <Cell>
-                <Badge>{page.status}</Badge>
+                {(() => {
+                  const state = publishState(page)
+                  return (
+                    <Badge tone={state === 'Live' ? 'PUBLISHED' : state === 'Scheduled' ? 'SCHEDULED' : 'DRAFT'}>
+                      {state}
+                    </Badge>
+                  )
+                })()}
               </Cell>
               <Cell className="text-muted">{formatDate(page.updatedAt)}</Cell>
               <Cell>

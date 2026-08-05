@@ -11,6 +11,8 @@ export interface PostRow {
   slug: string
   title: string
   status: string
+  /** Real visibility, which `status` alone does not convey for SCHEDULED rows. */
+  state: 'Live' | 'Scheduled' | 'Draft' | 'Archived'
   author: string
   category: string
   publishedAt: string | null
@@ -188,7 +190,14 @@ export function PostsTable({
                 <td className="px-4 py-3 text-muted">{post.category || '—'}</td>
                 <td className="px-4 py-3 text-muted">{post.author || '—'}</td>
                 <td className="px-4 py-3">
-                  <Badge>{post.status}</Badge>
+                  <Badge tone={post.state === 'Live' ? 'PUBLISHED' : post.state === 'Scheduled' ? 'SCHEDULED' : 'DRAFT'}>
+                    {post.state}
+                  </Badge>
+                  {post.state === 'Scheduled' && post.publishedAt ? (
+                    <span className="mt-1 block text-[0.68rem] text-subtle">
+                      goes live {formatDate(post.publishedAt)}
+                    </span>
+                  ) : null}
                 </td>
                 <td className="px-4 py-3 text-muted">
                   {post.publishedAt ? formatDate(post.publishedAt) : '—'}

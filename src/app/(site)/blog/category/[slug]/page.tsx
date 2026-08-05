@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { publishedPostWhere } from '@/lib/publish'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { buildMetadata } from '@/lib/seo'
@@ -49,7 +50,7 @@ export default async function CategoryArchive({ params }: Props) {
 
   const posts = await prisma.post
     .findMany({
-      where: { status: 'PUBLISHED', categoryId: category.id },
+      where: { ...publishedPostWhere(), categoryId: category.id },
       orderBy: { publishedAt: 'desc' },
       include: { featuredImage: true },
     })

@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { publishedPostWhere } from '@/lib/publish'
 import { getSettings } from '@/lib/settings'
 import { getForm } from '@/lib/forms'
 import { cn, excerptFrom, formatDate, formatPhone, isoDate, telHref } from '@/lib/utils'
@@ -211,7 +212,7 @@ export async function RelatedPostsBlock({
   const posts = await prisma.post
     .findMany({
       where: {
-        status: 'PUBLISHED',
+        ...publishedPostWhere(),
         ...(categorySlug ? { category: { slug: categorySlug } } : {}),
         ...(excludeSlug ? { NOT: { slug: excludeSlug } } : {}),
       },

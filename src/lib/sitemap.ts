@@ -1,4 +1,5 @@
 import 'server-only'
+import { publishedPageWhere, publishedPostWhere, publishedCoachWhere } from '@/lib/publish'
 import { prisma } from '@/lib/prisma'
 import { absoluteUrl } from '@/lib/utils'
 
@@ -70,7 +71,7 @@ export async function sitemapEntries(type: SitemapType): Promise<SitemapEntry[]>
     if (type === 'pages') {
       const [pages, overrides] = await Promise.all([
         prisma.page.findMany({
-          where: { status: 'PUBLISHED' },
+          where: publishedPageWhere(),
           select: { id: true, path: true, updatedAt: true },
           orderBy: { path: 'asc' },
         }),
@@ -93,7 +94,7 @@ export async function sitemapEntries(type: SitemapType): Promise<SitemapEntry[]>
     if (type === 'posts') {
       const [posts, overrides] = await Promise.all([
         prisma.post.findMany({
-          where: { status: 'PUBLISHED' },
+          where: publishedPostWhere(),
           select: { id: true, slug: true, updatedAt: true },
           orderBy: { publishedAt: 'desc' },
         }),
@@ -118,7 +119,7 @@ export async function sitemapEntries(type: SitemapType): Promise<SitemapEntry[]>
 
     const [coaches, overrides] = await Promise.all([
       prisma.coach.findMany({
-        where: { status: 'PUBLISHED' },
+        where: publishedCoachWhere(),
         select: { id: true, slug: true, updatedAt: true },
         orderBy: { displayOrder: 'asc' },
       }),

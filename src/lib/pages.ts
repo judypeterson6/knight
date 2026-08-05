@@ -2,6 +2,7 @@ import 'server-only'
 import { unstable_cache } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { normalizeRoute } from '@/lib/utils'
+import { isLive, publishedPageWhere } from '@/lib/publish'
 import type { StoredBlock } from '@/components/blocks'
 
 export interface LoadedPage {
@@ -26,7 +27,8 @@ async function loadPage(path: string): Promise<LoadedPage | null> {
         blocks: { orderBy: { order: 'asc' } },
       },
     })
-    if (!page || page.status !== 'PUBLISHED') return null
+    // A SCHEDULED page whose date has passed is live — see lib/publish.ts.
+    if (!page || !isLive(page)) return null
     return {
       id: page.id,
       path: page.path,
@@ -62,7 +64,7 @@ export const getPage = (rawPath: string) => {
 export async function getPublishedPagePaths(): Promise<string[]> {
   try {
     const pages = await prisma.page.findMany({
-      where: { status: 'PUBLISHED' },
+      where: publishedPageWhere(),
       select: { path: true },
       orderBy: { path: 'asc' },
     })

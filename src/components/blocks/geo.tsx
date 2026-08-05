@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { publishedLocationWhere } from '@/lib/publish'
 import { cn } from '@/lib/utils'
 import type { BlockPropsMap } from '@/lib/blocks/schema'
 import { Card, CtaButton, Section, SectionHeading, sectionHeadingId, SmartImage, SmartLink } from '@/components/ui/primitives'
@@ -90,7 +91,7 @@ export async function DestinationGridBlock({ props }: { props: BlockPropsMap['De
   const locations = await prisma.location
     .findMany({
       where: {
-        status: 'PUBLISHED',
+        ...publishedLocationWhere(),
         ...(props.hubsOnly ? { isHub: true } : {}),
         NOT: { path: null },
       },

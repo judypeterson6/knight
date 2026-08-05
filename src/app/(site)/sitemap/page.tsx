@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { publishedPageWhere, publishedPostWhere, publishedCoachWhere } from '@/lib/publish'
 import { prisma } from '@/lib/prisma'
 import { Section, SectionHeading, SmartLink } from '@/components/ui/primitives'
 
@@ -17,13 +18,13 @@ export const metadata: Metadata = {
 export default async function HtmlSitemap() {
   const [pages, coaches, posts, categories] = await Promise.all([
     prisma.page
-      .findMany({ where: { status: 'PUBLISHED' }, select: { path: true, title: true, pageType: true }, orderBy: { path: 'asc' } })
+      .findMany({ where: publishedPageWhere(), select: { path: true, title: true, pageType: true }, orderBy: { path: 'asc' } })
       .catch(() => []),
     prisma.coach
-      .findMany({ where: { status: 'PUBLISHED' }, select: { slug: true, name: true }, orderBy: { displayOrder: 'asc' } })
+      .findMany({ where: publishedCoachWhere(), select: { slug: true, name: true }, orderBy: { displayOrder: 'asc' } })
       .catch(() => []),
     prisma.post
-      .findMany({ where: { status: 'PUBLISHED' }, select: { slug: true, title: true }, orderBy: { publishedAt: 'desc' } })
+      .findMany({ where: publishedPostWhere(), select: { slug: true, title: true }, orderBy: { publishedAt: 'desc' } })
       .catch(() => []),
     prisma.category.findMany({ select: { slug: true, name: true }, orderBy: { order: 'asc' } }).catch(() => []),
   ])

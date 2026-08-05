@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { publishedPostWhere } from '@/lib/publish'
 import { prisma } from '@/lib/prisma'
 import { getSettings } from '@/lib/settings'
 import { excerptFrom, formatDate, isoDate, readingMinutes } from '@/lib/utils'
@@ -29,14 +30,14 @@ export default async function BlogArchive({ searchParams }: Props) {
   const [posts, total, categories] = await Promise.all([
     prisma.post
       .findMany({
-        where: { status: 'PUBLISHED' },
+        where: publishedPostWhere(),
         orderBy: { publishedAt: 'desc' },
         skip: (current - 1) * PER_PAGE,
         take: PER_PAGE,
         include: { featuredImage: true, category: true, author: true },
       })
       .catch(() => []),
-    prisma.post.count({ where: { status: 'PUBLISHED' } }).catch(() => 0),
+    prisma.post.count({ where: publishedPostWhere() }).catch(() => 0),
     prisma.category.findMany({ orderBy: { order: 'asc' } }).catch(() => []),
   ])
 
