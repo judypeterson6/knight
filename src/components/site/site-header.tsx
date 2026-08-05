@@ -5,6 +5,7 @@ import { getSettings } from '@/lib/settings'
 import { formatPhone, telHref } from '@/lib/utils'
 import { Icon } from '@/components/ui/icon'
 import { MobileNav } from '@/components/site/mobile-nav'
+import { NavLinks } from '@/components/site/nav-links'
 
 /**
  * Site header. Rendered server-side from the HEADER menu in the database.
@@ -12,7 +13,7 @@ import { MobileNav } from '@/components/site/mobile-nav'
  * The phone number is real <a href="tel:"> text — in the header, the footer and
  * on the contact page — rather than an image or a JS-built string.
  */
-export async function SiteHeader({ currentPath }: { currentPath: string }) {
+export async function SiteHeader() {
   const [items, { branding, organization }] = await Promise.all([getMenu('HEADER'), getSettings()])
 
   const navItems = items.filter((item) => !item.isCta)
@@ -32,27 +33,15 @@ export async function SiteHeader({ currentPath }: { currentPath: string }) {
           />
         </Link>
 
-        <nav aria-label="Primary" className="hidden items-center gap-6 xl:flex xl:gap-8">
-          {navItems.map((item) => {
-            const active = currentPath === item.url || (item.url !== '/' && currentPath.startsWith(`${item.url}/`))
-            return (
-              <Link
-                key={item.id}
-                href={item.url}
-                aria-current={active ? 'page' : undefined}
-                rel={item.rel ?? undefined}
-                target={item.target ?? undefined}
-                className={
-                  active
-                    ? 'text-[0.94rem] font-bold text-primary'
-                    : 'text-[0.94rem] font-semibold text-ink transition hover:text-primary'
-                }
-              >
-                {item.label}
-              </Link>
-            )
-          })}
-        </nav>
+        <NavLinks
+          items={navItems.map((item) => ({
+            id: item.id,
+            label: item.label,
+            url: item.url,
+            rel: item.rel,
+            target: item.target,
+          }))}
+        />
 
         <a
           href={telHref(organization.phone)}

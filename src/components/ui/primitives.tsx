@@ -62,6 +62,23 @@ export function Section({
   )
 }
 
+/**
+ * The id a section should point `aria-labelledby` at.
+ *
+ * Returns undefined when the block has no heading text, because SectionHeading
+ * renders nothing in that case and an `aria-labelledby` pointing at a missing
+ * element is an accessibility failure, not a harmless no-op. A <section> with no
+ * accessible name is simply not exposed as a landmark, which is the correct
+ * outcome for a decorative or heading-less block.
+ */
+export function sectionHeadingId(
+  props: { anchor?: string; heading?: string },
+  fallback?: string,
+): string | undefined {
+  if (!props.heading?.trim()) return undefined
+  return props.anchor ? `${props.anchor}-heading` : fallback
+}
+
 export function Eyebrow({
   children,
   rules = 'left',

@@ -4,7 +4,7 @@ import { getForm } from '@/lib/forms'
 import { cn, excerptFrom, formatDate, formatPhone, isoDate, telHref } from '@/lib/utils'
 import type { BlockPropsMap } from '@/lib/blocks/schema'
 import type { BlockContext } from '@/lib/blocks/context'
-import { Card, CtaButton, Section, SectionHeading, SmartImage, SmartLink } from '@/components/ui/primitives'
+import { Card, CtaButton, Section, SectionHeading, sectionHeadingId, SmartImage, SmartLink } from '@/components/ui/primitives'
 import { Icon } from '@/components/ui/icon'
 import { FaqAccordionClient } from '@/components/blocks/faq-accordion-client'
 
@@ -29,7 +29,7 @@ export async function FaqAccordionBlock({ props }: { props: BlockPropsMap['FaqAc
   ])
 
   if (!items.length) return null
-  const headingId = props.anchor ? `${props.anchor}-heading` : 'faq-heading'
+  const headingId = sectionHeadingId(props, 'faq-heading')
 
   const aside = (
     <div className="lg:sticky lg:top-28">
@@ -72,7 +72,7 @@ export async function ContactBlockBlock({ props }: { props: BlockPropsMap['Conta
     getSettings(),
     props.showForm ? getForm(props.formSlug) : Promise.resolve(null),
   ])
-  const headingId = props.anchor ? `${props.anchor}-heading` : undefined
+  const headingId = sectionHeadingId(props)
   const { QuoteFormClient } = await import('@/components/forms/quote-form-client')
 
   const cards = [
@@ -222,7 +222,7 @@ export async function RelatedPostsBlock({
     .catch(() => [])
 
   if (!posts.length) return null
-  const headingId = props.anchor ? `${props.anchor}-heading` : undefined
+  const headingId = sectionHeadingId(props)
 
   return (
     <Section base={props} labelledBy={headingId} as="aside">

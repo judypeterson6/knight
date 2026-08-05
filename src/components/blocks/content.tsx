@@ -1,6 +1,6 @@
 import { cn, sanitizeHtml } from '@/lib/utils'
 import type { BlockPropsMap } from '@/lib/blocks/schema'
-import { CtaRow, Figure, Section, SectionHeading, SmartImage } from '@/components/ui/primitives'
+import { CtaRow, Figure, Section, SectionHeading, sectionHeadingId, SmartImage } from '@/components/ui/primitives'
 
 /**
  * RichText — the workhorse for migrated WordPress body copy. Heading levels,
@@ -8,7 +8,7 @@ import { CtaRow, Figure, Section, SectionHeading, SmartImage } from '@/component
  * (sanitised), optionally paired with an image.
  */
 export function RichTextBlock({ props }: { props: BlockPropsMap['RichText'] }) {
-  const headingId = props.anchor ? `${props.anchor}-heading` : undefined
+  const headingId = sectionHeadingId(props)
   const hasImage = props.imagePosition !== 'none' && props.image.src
 
   const text = (
@@ -68,7 +68,7 @@ export function RichTextBlock({ props }: { props: BlockPropsMap['RichText'] }) {
 export function GalleryBlock({ props }: { props: BlockPropsMap['Gallery'] }) {
   const usable = props.items.filter((image) => image.src && (image.alt || image.decorative))
   if (!usable.length) return null
-  const headingId = props.anchor ? `${props.anchor}-heading` : undefined
+  const headingId = sectionHeadingId(props)
 
   return (
     <Section base={props} labelledBy={headingId}>
@@ -114,7 +114,7 @@ export function GalleryBlock({ props }: { props: BlockPropsMap['Gallery'] }) {
  */
 export function RawHtmlBlock({ props }: { props: BlockPropsMap['RawHtml'] }) {
   if (!props.html) return null
-  const headingId = props.anchor ? `${props.anchor}-heading` : undefined
+  const headingId = sectionHeadingId(props)
   return (
     <Section base={props} labelledBy={headingId}>
       {props.heading ? (

@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { cn } from '@/lib/utils'
 import type { BlockPropsMap } from '@/lib/blocks/schema'
-import { Card, CtaButton, Grid, Section, SectionHeading, SmartImage, SmartLink } from '@/components/ui/primitives'
+import { Card, CtaButton, Grid, Section, SectionHeading, sectionHeadingId, SmartImage, SmartLink } from '@/components/ui/primitives'
 import { Icon } from '@/components/ui/icon'
 
 /**
@@ -13,7 +13,7 @@ import { Icon } from '@/components/ui/icon'
  */
 export function StatCountersBlock({ props }: { props: BlockPropsMap['StatCounters'] }) {
   if (!props.items.length) return null
-  const headingId = props.anchor ? `${props.anchor}-heading` : undefined
+  const headingId = sectionHeadingId(props)
   const onDark = props.background === 'dark'
 
   return (
@@ -50,7 +50,7 @@ export function StatCountersBlock({ props }: { props: BlockPropsMap['StatCounter
 /** Differentiators — each block states a verifiable fact, not an adjective. */
 export function FeatureGridBlock({ props }: { props: BlockPropsMap['FeatureGrid'] }) {
   if (!props.items.length) return null
-  const headingId = props.anchor ? `${props.anchor}-heading` : undefined
+  const headingId = sectionHeadingId(props)
 
   return (
     <Section base={props} labelledBy={headingId}>
@@ -81,7 +81,7 @@ export function FeatureGridBlock({ props }: { props: BlockPropsMap['FeatureGrid'
 /** Numbered how-to-book steps. */
 export function StepsHowItWorksBlock({ props }: { props: BlockPropsMap['StepsHowItWorks'] }) {
   if (!props.items.length) return null
-  const headingId = props.anchor ? `${props.anchor}-heading` : undefined
+  const headingId = sectionHeadingId(props)
 
   return (
     <Section base={props} labelledBy={headingId}>
@@ -125,7 +125,7 @@ export function StepsHowItWorksBlock({ props }: { props: BlockPropsMap['StepsHow
 export function ServiceCardsBlock({ props }: { props: BlockPropsMap['ServiceCards'] }) {
   const usable = props.items.filter((item) => item.cta.url)
   if (!usable.length) return null
-  const headingId = props.anchor ? `${props.anchor}-heading` : undefined
+  const headingId = sectionHeadingId(props)
 
   return (
     <Section base={props} labelledBy={headingId}>
@@ -208,7 +208,7 @@ export async function TestimonialsBlock({ props }: { props: BlockPropsMap['Testi
     .catch(() => [])
 
   if (!items.length) return null
-  const headingId = props.anchor ? `${props.anchor}-heading` : undefined
+  const headingId = sectionHeadingId(props)
 
   return (
     <Section base={props} labelledBy={headingId}>

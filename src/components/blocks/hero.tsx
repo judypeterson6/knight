@@ -3,7 +3,7 @@ import { getSettings } from '@/lib/settings'
 import { getForm } from '@/lib/forms'
 import { cn, formatPhone, telHref } from '@/lib/utils'
 import type { BlockPropsMap } from '@/lib/blocks/schema'
-import { CtaButton, CtaRow, Section, SectionHeading, SmartLink } from '@/components/ui/primitives'
+import { CtaButton, CtaRow, Section, SectionHeading, sectionHeadingId, SmartLink } from '@/components/ui/primitives'
 import { Icon } from '@/components/ui/icon'
 import { QuoteFormClient } from '@/components/forms/quote-form-client'
 
@@ -28,7 +28,7 @@ export async function HeroBlock({ props, first }: { props: BlockPropsMap['Hero']
   const { organization } = await getSettings()
   const phone = organization.phone
   const isLanding = props.variant === 'landing'
-  const headingId = props.anchor ? `${props.anchor}-heading` : 'hero-heading'
+  const headingId = sectionHeadingId(props, 'hero-heading')
   const H = props.headingLevel
 
   const form = props.showQuoteForm ? await getForm(props.quoteFormSlug) : null
@@ -149,7 +149,7 @@ export async function HeroBlock({ props, first }: { props: BlockPropsMap['Hero']
 
 /** Full-width call-to-action banner. Used at the foot of service pages. */
 export function CtaBannerBlock({ props }: { props: BlockPropsMap['CtaBanner'] }) {
-  const headingId = props.anchor ? `${props.anchor}-heading` : undefined
+  const headingId = sectionHeadingId(props)
   return (
     <Section base={{ ...props, background: props.background }} labelledBy={headingId}>
       <div className="relative flex flex-wrap items-center justify-between gap-7 overflow-hidden rounded-block bg-primary px-7 py-9 text-primary-contrast shadow-cta md:px-14 md:py-12">
@@ -190,7 +190,7 @@ export function CtaBannerBlock({ props }: { props: BlockPropsMap['CtaBanner'] })
  * on a service page, plus the supporting facts as a list.
  */
 export function ServiceStatementBlock({ props }: { props: BlockPropsMap['ServiceStatement'] }) {
-  const headingId = props.anchor ? `${props.anchor}-heading` : undefined
+  const headingId = sectionHeadingId(props)
   return (
     <Section base={props} labelledBy={headingId}>
       <div className={cn('grid gap-10', props.points.length ? 'lg:grid-cols-[1.2fr_1fr]' : '')}>
@@ -221,7 +221,7 @@ export function ServiceStatementBlock({ props }: { props: BlockPropsMap['Service
 /** Standalone quote-form block for mid-page placement on service pages. */
 export async function QuoteFormBlock({ props }: { props: BlockPropsMap['QuoteForm'] }) {
   const [{ organization }, form] = await Promise.all([getSettings(), getForm(props.formSlug)])
-  const headingId = props.anchor ? `${props.anchor}-heading` : undefined
+  const headingId = sectionHeadingId(props)
   if (!form) return null
 
   return (
@@ -260,7 +260,7 @@ export async function TrustStripBlock({ props }: { props: BlockPropsMap['TrustSt
   const { trust } = await getSettings()
   const items = props.useTrustSettings ? trust.items : props.items
   if (!items.length) return null
-  const headingId = props.anchor ? `${props.anchor}-heading` : undefined
+  const headingId = sectionHeadingId(props)
 
   return (
     <Section base={{ ...props, spacing: props.spacing === 'md' ? 'sm' : props.spacing }} labelledBy={headingId}>

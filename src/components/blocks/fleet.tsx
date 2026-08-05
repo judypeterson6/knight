@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { cn } from '@/lib/utils'
 import type { BlockPropsMap } from '@/lib/blocks/schema'
 import type { BlockContext } from '@/lib/blocks/context'
-import { Card, CtaButton, Section, SectionHeading, SmartImage, SmartLink } from '@/components/ui/primitives'
+import { Card, CtaButton, Section, SectionHeading, sectionHeadingId, SmartImage, SmartLink } from '@/components/ui/primitives'
 import { Icon } from '@/components/ui/icon'
 
 export function formatPrice(price: number | null, currency: string): string | null {
@@ -87,7 +87,7 @@ export async function FleetGridBlock({
     prisma.coach.count({ where: { status: 'PUBLISHED', NOT: { dailyPrice: null } } }).catch(() => 0),
   ])
 
-  const headingId = props.anchor ? `${props.anchor}-heading` : undefined
+  const headingId = sectionHeadingId(props)
   const filtered = Boolean(filters.coachClass || filters.minBunks || filters.slides || filters.maxPrice)
   // The price control only renders when at least one coach carries a published
   // rate. A filter that cannot change the result set has no business being on
@@ -292,7 +292,7 @@ export async function FleetGridBlock({
  * <dl> and <table> elements so the definitions are retrievable text.
  */
 export async function CoachSpecTableBlock({ props }: { props: BlockPropsMap['CoachSpecTable'] }) {
-  const headingId = props.anchor ? `${props.anchor}-heading` : undefined
+  const headingId = sectionHeadingId(props)
 
   const classes = props.showClassComparison
     ? await prisma.coachClass

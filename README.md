@@ -57,18 +57,33 @@ Run in this environment, all passing:
 | `npx tsc --noEmit` | 0 errors |
 | `npm run lint` | 0 errors, 0 warnings |
 | `npm run build` | exit 0, compiled successfully |
-| `npm run verify` | 20 block schemas, 44 pages, 916 media files on disk, 11 redirects, 0 failures |
+| `npm run verify` | 20 block schemas, 44 pages, 916 media files on disk, 11 redirects, **47 page templates composed, 731 blocks validated**, 26 internal link targets — 0 failures |
 | `npm run migrate:wp` | 44 pages, 5 posts, 916 images, **0 image failures** |
 
 **Not verified here:** `prisma migrate deploy` and `prisma db seed` against a
 real MySQL server. No MySQL and no Docker were available in the build
-environment, so those two commands are written and typechecked but have not been
-executed end to end. `npm run verify` exists specifically to cover as much of the
-seed's input as possible without a database — it validates every block schema,
-the whole migration snapshot, that all 916 image files are actually on disk, and
-that every redirect target resolves. Run `docker compose up -d` and the two
-Prisma commands as the first thing you do; if anything fails there it will be in
-the Prisma calls, not the content.
+environment.
+
+To shrink that gap as far as possible, all page composition was extracted into
+`prisma/seed-blocks.ts` as **pure functions** — snapshot in, block list out, no
+Prisma and no filesystem. `npm run verify` then runs every builder the seed will
+run, against the real migration snapshot, and checks the result:
+
+- all 47 page templates compose without throwing
+- all 731 resulting blocks re-parse against their own Zod schema
+- **exactly one `<h1>` block per page** (the source pages carried two or three)
+- the alt-text gate passes on every block, the same check the write API applies
+- all 26 distinct internal link targets resolve to a route the seed creates —
+  so there are no dead CTAs
+- every one of the 916 media files referenced by the snapshot exists on disk
+- every redirect target resolves, with no self-references or loops
+
+What remains unproven is the Prisma write calls themselves. Run
+`docker compose up -d` and the two Prisma commands first; if anything fails it
+will be there, not in the content.
+
+This already caught one real defect: the `image` and `cta` sub-schemas had no
+default, so inserting a fresh block in the page builder would have thrown.
 
 `npm run build` also runs cleanly *without* a database, because every data
 function catches connection errors — but the generated `sitemap*.xml` would then
@@ -242,11 +257,12 @@ complete. It was not — there are 32 further pages, all migrated:
 prisma/
   schema.prisma            21 models, MySQL
   migrations/              committed, generated with `prisma migrate diff`
-  seed.ts                  builds the whole site from the snapshot
+  seed.ts                  database writes
+  seed-blocks.ts           page composition as pure functions — testable, no DB
   seed-data/               migration output (committed)
 scripts/
   migrate-wordpress.ts     WP REST / sitemap crawl, media, SEO, redirects
-  verify-content.ts        pre-seed smoke test (no DB)
+  verify-content.ts        runs every page builder and validates every block
 src/
   app/
     (site)/                public site
@@ -422,10 +438,41 @@ The inbox shows delivery status and exports to CSV.
 
 ---
 
+## Rendering model
+
+Worth stating exactly, because there is one real trade-off in it.
+
+**No public route uses `force-dynamic`** — only admin screens do. Public routes
+are registered as ISR routes (`revalidate = 300`, `dynamicParams = true`) and
+every database read goes through `unstable_cache` with tags, invalidated by
+`revalidateTag` on save. So content changes propagate immediately and the
+database is not queried per request.
+
+The site layout deliberately calls **no dynamic request API of its own**. The
+header's active-nav state is resolved client-side from `usePathname()` rather
+than `headers()`, and the layout performs no database query at all.
+
+The one dynamic API left on the public path is the session check in
+`EditToolbarGate`. That is a deliberate choice: the brief requires that edit mode
+"never renders for anonymous visitors and its JS is not shipped to them", and the
+only way to guarantee the JavaScript never enters the bundle is to decide on the
+server, which means reading the session cookie. The cost is a React render per
+request instead of a full-route cache hit; the data behind it is still cached.
+
+If you would rather have the full-route cache and can accept a ~1 KB probe
+script for anonymous visitors, delete `EditToolbarGate` from
+`src/app/(site)/layout.tsx` and mount `EditToolbar` from a client component that
+self-gates against `/api/admin/page-context`. Everything else keeps working —
+the block builder at `/admin/pages/[id]/edit` is the primary editing surface
+either way.
+
+---
+
 ## Performance
 
 - ISR everywhere; `revalidateTag` / `revalidatePath` on save. **No `force-dynamic`
-  on any public route** (only admin screens use it).
+  on any public route** (only admin screens use it). See *Rendering model* above
+  for the one dynamic API that remains and why.
 - Server components by default. The only client components are the ones that
   genuinely need state: mobile nav, FAQ accordion, forms, and the admin editors.
 - `next/font` with `display: swap`, only the selected weights fetched. No
@@ -486,9 +533,10 @@ them), `INDEXNOW_KEY`, `GOOGLE_INDEXING_SA_JSON`, `TURNSTILE_SECRET_KEY` +
 
 Stated plainly rather than left to be discovered:
 
-1. **`prisma db seed` has not been executed against a real MySQL** — see
-   *Verification status*. Everything that can be checked without a database is
-   checked by `npm run verify`.
+1. **The Prisma write calls in `prisma db seed` have not been executed against a
+   real MySQL.** Everything upstream of them is verified: `npm run verify`
+   composes all 47 page templates and validates all 731 blocks, the alt-text
+   gate, the single-h1 rule and every internal link. See *Verification status*.
 2. **803 of 916 migrated images have no alt text**, because they had none in
    WordPress. They are flagged in `/admin/seo/audit` and in the media library, and
    they cannot be added to a coach gallery until labelled. This is real content

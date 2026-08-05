@@ -1,8 +1,8 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
 interface ToolbarBlock {
@@ -10,6 +10,14 @@ interface ToolbarBlock {
   type: string
   order: number
   visible: boolean
+}
+
+interface PageContext {
+  id: string
+  title: string
+  path: string
+  status: string
+  blocks: ToolbarBlock[]
 }
 
 /**
@@ -24,29 +32,43 @@ interface ToolbarBlock {
  * This component is only ever rendered for a signed-in admin or editor — see
  * EditToolbarGate.
  */
-export function EditToolbar({
-  pageId,
-  pageTitle,
-  pagePath,
-  status,
-  blocks,
-  userName,
-}: {
-  pageId: string
-  pageTitle: string
-  pagePath: string
-  status: string
-  blocks: ToolbarBlock[]
-  userName: string
-}) {
+export function EditToolbar({ userName }: { userName: string }) {
   const router = useRouter()
+  const pathname = usePathname()
+  const [page, setPage] = useState<PageContext | null>(null)
+  const [loaded, setLoaded] = useState(false)
   const [editing, setEditing] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [dirty, setDirty] = useState(false)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
-  const [order, setOrder] = useState<ToolbarBlock[]>(blocks)
+  const [order, setOrder] = useState<ToolbarBlock[]>([])
   const originals = useRef<Map<HTMLElement, string>>(new Map())
+
+  // Resolve which page we are on after mount, so the site layout itself does no
+  // database work for editors browsing the public site.
+  useEffect(() => {
+    let cancelled = false
+    setLoaded(false)
+    setEditing(false)
+    setDirty(false)
+
+    fetch(`/api/admin/page-context?path=${encodeURIComponent(pathname)}`)
+      .then((r) => r.json() as Promise<{ ok: boolean; data: PageContext | null }>)
+      .then((body) => {
+        if (cancelled) return
+        setPage(body.ok ? body.data : null)
+        setOrder(body.data?.blocks ?? [])
+        setLoaded(true)
+      })
+      .catch(() => {
+        if (!cancelled) setLoaded(true)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [pathname])
 
   /** Text nodes that are safe to edit in place — headings and paragraphs only. */
   const editableSelector = 'h1, h2, h3, h4, p, li, figcaption, dd, dt, blockquote'
@@ -101,10 +123,11 @@ export function EditToolbar({
    * against the original text, so an edit never lands in the wrong property.
    */
   async function save() {
+    if (!page) return
     setSaving(true)
     setMessage('Saving…')
 
-    const current = await fetch(`/api/admin/pages/${pageId}`)
+    const current = await fetch(`/api/admin/pages/${page.id}`)
       .then((r) => r.json() as Promise<{ ok: boolean; data?: { blocks: { id: string; type: string; order: number; visible: boolean; props: Record<string, unknown> }[] } }>)
       .catch(() => null)
 
@@ -145,7 +168,7 @@ export function EditToolbar({
       .sort((a, b) => a.order - b.order)
       .map((block, index) => ({ ...block, order: index }))
 
-    const res = await fetch(`/api/admin/pages/${pageId}/blocks`, {
+    const res = await fetch(`/api/admin/pages/${page.id}/blocks`, {
       method: 'PUT',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ blocks: payload, createRevision: true, note: `Inline edit by ${userName}` }),
@@ -194,10 +217,20 @@ export function EditToolbar({
         className="fixed inset-x-0 bottom-0 z-[200] flex flex-wrap items-center gap-3 border-t border-line bg-surface px-4 py-3 shadow-[0_-8px_30px_rgba(0,0,0,0.12)]"
       >
         <p className="mr-auto text-step--1">
-          <span className="font-extrabold">{pageTitle}</span>{' '}
-          <span className="text-muted">
-            · {pagePath} · {status}
-          </span>
+          {page ? (
+            <>
+              <span className="font-extrabold">{page.title}</span>{' '}
+              <span className="text-muted">
+                · {page.path} · {page.status}
+              </span>
+            </>
+          ) : (
+            <span className="text-muted">
+              {loaded
+                ? 'This URL is not a block-built page — edit it from its own admin screen.'
+                : 'Loading page…'}
+            </span>
+          )}
         </p>
 
         <p role="status" aria-live="polite" className={cn('text-step--1', message ? 'text-muted' : 'sr-only')}>
@@ -242,22 +275,29 @@ export function EditToolbar({
           </>
         ) : (
           <>
-            <Link
-              href={`/admin/pages/${pageId}/edit`}
-              className="rounded-control border border-line px-3.5 py-2 text-step--1 font-bold"
-            >
-              Open block builder
+            <Link href="/admin" className="rounded-control border border-line px-3.5 py-2 text-step--1 font-bold">
+              Admin
             </Link>
-            <button
-              type="button"
-              onClick={() => {
-                setEditing(true)
-                setMessage('Edit mode on. Click any heading or paragraph to change it.')
-              }}
-              className="kc-btn kc-btn-primary !px-5 !py-2 !text-step--1"
-            >
-              Edit this page
-            </button>
+            {page ? (
+              <>
+                <Link
+                  href={`/admin/pages/${page.id}/edit`}
+                  className="rounded-control border border-line px-3.5 py-2 text-step--1 font-bold"
+                >
+                  Open block builder
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditing(true)
+                    setMessage('Edit mode on. Click any heading or paragraph to change it.')
+                  }}
+                  className="kc-btn kc-btn-primary !px-5 !py-2 !text-step--1"
+                >
+                  Edit this page
+                </button>
+              </>
+            ) : null}
           </>
         )}
       </div>

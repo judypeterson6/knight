@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { cn } from '@/lib/utils'
 import type { BlockPropsMap } from '@/lib/blocks/schema'
-import { Card, CtaButton, Section, SectionHeading, SmartImage, SmartLink } from '@/components/ui/primitives'
+import { Card, CtaButton, Section, SectionHeading, sectionHeadingId, SmartImage, SmartLink } from '@/components/ui/primitives'
 import { UsCoverageMap } from '@/components/ui/us-coverage-map'
 
 /**
@@ -13,7 +13,7 @@ import { UsCoverageMap } from '@/components/ui/us-coverage-map'
  * without parsing SVG paths.
  */
 export function CoverageMapBlock({ props }: { props: BlockPropsMap['CoverageMap'] }) {
-  const headingId = props.anchor ? `${props.anchor}-heading` : undefined
+  const headingId = sectionHeadingId(props)
   const servedCodes = new Set(props.states.map((s) => s.code))
 
   return (
@@ -101,7 +101,7 @@ export async function DestinationGridBlock({ props }: { props: BlockPropsMap['De
     .catch(() => [])
 
   if (!locations.length) return null
-  const headingId = props.anchor ? `${props.anchor}-heading` : undefined
+  const headingId = sectionHeadingId(props)
 
   return (
     <Section base={props} labelledBy={headingId}>
