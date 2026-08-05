@@ -63,6 +63,17 @@ export const postCreateSchema = z.object({
 
 export const postUpdateSchema = postCreateSchema.partial()
 
+export const postBulkSchema = z
+  .object({
+    ids: z.array(z.string().min(1)).min(1).max(200),
+    action: z.enum(['publish', 'draft', 'archive', 'delete', 'setCategory']),
+    categoryId: z.string().nullable().optional(),
+  })
+  .refine((value) => value.action !== 'setCategory' || value.categoryId !== undefined, {
+    message: 'Choose a category to move the selected posts into',
+    path: ['categoryId'],
+  })
+
 // --- Categories ------------------------------------------------------------
 
 export const categoryCreateSchema = z.object({

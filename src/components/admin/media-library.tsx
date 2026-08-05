@@ -35,6 +35,7 @@ export function MediaLibrary({ initial, query }: { initial: MediaItem[]; query: 
   const [uploadAlt, setUploadAlt] = useState('')
   const [uploadDecorative, setUploadDecorative] = useState(false)
   const fileInput = useRef<HTMLInputElement>(null)
+  const replaceInput = useRef<HTMLInputElement>(null)
 
   async function upload(files: FileList | null) {
     if (!files?.length) return
@@ -87,6 +88,32 @@ export function MediaLibrary({ initial, query }: { initial: MediaItem[]; query: 
     setBusy(false)
     setMessage(body.ok ? 'Saved.' : (body.error ?? 'Save failed.'))
     if (body.ok) router.refresh()
+  }
+
+  /**
+   * Replaces the bytes behind the selected asset, keeping its id and URL so
+   * every existing reference keeps working. A cache-busting query is appended
+   * to the preview only — the stored path is unchanged.
+   */
+  async function replaceFile(files: FileList | null) {
+    if (!selected || !files?.length) return
+    setBusy(true)
+    setMessage('Replacing…')
+
+    const data = new FormData()
+    data.append('file', files[0])
+
+    const res = await fetch(`/api/admin/media/${selected.id}/replace`, { method: 'POST', body: data })
+    const body = (await res.json()) as { ok: boolean; error?: string }
+
+    setBusy(false)
+    if (!body.ok) {
+      setMessage(body.error ?? 'Replace failed.')
+      return
+    }
+    setMessage('Replaced. Every page referencing this asset now shows the new file.')
+    if (replaceInput.current) replaceInput.current.value = ''
+    router.refresh()
   }
 
   async function remove(force = false) {
@@ -236,6 +263,25 @@ export function MediaLibrary({ initial, query }: { initial: MediaItem[]; query: 
                   ))}
                 </ul>
               )}
+            </div>
+
+            <div className="mt-6">
+              <label htmlFor="replace-file" className="kc-label">
+                Replace the file
+              </label>
+              <input
+                ref={replaceInput}
+                id="replace-file"
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif,image/avif,image/svg+xml"
+                onChange={(e) => void replaceFile(e.target.files)}
+                disabled={busy}
+                className="kc-field"
+              />
+              <p className="mt-1.5 text-step--1 text-subtle">
+                Keeps the same URL, so everything already using this asset picks up the new file. Must be the same
+                file type as the original.
+              </p>
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3">

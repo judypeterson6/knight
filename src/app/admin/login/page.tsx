@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { LoginForm } from '@/components/admin/login-form'
 
 export const metadata: Metadata = {
@@ -19,6 +20,12 @@ export default async function LoginPage({
         <h1 className="text-step-3">Sign in</h1>
         <p className="mt-2 text-step--1 text-muted">Knights Coaches site administration.</p>
         <LoginForm callbackUrl={callbackUrl ?? '/admin'} initialError={error ? 'Wrong email or password.' : null} />
+
+        <p className="mt-6 text-step--1">
+          <Link href="/admin/reset-password" className="font-bold text-primary hover:underline">
+            Forgot your password?
+          </Link>
+        </p>
       </div>
     </main>
   )

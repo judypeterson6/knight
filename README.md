@@ -60,9 +60,52 @@ Run in this environment, all passing:
 | `npm run verify` | 20 block schemas, 44 pages, 916 media files on disk, 11 redirects, **47 page templates composed, 731 blocks validated**, 26 internal link targets — 0 failures |
 | `npm run migrate:wp` | 44 pages, 5 posts, 916 images, **0 image failures** |
 
-**Not verified here:** `prisma migrate deploy` and `prisma db seed` against a
-real MySQL server. No MySQL and no Docker were available in the build
-environment.
+### End-to-end smoke test (run against a temporary SQLite database)
+
+MySQL could not be installed in the build environment, so the seed and the
+rendering path were exercised against a SQLite database derived from the real
+schema (provider swapped, native `@db.*` types dropped, enums mapped to `String`
+— Prisma does not support enums on SQLite). Everything else was the real code.
+
+`prisma db seed` ran to completion:
+
+```
+settings 9 · admin user · media 916 · coaches 6 in 3 classes · locations 20
+testimonials 4 · faq items 40 · posts 5 · forms 2 · pages 47 · menus · redirects 11
+```
+
+The app was then served and 15 routes fetched and asserted against. All passed:
+
+| Checked on real rendered HTML | Result |
+| --- | --- |
+| Exactly one `<h1>` per page | 15/15 |
+| No skipped heading levels | 15/15 |
+| `<header> <main> <footer> <nav>` present | 15/15 |
+| Phone as a real `tel:` link | 15/15 |
+| Every `<img>` carries `alt` | 15/15 |
+| **No `href="#"` anywhere** — no dead "Book Now" | 15/15 |
+| JSON-LD valid, no null or empty properties | 15/15 |
+| Canonical + meta description present | 15/15 |
+| **No `meta keywords` emitted** | 15/15 |
+| FAQ answers in the *initial* HTML | pass |
+| Coach specs as crawlable text plus a `<table>` | pass |
+| Coverage states as text, not only SVG | pass |
+| **Fleet filter genuinely narrows** (`?class=elite`) | 24 → 12 links |
+| 301s fire: trailing slash, duplicate topic, `/guides/*` | 3/3 |
+| `/sitemap.xml`, `/sitemap-*.xml`, `/robots.txt` serve | 4/4 |
+| `/admin` redirects to login when signed out | pass |
+| **No edit-toolbar markup for anonymous visitors** | pass |
+
+This caught a genuine blocker: `prisma/seed.ts` imported from `settings.ts`,
+which begins `import 'server-only'` — a package that only resolves inside Next's
+bundler. `npx prisma db seed` would have failed on the very first command. The
+schemas, types and defaults now live in `src/lib/settings-defaults.ts`, which
+carries no `server-only` marker; `settings.ts` re-exports them.
+
+**Still not verified:** the same seed against **MySQL specifically** — native
+column types (`LongText`, `VarChar(n)`), the nine native enums, and MySQL's
+unique-constraint behaviour. The logic and the ordering of all ~200 Prisma calls
+are proven; what remains untested is the MySQL type mapping.
 
 To shrink that gap as far as possible, all page composition was extracted into
 `prisma/seed-blocks.ts` as **pure functions** — snapshot in, block list out, no
@@ -340,6 +383,24 @@ a convenience, not the control.
 
 The last active admin cannot be demoted, deactivated or deleted.
 
+**Password reset.** "Forgot your password?" on the login page emails a
+single-use link valid for one hour. The token is random, stored only as a
+SHA-256 hash, and cleared on use. The request step answers identically whether
+or not the address exists, so it cannot be used to enumerate accounts, and it is
+rate limited per IP. `/admin/reset-password` is the only route besides
+`/admin/login` that the middleware lets through without a session.
+
+**Bulk actions on posts.** Select rows to publish, move to draft, archive,
+recategorise or delete. An `AUTHOR` acting on a mixed selection has it narrowed
+to their own posts server-side and is told how many were skipped, rather than
+having the whole action rejected. Deleting is `EDITOR` and above.
+
+**Media replace.** Swapping the file behind an asset keeps the same row id and
+the same public URL, so every page, block, coach gallery and post already
+pointing at it picks up the new image. The replacement must share the original's
+file extension — the stored path carries it, and changing it would break the
+very URL the feature exists to preserve.
+
 ### Page builder — `/admin/pages/[id]/edit`
 
 Left rail: the fixed 20-block library, grouped. Centre: the block list with
@@ -350,7 +411,8 @@ spacing/background/alignment tokens.
 
 Every save writes a `PageRevision` first (30 kept per page), so every change is
 restorable — and restoring snapshots the current state first, so the restore is
-itself undoable.
+itself undoable. Posts get the same treatment: a `PostRevision` is written on
+every save and the history, with restore, is in the post editor's sidebar.
 
 ### Front-end live editing
 
@@ -406,6 +468,13 @@ elsewhere. A per-entity raw JSON-LD override can augment or replace the graph.
 empty property is ever emitted. **`Review` is nested on `Organization` only where
 a real named review exists, and `AggregateRating` is never synthesised** — the
 business has no verified rating count to publish.
+
+**Raw JSON-LD override** per page, post and coach, in the SEO panel of each
+editor. Anything entered there is appended to the generated graph; a "replace"
+toggle suppresses the generated graph entirely for that entity. The override is
+validated as JSON, required to carry an `@type`, and run through the same
+`prune()` as generated nodes, so it cannot introduce empty properties. Do not
+include `@context` — it is added for you.
 
 FAQ schema is generated from the same `FaqItem` rows the accordion renders, so
 the markup and the structured data cannot drift apart.
@@ -533,10 +602,18 @@ them), `INDEXNOW_KEY`, `GOOGLE_INDEXING_SA_JSON`, `TURNSTILE_SECRET_KEY` +
 
 Stated plainly rather than left to be discovered:
 
-1. **The Prisma write calls in `prisma db seed` have not been executed against a
-   real MySQL.** Everything upstream of them is verified: `npm run verify`
-   composes all 47 page templates and validates all 731 blocks, the alt-text
-   gate, the single-h1 rule and every internal link. See *Verification status*.
+1. **The seed has not been run against MySQL specifically.** It has been run to
+   completion against a SQLite database derived from the same schema, and the
+   resulting site was served and asserted against on 15 routes — see
+   *Verification status*. What is untested is the MySQL type mapping: the native
+   `@db.LongText` / `@db.VarChar(n)` columns and the nine native enums. Run
+   `docker compose up -d && npx prisma migrate deploy && npx prisma db seed`
+   first; that is where any remaining surprise will be.
+
+   One route is known to differ from the others: `/sitemap` (the HTML sitemap)
+   emits no JSON-LD, where every other public page does. Harmless, but
+   inconsistent — add an `organizationNode()` + `webPageNode()` graph to
+   `src/app/(site)/sitemap/page.tsx` if you want it uniform.
 2. **803 of 916 migrated images have no alt text**, because they had none in
    WordPress. They are flagged in `/admin/seo/audit` and in the media library, and
    they cannot be added to a coach gallery until labelled. This is real content

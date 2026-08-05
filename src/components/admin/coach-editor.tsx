@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { slugify } from '@/lib/utils'
 import { Text } from '@/components/admin/props-inspector'
+import { SchemaOverrideEditor } from '@/components/admin/schema-override-editor'
 
 interface CoachForm {
   name: string
@@ -356,6 +357,9 @@ export function CoachEditor({
             Save SEO
           </button>
         </section>
+
+        {/* Appends to the generated Product/Vehicle graph. Needs a saved coach. */}
+        {id ? <SchemaOverrideEditor entityType="COACH" entityId={id} onMessage={setMessage} /> : null}
       </aside>
     </div>
   )

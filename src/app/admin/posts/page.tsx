@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { requireRole } from '@/lib/auth'
-import { formatDate } from '@/lib/utils'
-import { AdminPageHeader, Badge, Cell, DataTable, EmptyState, Row } from '@/components/admin/ui'
+import { isoDate } from '@/lib/utils'
+import { AdminPageHeader, EmptyState } from '@/components/admin/ui'
+import { PostsTable } from '@/components/admin/posts-table'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,24 +13,27 @@ export default async function PostsList({ searchParams }: { searchParams: Promis
 
   const { q, status } = await searchParams
 
-  const posts = await prisma.post
-    .findMany({
-      where: {
-        ...(q ? { OR: [{ title: { contains: q } }, { slug: { contains: q } }] } : {}),
-        ...(status && status !== 'ALL'
-          ? { status: status as 'DRAFT' | 'PUBLISHED' | 'SCHEDULED' | 'ARCHIVED' }
-          : {}),
-      },
-      orderBy: { updatedAt: 'desc' },
-      include: { author: { select: { name: true } }, category: { select: { name: true } } },
-    })
-    .catch(() => [])
+  const [posts, categories] = await Promise.all([
+    prisma.post
+      .findMany({
+        where: {
+          ...(q ? { OR: [{ title: { contains: q } }, { slug: { contains: q } }] } : {}),
+          ...(status && status !== 'ALL'
+            ? { status: status as 'DRAFT' | 'PUBLISHED' | 'SCHEDULED' | 'ARCHIVED' }
+            : {}),
+        },
+        orderBy: { updatedAt: 'desc' },
+        include: { author: { select: { name: true } }, category: { select: { name: true } } },
+      })
+      .catch(() => []),
+    prisma.category.findMany({ orderBy: { order: 'asc' }, select: { id: true, name: true } }).catch(() => []),
+  ])
 
   return (
     <>
       <AdminPageHeader
         title="Posts"
-        description="Blog posts use categories only — this site has no tag system by design."
+        description="Blog posts use categories only — this site has no tag system by design. Select posts to publish, archive, recategorise or delete them in bulk."
         actions={
           <Link href="/admin/posts/new" className="kc-btn kc-btn-primary !px-5 !py-2.5">
             New post
@@ -72,34 +76,19 @@ export default async function PostsList({ searchParams }: { searchParams: Promis
           }
         />
       ) : (
-        <DataTable head={['Title', 'Category', 'Author', 'Status', 'Published', '']}>
-          {posts.map((post) => (
-            <Row key={post.id}>
-              <Cell>
-                <Link href={`/admin/posts/${post.id}`} className="font-bold text-primary hover:underline">
-                  {post.title}
-                </Link>
-                <span className="block font-mono text-[0.7rem] text-subtle">/blog/{post.slug}</span>
-              </Cell>
-              <Cell className="text-muted">{post.category?.name ?? '—'}</Cell>
-              <Cell className="text-muted">{post.author?.name ?? '—'}</Cell>
-              <Cell>
-                <Badge>{post.status}</Badge>
-              </Cell>
-              <Cell className="text-muted">{post.publishedAt ? formatDate(post.publishedAt) : '—'}</Cell>
-              <Cell>
-                <div className="flex gap-3">
-                  <Link href={`/admin/posts/${post.id}`} className="font-bold text-primary hover:underline">
-                    Edit
-                  </Link>
-                  <Link href={`/blog/${post.slug}`} className="font-bold text-muted hover:text-primary hover:underline">
-                    View
-                  </Link>
-                </div>
-              </Cell>
-            </Row>
-          ))}
-        </DataTable>
+        <PostsTable
+          posts={posts.map((post) => ({
+            id: post.id,
+            slug: post.slug,
+            title: post.title,
+            status: post.status,
+            author: post.author?.name ?? '',
+            category: post.category?.name ?? '',
+            publishedAt: post.publishedAt ? isoDate(post.publishedAt) : null,
+          }))}
+          categories={categories}
+          canDelete={gate.user.role !== 'AUTHOR'}
+        />
       )}
     </>
   )

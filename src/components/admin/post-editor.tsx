@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { slugify } from '@/lib/utils'
 import { RichTextEditor } from '@/components/admin/rich-text-editor'
 import { Text } from '@/components/admin/props-inspector'
+import { PostRevisions } from '@/components/admin/post-revisions'
+import { SchemaOverrideEditor } from '@/components/admin/schema-override-editor'
 
 interface PostForm {
   title: string
@@ -272,6 +274,14 @@ export function PostEditor({
             Save SEO
           </button>
         </section>
+
+        {/* Both need a saved post to attach to. */}
+        {id ? (
+          <>
+            <SchemaOverrideEditor entityType="POST" entityId={id} onMessage={setMessage} />
+            <PostRevisions postId={id} onMessage={setMessage} />
+          </>
+        ) : null}
       </aside>
     </div>
   )

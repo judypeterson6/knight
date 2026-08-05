@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { cn } from '@/lib/utils'
 import type { BlockType } from '@/lib/blocks/schema'
 import { PropsInspector, type MediaOption } from '@/components/admin/props-inspector'
+import { SchemaOverrideEditor } from '@/components/admin/schema-override-editor'
 
 export interface BuilderBlock {
   id: string
@@ -326,7 +327,12 @@ export function BlockBuilder({
         ) : null}
 
         {tab === 'settings' ? <PageSettings pageId={pageId} page={page} onMessage={setMessage} /> : null}
-        {tab === 'seo' ? <SeoPanel entityId={pageId} route={pagePath} initial={seo} onMessage={setMessage} /> : null}
+        {tab === 'seo' ? (
+          <div className="space-y-6">
+            <SeoPanel entityId={pageId} route={pagePath} initial={seo} onMessage={setMessage} />
+            <SchemaOverrideEditor entityType="PAGE" entityId={pageId} onMessage={setMessage} />
+          </div>
+        ) : null}
 
         {tab === 'revisions' ? (
           revisions.length === 0 ? (

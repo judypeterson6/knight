@@ -61,7 +61,11 @@ export async function middleware(request: NextRequest) {
   }
 
   // --- 5. Admin gate --------------------------------------------------------
-  if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
+  // /admin/login and /admin/reset-password are the two routes a signed-out user
+  // legitimately needs; everything else under /admin requires a session.
+  const PUBLIC_ADMIN = pathname === '/admin/login' || pathname === '/admin/reset-password'
+
+  if (pathname.startsWith('/admin') && !PUBLIC_ADMIN) {
     const hasSession =
       request.cookies.has('authjs.session-token') ||
       request.cookies.has('__Secure-authjs.session-token') ||
