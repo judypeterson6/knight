@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Settings schemas, types and defaults.
  *
  * Deliberately free of `server-only`, Prisma and next/cache imports: this module

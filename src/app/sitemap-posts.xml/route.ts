@@ -1,4 +1,4 @@
-﻿import { sitemapEntries, urlsetXml, XML_HEADERS } from '@/lib/sitemap'
+import { sitemapEntries, urlsetXml, XML_HEADERS } from '@/lib/sitemap'
 
 export const revalidate = 3600
 

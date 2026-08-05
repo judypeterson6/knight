@@ -169,6 +169,24 @@ export const faqUpdateSchema = faqCreateSchema.partial()
 
 // --- Media -----------------------------------------------------------------
 
+export const mediaBulkAltSchema = z.object({
+  items: z
+    .array(
+      z
+        .object({
+          id: z.string().min(1),
+          alt: z.string().max(500),
+          decorative: z.boolean().default(false),
+        })
+        .refine((v) => v.decorative || v.alt.trim().length > 0, {
+          message: 'Alt text is required unless the image is marked decorative',
+          path: ['alt'],
+        }),
+    )
+    .min(1)
+    .max(100),
+})
+
 export const mediaUpdateSchema = z
   .object({
     alt: z.string().max(500),

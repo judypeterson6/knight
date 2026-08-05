@@ -1,4 +1,4 @@
-﻿# knightscoaches.com
+# knightscoaches.com
 
 Next.js 15 + React 19 + MySQL rebuild of the WordPress/Elementor site at
 https://knightscoaches.com. Entertainer coach rental — a national service
@@ -60,14 +60,11 @@ Run in this environment, all passing:
 | `npm run verify` | 20 block schemas, 44 pages, 916 media files on disk, 11 redirects, **47 page templates composed, 731 blocks validated**, 26 internal link targets — 0 failures |
 | `npm run migrate:wp` | 44 pages, 5 posts, 916 images, **0 image failures** |
 
-### End-to-end smoke test (run against a temporary SQLite database)
+### End-to-end, against the real production MariaDB
 
-MySQL could not be installed in the build environment, so the seed and the
-rendering path were exercised against a SQLite database derived from the real
-schema (provider swapped, native `@db.*` types dropped, enums mapped to `String`
-— Prisma does not support enums on SQLite). Everything else was the real code.
-
-`prisma db seed` ran to completion:
+`prisma migrate deploy` and `prisma db seed` have both been run against the live
+Hostinger database (`srv1167.hstgr.io`, MariaDB), and the site was then served
+from it and asserted against. All 21 tables created; the seed reported:
 
 ```
 settings 9 · admin user · media 916 · coaches 6 in 3 classes · locations 20
@@ -96,16 +93,26 @@ The app was then served and 15 routes fetched and asserted against. All passed:
 | `/admin` redirects to login when signed out | pass |
 | **No edit-toolbar markup for anonymous visitors** | pass |
 
-This caught a genuine blocker: `prisma/seed.ts` imported from `settings.ts`,
-which begins `import 'server-only'` — a package that only resolves inside Next's
-bundler. `npx prisma db seed` would have failed on the very first command. The
-schemas, types and defaults now live in `src/lib/settings-defaults.ts`, which
-carries no `server-only` marker; `settings.ts` re-exports them.
+Getting to that point caught three genuine blockers, each of which would have
+stopped a first-time deploy dead:
 
-**Still not verified:** the same seed against **MySQL specifically** — native
-column types (`LongText`, `VarChar(n)`), the nine native enums, and MySQL's
-unique-constraint behaviour. The logic and the ordering of all ~200 Prisma calls
-are proven; what remains untested is the MySQL type mapping.
+1. **`import 'server-only'` reached the seed.** `prisma/seed.ts` imported from
+   `settings.ts`, which begins `import 'server-only'` — a package that only
+   resolves inside Next's bundler. `npx prisma db seed` failed on the very first
+   command. The schemas, types and defaults now live in
+   `src/lib/settings-defaults.ts`, which carries no `server-only` marker.
+2. **A UTF-8 BOM in `migration_lock.toml`.** Prisma could not read the provider
+   and aborted with `P3019`, refusing to run any migration.
+3. **A UTF-8 BOM in `migration.sql`.** MariaDB rejected query 1 with a syntax
+   error at `﻿-- CreateTable`. Ten committed files had picked up BOMs from
+   PowerShell redirects; all are stripped, and the two that mattered are fixed.
+
+If you regenerate either file on Windows, write it as **UTF-8 without BOM** —
+`Out-File`/`>` in PowerShell adds one and will reintroduce both failures.
+
+Note the server is **MariaDB**, not stock MySQL. Prisma's `mysql` provider
+handles it, and the full schema — `LongText`, `VarChar(n)`, the nine native
+enums, every unique constraint and cascade — applied without modification.
 
 To shrink that gap as far as possible, all page composition was extracted into
 `prisma/seed-blocks.ts` as **pure functions** — snapshot in, block list out, no
@@ -602,17 +609,8 @@ them), `INDEXNOW_KEY`, `GOOGLE_INDEXING_SA_JSON`, `TURNSTILE_SECRET_KEY` +
 
 Stated plainly rather than left to be discovered:
 
-1. **The seed has not been run against MySQL specifically.** It has been run to
-   completion against a SQLite database derived from the same schema, and the
-   resulting site was served and asserted against on 15 routes — see
-   *Verification status*. What is untested is the MySQL type mapping: the native
-   `@db.LongText` / `@db.VarChar(n)` columns and the nine native enums. Run
-   `docker compose up -d && npx prisma migrate deploy && npx prisma db seed`
-   first; that is where any remaining surprise will be.
-
-   One route is known to differ from the others: `/sitemap` (the HTML sitemap)
-   emits no JSON-LD, where every other public page does. Harmless, but
-   inconsistent — add an `organizationNode()` + `webPageNode()` graph to
+1. **`/sitemap` emits no JSON-LD**, where every other public page does. Harmless
+   but inconsistent — add an `organizationNode()` + `webPageNode()` graph to
    `src/app/(site)/sitemap/page.tsx` if you want it uniform.
 2. **803 of 916 migrated images have no alt text**, because they had none in
    WordPress. They are flagged in `/admin/seo/audit` and in the media library, and

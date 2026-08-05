@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Database seed.
  *
  * Consumes the migration snapshot in prisma/seed-data (produced by
