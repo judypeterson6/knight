@@ -15,6 +15,9 @@ export interface PublicFormField {
   order: number
   showWhen: string | null
   halfWidth: boolean
+  /** Multi-step grouping. Everything on step 1 = a single-page form. */
+  step: number
+  stepTitle: string | null
 }
 
 export interface PublicForm {
@@ -32,7 +35,7 @@ async function loadForm(slug: string): Promise<PublicForm | null> {
   try {
     const form = await prisma.form.findUnique({
       where: { slug },
-      include: { fields: { orderBy: { order: 'asc' } } },
+      include: { fields: { orderBy: [{ step: 'asc' }, { order: 'asc' }] } },
     })
     if (!form || !form.enabled) return null
     return {
@@ -55,6 +58,8 @@ async function loadForm(slug: string): Promise<PublicForm | null> {
         order: f.order,
         showWhen: f.showWhen,
         halfWidth: f.halfWidth,
+        step: f.step,
+        stepTitle: f.stepTitle,
       })),
     }
   } catch {

@@ -12,7 +12,10 @@ export default async function FormsAdmin() {
   const forms = await prisma.form
     .findMany({
       orderBy: { slug: 'asc' },
-      include: { fields: { orderBy: { order: 'asc' } }, _count: { select: { submissions: true } } },
+      include: {
+        fields: { orderBy: [{ step: 'asc' }, { order: 'asc' }] },
+        _count: { select: { submissions: true } },
+      },
     })
     .catch(() => [])
 
@@ -53,6 +56,8 @@ export default async function FormsAdmin() {
               order: field.order,
               showWhen: field.showWhen ?? '',
               halfWidth: field.halfWidth,
+              step: field.step,
+              stepTitle: field.stepTitle ?? '',
             }))}
           />
         </Panel>

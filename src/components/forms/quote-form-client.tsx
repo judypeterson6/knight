@@ -1,33 +1,119 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useMemo, useRef, useState, type FormEvent } from 'react'
 import { cn } from '@/lib/utils'
 import type { PublicForm, PublicFormField } from '@/lib/forms'
 
 /**
  * Renders a form entirely from its database definition — labels, types,
- * required flags, options and conditional visibility all come from FormField
- * rows, so /admin/forms controls what a visitor sees.
+ * required flags, options, conditional visibility and step grouping all come
+ * from FormField rows, so /admin/forms controls what a visitor sees.
+ *
+ * Multi-step: when fields carry more than one distinct `step`, the form paginates.
+ * The step indicator reflects real position, and "Next" refuses to advance while
+ * a required field on the current step is empty — so the progress shown is never
+ * ahead of what has actually been filled in.
  *
  * Accessibility: every control has a real <label> bound by id, required fields
- * are marked with aria-required, validation errors are announced through an
- * aria-live region, and the success state moves focus to the confirmation.
+ * are marked aria-required, validation and step changes are announced through an
+ * aria-live region, and focus moves to the new step's heading on advance.
  */
 export function QuoteFormClient({ form, compact = false }: { form: PublicForm; compact?: boolean }) {
   const [state, setState] = useState<'idle' | 'submitting' | 'sent' | 'error'>('idle')
   const [message, setMessage] = useState('')
   const [checked, setChecked] = useState<Record<string, boolean>>({})
+  const [values, setValues] = useState<Record<string, string>>({})
+  const [stepIndex, setStepIndex] = useState(0)
+  const [invalid, setInvalid] = useState<string[]>([])
+  const formRef = useRef<HTMLFormElement>(null)
+  const headingRef = useRef<HTMLParagraphElement>(null)
+
+  /** Fields currently visible, respecting conditional `showWhen`. */
+  const visible = useMemo(
+    () => form.fields.filter((f) => !f.showWhen || checked[f.showWhen]),
+    [form.fields, checked],
+  )
+
+  /** Distinct steps, in order, derived from the visible fields. */
+  const steps = useMemo(() => {
+    const byStep = new Map<number, PublicFormField[]>()
+    for (const field of visible) {
+      byStep.set(field.step, [...(byStep.get(field.step) ?? []), field])
+    }
+    return [...byStep.entries()]
+      .sort((a, b) => a[0] - b[0])
+      .map(([step, fields]) => ({
+        step,
+        title: fields.find((f) => f.stepTitle)?.stepTitle ?? '',
+        fields,
+      }))
+  }, [visible])
+
+  const multi = steps.length > 1
+  const current = steps[Math.min(stepIndex, steps.length - 1)]
+  const isLast = stepIndex >= steps.length - 1
+
+  function setValue(name: string, value: string) {
+    setValues((prev) => ({ ...prev, [name]: value }))
+    if (invalid.includes(name)) setInvalid((prev) => prev.filter((n) => n !== name))
+  }
+
+  /** Required fields on this step that are still empty. */
+  function missingOnStep(): PublicFormField[] {
+    return current.fields.filter((f) => {
+      if (!f.required || f.type === 'HIDDEN') return false
+      if (f.type === 'CHECKBOX') return !checked[f.name]
+      return !(values[f.name] ?? '').trim()
+    })
+  }
+
+  function goNext() {
+    const missing = missingOnStep()
+    if (missing.length) {
+      setInvalid(missing.map((f) => f.name))
+      setMessage(`Please complete: ${missing.map((f) => f.label).join(', ')}`)
+      const first = formRef.current?.querySelector<HTMLElement>(`[name="${missing[0].name}"]`)
+      first?.focus()
+      return
+    }
+    setInvalid([])
+    setMessage('')
+    setStepIndex((i) => Math.min(i + 1, steps.length - 1))
+    requestAnimationFrame(() => headingRef.current?.focus())
+  }
+
+  function goBack() {
+    setInvalid([])
+    setMessage('')
+    setStepIndex((i) => Math.max(i - 1, 0))
+    requestAnimationFrame(() => headingRef.current?.focus())
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+
+    // On a multi-step form, Enter mid-way should advance, not submit.
+    if (multi && !isLast) {
+      goNext()
+      return
+    }
+
+    const missing = missingOnStep()
+    if (missing.length) {
+      setInvalid(missing.map((f) => f.name))
+      setMessage(`Please complete: ${missing.map((f) => f.label).join(', ')}`)
+      return
+    }
+
     setState('submitting')
     setMessage('Sending your request…')
 
-    const formData = new FormData(event.currentTarget)
-    const payload: Record<string, string> = {}
-    for (const [key, value] of formData.entries()) {
-      if (typeof value === 'string') payload[key] = value
+    const payload: Record<string, string> = { ...values }
+    for (const [name, isChecked] of Object.entries(checked)) {
+      if (isChecked) payload[name] = 'yes'
     }
+    const honeypot = formRef.current?.querySelector<HTMLInputElement>('[name="company_website"]')
+    if (honeypot?.value) payload.company_website = honeypot.value
 
     try {
       const res = await fetch(`/api/forms/${form.slug}`, {
@@ -59,6 +145,9 @@ export function QuoteFormClient({ form, compact = false }: { form: PublicForm; c
           onClick={() => {
             setState('idle')
             setMessage('')
+            setValues({})
+            setChecked({})
+            setStepIndex(0)
           }}
           className="mt-6 font-bold text-primary underline underline-offset-2"
         >
@@ -68,11 +157,42 @@ export function QuoteFormClient({ form, compact = false }: { form: PublicForm; c
     )
   }
 
-  const visible = form.fields.filter((f) => !f.showWhen || checked[f.showWhen])
-
   return (
-    <form onSubmit={onSubmit} noValidate={false}>
-      {form.description ? <p className="mb-6 text-step-0 text-muted">{form.description}</p> : null}
+    <form ref={formRef} onSubmit={onSubmit}>
+      {form.description && stepIndex === 0 ? (
+        <p className="mb-6 text-step-0 text-muted">{form.description}</p>
+      ) : null}
+
+      {multi ? (
+        <div className="mb-6">
+          <ol className="flex flex-wrap gap-2" aria-label="Form steps">
+            {steps.map((s, i) => (
+              <li key={s.step} className="flex-1">
+                <span
+                  aria-current={i === stepIndex ? 'step' : undefined}
+                  className={cn(
+                    'block h-1.5 rounded-pill transition-colors',
+                    i < stepIndex ? 'bg-primary' : i === stepIndex ? 'bg-primary' : 'bg-line',
+                  )}
+                />
+                <span className="sr-only">
+                  Step {i + 1}
+                  {s.title ? `: ${s.title}` : ''}
+                  {i < stepIndex ? ' (completed)' : i === stepIndex ? ' (current)' : ''}
+                </span>
+              </li>
+            ))}
+          </ol>
+          <p
+            ref={headingRef}
+            tabIndex={-1}
+            className="mt-4 text-step--1 font-bold uppercase tracking-[0.1em] text-primary"
+          >
+            Step {stepIndex + 1} of {steps.length}
+            {current.title ? <span className="ml-2 normal-case tracking-normal text-ink">{current.title}</span> : null}
+          </p>
+        </div>
+      ) : null}
 
       {/* Honeypot. Real visitors never see or fill this. */}
       <div aria-hidden className="absolute left-[-9999px] top-0 h-0 w-0 overflow-hidden">
@@ -81,12 +201,16 @@ export function QuoteFormClient({ form, compact = false }: { form: PublicForm; c
       </div>
 
       <div className={cn('grid gap-x-6 gap-y-5', compact ? 'grid-cols-1' : 'sm:grid-cols-2')}>
-        {visible.map((field) => (
+        {current.fields.map((field) => (
           <Field
             key={field.id}
             field={field}
             formSlug={form.slug}
             compact={compact}
+            value={values[field.name] ?? ''}
+            checked={Boolean(checked[field.name])}
+            invalid={invalid.includes(field.name)}
+            onValue={setValue}
             onCheckedChange={(name, value) => setChecked((prev) => ({ ...prev, [name]: value }))}
           />
         ))}
@@ -97,16 +221,30 @@ export function QuoteFormClient({ form, compact = false }: { form: PublicForm; c
         aria-live="polite"
         className={cn(
           'mt-5 text-step--1',
-          state === 'error' ? 'text-danger' : 'text-muted',
+          state === 'error' || invalid.length ? 'text-danger' : 'text-muted',
           !message && 'sr-only',
         )}
       >
         {message}
       </p>
 
-      <button type="submit" disabled={state === 'submitting'} className="kc-btn kc-btn-primary mt-6 disabled:opacity-60">
-        {state === 'submitting' ? 'Sending…' : form.submitLabel}
-      </button>
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        {multi && stepIndex > 0 ? (
+          <button type="button" onClick={goBack} className="kc-btn kc-btn-outline">
+            Back
+          </button>
+        ) : null}
+
+        {multi && !isLast ? (
+          <button type="button" onClick={goNext} className="kc-btn kc-btn-primary">
+            Next
+          </button>
+        ) : (
+          <button type="submit" disabled={state === 'submitting'} className="kc-btn kc-btn-primary disabled:opacity-60">
+            {state === 'submitting' ? 'Sending…' : form.submitLabel}
+          </button>
+        )}
+      </div>
     </form>
   )
 }
@@ -115,11 +253,19 @@ function Field({
   field,
   formSlug,
   compact,
+  value,
+  checked,
+  invalid,
+  onValue,
   onCheckedChange,
 }: {
   field: PublicFormField
   formSlug: string
   compact: boolean
+  value: string
+  checked: boolean
+  invalid: boolean
+  onValue: (name: string, value: string) => void
   onCheckedChange: (name: string, value: boolean) => void
 }) {
   const id = `${formSlug}-${field.name}`
@@ -127,7 +273,7 @@ function Field({
   const wrapperClass = cn(field.halfWidth && !compact ? '' : 'sm:col-span-2')
 
   if (field.type === 'HIDDEN') {
-    return <input type="hidden" id={id} name={field.name} value={field.placeholder ?? ''} />
+    return <input type="hidden" id={id} name={field.name} value={field.placeholder ?? ''} readOnly />
   }
 
   if (field.type === 'CHECKBOX') {
@@ -138,7 +284,7 @@ function Field({
             id={id}
             name={field.name}
             type="checkbox"
-            value="yes"
+            checked={checked}
             required={field.required}
             aria-required={field.required}
             aria-describedby={describedBy}
@@ -156,36 +302,37 @@ function Field({
     )
   }
 
-  const label = (
-    <label htmlFor={id} className="kc-label">
-      {field.label}
-      {field.required ? (
-        <>
-          {' '}
-          <span className="text-danger" aria-hidden>
-            *
-          </span>
-          <span className="sr-only">(required)</span>
-        </>
-      ) : null}
-    </label>
-  )
-
   const shared = {
     id,
     name: field.name,
+    value,
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+      onValue(field.name, e.target.value),
     required: field.required,
     'aria-required': field.required,
+    'aria-invalid': invalid || undefined,
     'aria-describedby': describedBy,
     placeholder: field.placeholder ?? undefined,
-    className: 'kc-field',
+    className: cn('kc-field', invalid && '!border-danger'),
   }
 
   return (
     <div className={wrapperClass}>
-      {label}
+      <label htmlFor={id} className="kc-label">
+        {field.label}
+        {field.required ? (
+          <>
+            {' '}
+            <span className="text-danger" aria-hidden>
+              *
+            </span>
+            <span className="sr-only">(required)</span>
+          </>
+        ) : null}
+      </label>
+
       {field.type === 'TEXTAREA' ? (
-        <textarea {...shared} rows={5} className="kc-field resize-y" />
+        <textarea {...shared} rows={5} className={cn('kc-field resize-y', invalid && '!border-danger')} />
       ) : field.type === 'SELECT' ? (
         <select {...shared}>
           <option value="">Please select…</option>
@@ -213,6 +360,7 @@ function Field({
           autoComplete={autoCompleteFor(field)}
         />
       )}
+
       {field.helpText ? (
         <p id={describedBy} className="mt-1.5 text-step--1 text-subtle">
           {field.helpText}

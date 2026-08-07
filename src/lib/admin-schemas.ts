@@ -327,6 +327,8 @@ export const formFieldsSchema = z.object({
         order: z.number().int().min(0),
         showWhen: z.string().max(120).nullable().optional(),
         halfWidth: z.boolean().default(true),
+        step: z.number().int().min(1).max(10).default(1),
+        stepTitle: z.string().max(160).nullable().optional(),
       }),
     )
     .max(60),

@@ -625,6 +625,11 @@ model FormField {
   // SELECT options as string[]
   options     Json?
   order       Int           @default(0)
+  // Which step of a multi-step form this field belongs to. Leaving every field
+  // on step 1 renders a single-page form, which is the default.
+  step        Int           @default(1)
+  // Heading shown above this step. Only read from the first field of each step.
+  stepTitle   String?       @db.VarChar(160)
   // Only shown when the named checkbox field is checked.
   showWhen    String?       @db.VarChar(120)
   // Half-width on desktop.

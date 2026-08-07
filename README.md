@@ -504,8 +504,28 @@ the markup and the structured data cannot drift apart.
 
 Two seeded forms (`quote-request`, `contact`), fully configurable at
 `/admin/forms` — label, type, required, options, conditional visibility, half/full
-width. **Validation on the public endpoint is generated from the same rows**, so
-the rules always match what the visitor was shown.
+width, and **step grouping**. **Validation on the public endpoint is generated
+from the same rows**, so the rules always match what the visitor was shown.
+
+**Multi-step.** Seventeen fields on one page is a wall, so the quote form
+paginates into four short steps — Your tour, Your details, Coaches, Trucking and
+notes. Steps live on the field (`step` + `stepTitle`), so an editor regroups them
+in `/admin/forms` without a deploy; leaving every field on step 1 renders a
+single-page form, which is what the contact form does.
+
+The step indicator reflects real position and **"Next" refuses to advance while a
+required field on the current step is empty** — the progress shown is never ahead
+of what has actually been filled in. Focus moves to the new step's heading on
+advance, and step changes and validation errors are announced through an
+aria-live region. A conditional field must sit on the same step as the checkbox
+that reveals it; the API rejects a cross-step dependency, because otherwise the
+trigger sits on a page the visitor has already left.
+
+> **After seeding, clear the Next data cache.** `prisma db seed` is a script, so
+> it cannot call `revalidateTag`. Form and page data stay cached for up to an hour
+> and your changes will not appear. Delete `.next/cache` (or restart with a clean
+> build) after any seed. Editing through `/admin` does not have this problem —
+> those writes revalidate properly.
 
 Protection: honeypot, in-process rate limit, optional Cloudflare Turnstile.
 **Submissions are written to MySQL before the notification email is attempted**,

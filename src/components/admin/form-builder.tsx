@@ -16,6 +16,8 @@ interface FieldDraft {
   order: number
   showWhen: string
   halfWidth: boolean
+  step: number
+  stepTitle: string
 }
 
 const TYPES = ['TEXT', 'EMAIL', 'TEL', 'NUMBER', 'DATE', 'TEXTAREA', 'SELECT', 'CHECKBOX', 'FILE', 'HIDDEN']
@@ -88,6 +90,8 @@ export function FormBuilder({
           order: index,
           showWhen: field.showWhen || null,
           halfWidth: field.halfWidth,
+          step: field.step || 1,
+          stepTitle: field.stepTitle || null,
         })),
       }),
     })
@@ -160,6 +164,29 @@ export function FormBuilder({
               </div>
               <Text label="Placeholder" value={field.placeholder} onChange={(v) => update(index, { placeholder: v })} />
               <Text label="Help text" value={field.helpText} onChange={(v) => update(index, { helpText: v })} />
+              <div>
+                <label htmlFor={`step-${index}`} className="kc-label">
+                  Step
+                </label>
+                <input
+                  id={`step-${index}`}
+                  type="number"
+                  min={1}
+                  max={10}
+                  value={field.step}
+                  onChange={(e) => update(index, { step: Number(e.target.value) || 1 })}
+                  className="kc-field"
+                />
+                <p className="mt-1.5 text-step--1 text-subtle">
+                  All fields on step 1 = a single-page form. A conditional field must share its trigger&rsquo;s step.
+                </p>
+              </div>
+              <Text
+                label="Step heading"
+                value={field.stepTitle}
+                onChange={(v) => update(index, { stepTitle: v })}
+                help="Only read from the first field of each step."
+              />
               {field.type === 'SELECT' ? (
                 <div className="sm:col-span-2">
                   <label htmlFor={`options-${index}`} className="kc-label">
@@ -223,6 +250,8 @@ export function FormBuilder({
                 order: fields.length,
                 showWhen: '',
                 halfWidth: true,
+                step: fields[fields.length - 1]?.step ?? 1,
+                stepTitle: '',
               },
             ])
           }

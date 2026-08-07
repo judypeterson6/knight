@@ -28,6 +28,17 @@ export async function PUT(request: Request, ctx: { params: Promise<{ slug: strin
     return fail(`"${badCondition.label}" is conditional on "${badCondition.showWhen}", which is not a checkbox field.`, 422)
   }
 
+  // A conditional field must live on the same step as the checkbox it depends
+  // on, otherwise the trigger sits on a page the visitor has already left.
+  const stepByName = new Map(body.data.fields.map((f) => [f.name, f.step]))
+  const crossStep = body.data.fields.find((f) => f.showWhen && stepByName.get(f.showWhen) !== f.step)
+  if (crossStep?.showWhen) {
+    return fail(
+      `"${crossStep.label}" is on step ${crossStep.step} but depends on "${crossStep.showWhen}" on step ${stepByName.get(crossStep.showWhen)}. Put them on the same step.`,
+      422,
+    )
+  }
+
   await prisma.$transaction([
     prisma.formField.deleteMany({ where: { formId: form.id } }),
     prisma.formField.createMany({
@@ -43,6 +54,8 @@ export async function PUT(request: Request, ctx: { params: Promise<{ slug: strin
         order: index,
         showWhen: field.showWhen ?? null,
         halfWidth: field.halfWidth,
+        step: field.step,
+        stepTitle: field.stepTitle ?? null,
       })),
     }),
   ])

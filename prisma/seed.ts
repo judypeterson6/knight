@@ -549,6 +549,8 @@ async function seedForms(): Promise<void> {
     update: {},
   })
 
+  // Four short steps rather than one seventeen-field wall. Step boundaries and
+  // titles live on the fields, so an editor can regroup them in /admin/forms.
   const quoteFields: {
     name: string
     label: string
@@ -558,33 +560,46 @@ async function seedForms(): Promise<void> {
     options?: string[]
     halfWidth?: boolean
     showWhen?: string
+    step: number
+    stepTitle?: string
   }[] = [
-    { name: 'pickup_location', label: 'Pick-up location', type: 'TEXT', helpText: 'City and state' },
-    { name: 'dropoff_location', label: 'Drop-off location', type: 'TEXT', helpText: 'City and state' },
-    { name: 'pickup_date', label: 'Pick-up date', type: 'DATE', required: true },
-    { name: 'return_date', label: 'Return date', type: 'DATE', required: true },
-    { name: 'name', label: 'Name', type: 'TEXT', required: true },
-    { name: 'job_title', label: 'Your title', type: 'TEXT' },
-    { name: 'email', label: 'Email', type: 'EMAIL', required: true },
-    { name: 'phone', label: 'Phone number', type: 'TEL', required: true },
-    { name: 'artist_name', label: 'Artist or organisation name', type: 'TEXT' },
-    { name: 'coach_count', label: 'Number of coaches', type: 'NUMBER', required: true },
-    { name: 'crew_size', label: 'Crew size', type: 'NUMBER', helpText: 'How many people need a bunk' },
+    // Step 1 — the trip
+    { step: 1, stepTitle: 'Your tour', name: 'pickup_location', label: 'Pick-up location', type: 'TEXT', helpText: 'City and state' },
+    { step: 1, name: 'dropoff_location', label: 'Drop-off location', type: 'TEXT', helpText: 'City and state' },
+    { step: 1, name: 'pickup_date', label: 'Pick-up date', type: 'DATE', required: true },
+    { step: 1, name: 'return_date', label: 'Return date', type: 'DATE', required: true },
+
+    // Step 2 — who you are
+    { step: 2, stepTitle: 'Your details', name: 'name', label: 'Name', type: 'TEXT', required: true },
+    { step: 2, name: 'job_title', label: 'Your title', type: 'TEXT' },
+    { step: 2, name: 'email', label: 'Email', type: 'EMAIL', required: true },
+    { step: 2, name: 'phone', label: 'Phone number', type: 'TEL', required: true },
+    { step: 2, name: 'artist_name', label: 'Artist or organisation name', type: 'TEXT' },
+
+    // Step 3 — what you need
+    { step: 3, stepTitle: 'Coaches', name: 'coach_count', label: 'Number of coaches', type: 'NUMBER', required: true },
+    { step: 3, name: 'crew_size', label: 'Crew size', type: 'NUMBER', helpText: 'How many people need a bunk' },
     {
+      step: 3,
       name: 'coach_class',
       label: 'Coach class preference',
       type: 'SELECT',
       options: ['No preference', 'Elite', 'Premium', 'Standard'],
     },
+
+    // Step 4 — trucking and anything else
     {
+      step: 4,
+      stepTitle: 'Trucking and notes',
       name: 'needs_trucking',
       label: 'Yes, please quote tour trucking as well',
       type: 'CHECKBOX',
       halfWidth: false,
       helpText: 'Enclosed trailers, box trucks and flatbeds travelling alongside the coach.',
     },
-    { name: 'truck_count', label: 'Number of tour trucks', type: 'NUMBER', showWhen: 'needs_trucking' },
+    { step: 4, name: 'truck_count', label: 'Number of tour trucks', type: 'NUMBER', showWhen: 'needs_trucking' },
     {
+      step: 4,
       name: 'trailer_type',
       label: 'Trailer type',
       type: 'SELECT',
@@ -592,6 +607,7 @@ async function seedForms(): Promise<void> {
       showWhen: 'needs_trucking',
     },
     {
+      step: 4,
       name: 'additional_information',
       label: 'Additional information',
       type: 'TEXTAREA',
@@ -614,9 +630,18 @@ async function seedForms(): Promise<void> {
         options: field.options ?? undefined,
         halfWidth: field.halfWidth ?? true,
         showWhen: field.showWhen ?? null,
+        step: field.step,
+        stepTitle: field.stepTitle ?? null,
         order,
       },
-      update: { label: field.label, type: field.type, required: field.required ?? false, order },
+      update: {
+        label: field.label,
+        type: field.type,
+        required: field.required ?? false,
+        step: field.step,
+        stepTitle: field.stepTitle ?? null,
+        order,
+      },
     })
   }
 

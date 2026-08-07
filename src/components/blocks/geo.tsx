@@ -16,6 +16,10 @@ import { UsCoverageMap } from '@/components/ui/us-coverage-map'
 export function CoverageMapBlock({ props }: { props: BlockPropsMap['CoverageMap'] }) {
   const headingId = sectionHeadingId(props)
   const servedCodes = new Set(props.states.map((s) => s.code))
+  // DC is served but is a federal district, not a state — counting it as one
+  // produced "49 states" against the 48 claimed in the heading and body copy.
+  const servesDc = servedCodes.has('DC')
+  const stateCount = props.states.length - (servesDc ? 1 : 0)
 
   return (
     <Section base={props} labelledBy={headingId}>
@@ -33,7 +37,11 @@ export function CoverageMapBlock({ props }: { props: BlockPropsMap['CoverageMap'
         <figure className="mx-auto mb-12 max-w-5xl">
           <UsCoverageMap servedCodes={servedCodes} />
           <figcaption className="mt-4 text-center text-step--1 text-subtle">
-            Knights Coaches serves {props.states.length} states. The full list is below as text links.
+            {/* Counted excluding DC, which is in the served list but is not a state.
+                Saying "49 states" here contradicted the 48 claimed everywhere else. */}
+            Knights Coaches serves {stateCount} states
+            {servesDc ? ' and the District of Columbia' : ''}. Alaska and Hawaii are outside the service area. The
+            full list is below as text links.
           </figcaption>
         </figure>
       ) : null}

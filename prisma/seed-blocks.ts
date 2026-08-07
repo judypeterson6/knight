@@ -183,6 +183,31 @@ export function sectionsFrom(outline: OutlineNode[], skipHeadings: string[] = []
   return sections.filter((s) => !skip.has(s.heading.toLowerCase().trim()) && s.html.length > 0)
 }
 
+/**
+ * Migrated headings that a purpose-built block already renders further down the
+ * page. Keeping them as RichText too produced the section twice — once as a
+ * proper component, once as raw text with an image bolted on.
+ *
+ * The narrative "How to book an entertainer coach" paragraph is deliberately NOT
+ * matched: the source carries both a prose explanation and a card grid, and only
+ * the card grid is replaced by StepsHowItWorks.
+ */
+const DUPLICATED_BY_A_BLOCK: RegExp[] = [
+  /^how to book your\b/i, // card grid -> StepsHowItWorks
+  /^how to book a\b.*\brental$/i, // ditto, nationwide wording
+  /^frequently asked questions/i, // -> FaqAccordion
+  /^our most popular$/i, // split heading -> DestinationGrid
+  /destinations$/i, // -> DestinationGrid
+  /^our prevost coach fleet/i, // -> FleetGrid
+  /coverage across \d+ states$/i, // -> CoverageMap
+  /^(send us (a )?message|get in touch|contact us)$/i, // contact chrome, not body copy
+]
+
+export function isDuplicatedByBlock(heading: string): boolean {
+  const h = heading.trim()
+  return DUPLICATED_BY_A_BLOCK.some((re) => re.test(h))
+}
+
 export function firstParagraph(outline: OutlineNode[]): string {
   return outline.find((n) => n.tag === 'p' && isBodyNode(n))?.text ?? ''
 }
@@ -469,6 +494,7 @@ export interface BuildContext {
   locations: LocationRecord[]
   img: MediaLookup
   fallbackHero: string
+  mediaByPath: Map<string, MediaRecord>
 }
 
 export function buildContext(pages: PageRecord[], locations: LocationRecord[], media: MediaRecord[]): BuildContext {
@@ -477,7 +503,35 @@ export function buildContext(pages: PageRecord[], locations: LocationRecord[], m
     locations,
     img: mediaLookup(media),
     fallbackHero: media.find((m) => /Outlaw/i.test(m.filename))?.path ?? media[0]?.path ?? '',
+    mediaByPath: new Map(media.map((m) => [m.path, m])),
   }
+}
+
+/**
+ * Images from a migrated page that are worth pairing with a text section.
+ *
+ * Filters out the things WordPress leaves lying around in page markup — avatars,
+ * logos, icons, client badges and anything too small to hold a half-width
+ * column. `exclude` drops the hero, which the page already uses at the top.
+ */
+export function sectionImagePool(page: PageRecord, ctx: BuildContext, exclude: string): string[] {
+  const seen = new Set<string>([exclude])
+  const pool: string[] = []
+
+  for (const path of page.images) {
+    if (seen.has(path)) continue
+    seen.add(path)
+
+    if (!/\.(png|jpe?g|webp)$/i.test(path)) continue
+    if (/(logo|icon|avatar|badge|favicon|client|logoipsum|placeholder)/i.test(path)) continue
+    if (/-\d{2,3}x\d{2,3}\./.test(path)) continue // WordPress thumbnail sizes
+
+    const meta = ctx.mediaByPath.get(path)
+    if (meta && meta.width !== null && meta.width < 600) continue
+
+    pool.push(path)
+  }
+  return pool
 }
 
 const marketLinks = (locations: LocationRecord[]) =>
@@ -925,7 +979,8 @@ export function buildContactBlocks(ctx: BuildContext): SeedBlock[] {
 export function buildAboutBlocks(ctx: BuildContext): SeedBlock[] {
   const page = ctx.pageByRoute.get('/about-us')
   const hero = heroImageFor(page, ctx.fallbackHero)
-  const sections = page ? sectionsFrom(page.outline) : []
+  const sections = page ? sectionsFrom(page.outline).filter((s) => !isDuplicatedByBlock(s.heading)) : []
+  const aboutPool = page ? sectionImagePool(page, ctx, hero) : []
 
   return [
     block('Hero', {
@@ -966,16 +1021,20 @@ export function buildAboutBlocks(ctx: BuildContext): SeedBlock[] {
         { value: '24/7', label: 'Dispatch' },
       ],
     }),
-    ...sections.map((section) =>
-      block('RichText', {
-        background: 'surface',
-        spacing: 'sm',
+    ...sections.map((section, i) => {
+      const imagePath = aboutPool[i]
+      const hasImage = Boolean(imagePath)
+      return block('RichText', {
+        background: i % 2 === 0 ? 'surface' : 'alt',
+        spacing: 'md',
         heading: section.heading,
         headingLevel: 'h2',
         html: section.html,
-        maxWidth: 'prose',
-      }),
-    ),
+        maxWidth: hasImage ? 'full' : 'prose',
+        imagePosition: hasImage ? (i % 2 === 0 ? 'right' : 'left') : 'none',
+        image: hasImage ? ctx.img(imagePath, `${section.heading || 'Knights Coaches'}`) : ctx.img(null, ''),
+      })
+    }),
     block('FeatureGrid', {
       background: 'alt',
       spacing: 'md',
@@ -1016,7 +1075,10 @@ export function buildGenericBlocks(page: PageRecord, ctx: BuildContext): SeedBlo
   const hero = heroImageFor(page, ctx.fallbackHero)
   const statement = firstParagraph(page.outline)
   const heading = h1For(page)
-  const sections = sectionsFrom(page.outline, [heading])
+  // Drop the migrated headings that StepsHowItWorks, FaqAccordion,
+  // DestinationGrid, FleetGrid and CoverageMap render properly below.
+  const sections = sectionsFrom(page.outline, [heading]).filter((s) => !isDuplicatedByBlock(s.heading))
+  const pool = sectionImagePool(page, ctx, hero)
 
   const faqGroup = isNationwide
     ? 'nationwide'
@@ -1038,16 +1100,31 @@ export function buildGenericBlocks(page: PageRecord, ctx: BuildContext): SeedBlo
       phoneLabel: 'Dispatch',
     }),
     block('TrustStrip', { background: 'alt', spacing: 'sm', align: 'center', useTrustSettings: true }),
-    ...sections.map((section, i) =>
-      block('RichText', {
+
+    /**
+     * Body sections alternate image-right / image-left, the way the design
+     * source lays out its two-column bands, instead of stacking as plain text.
+     * Images come from the page's own migrated assets; once the pool runs out
+     * the remaining sections fall back to a centred prose column rather than
+     * repeating the same photograph down the page.
+     */
+    ...sections.map((section, i) => {
+      const imagePath = pool[i]
+      const hasImage = Boolean(imagePath)
+
+      return block('RichText', {
         background: i % 2 === 0 ? 'surface' : 'alt',
-        spacing: 'sm',
+        spacing: 'md',
         heading: section.heading,
         headingLevel: 'h2',
         html: section.html,
-        maxWidth: 'prose',
-      }),
-    ),
+        maxWidth: hasImage ? 'full' : 'prose',
+        imagePosition: hasImage ? (i % 2 === 0 ? 'right' : 'left') : 'none',
+        image: hasImage
+          ? ctx.img(imagePath, `${section.heading || heading} — Knights Coaches`)
+          : ctx.img(null, ''),
+      })
+    }),
   ]
 
   if (geo) {
