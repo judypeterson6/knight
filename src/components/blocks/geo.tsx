@@ -46,41 +46,60 @@ export function CoverageMapBlock({ props }: { props: BlockPropsMap['CoverageMap'
         </figure>
       ) : null}
 
-      <div className="grid gap-10 lg:grid-cols-2">
+      {/* Two panels rather than two bare columns. The states list is far denser
+          than the markets list, so as plain columns the shorter one left a wide
+          empty band; panels give both a floor and keep the section balanced. */}
+      <div className="grid gap-6 lg:grid-cols-[1.35fr_minmax(0,1fr)] lg:gap-8">
         {props.states.length ? (
-          <div>
-            <h3>{props.statesHeading}</h3>
-            <ul className="mt-5 flex flex-wrap gap-x-3 gap-y-2">
+          <div className="rounded-block border border-line bg-surface p-7 text-left md:p-9">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+              <h3 className="text-step-1">{props.statesHeading}</h3>
+              <p className="text-step--1 font-bold uppercase tracking-[0.08em] text-subtle">
+                {stateCount} states{servesDc ? ' + DC' : ''}
+              </p>
+            </div>
+
+            {/* Fixed-width code column so every state name starts on the same
+                vertical line — the wrapped pills this replaces left a ragged
+                right edge and no two rows lined up. */}
+            <ul className="mt-6 grid grid-cols-2 gap-x-7 sm:grid-cols-3">
               {props.states.map((state) => (
-                <li key={state.code}>
-                  <span className="inline-flex items-center gap-1.5 rounded-pill border border-line bg-surface px-3 py-1.5 text-step--1 font-semibold">
-                    <span className="text-primary">{state.code}</span>
-                    <span className="text-muted">{state.name}</span>
-                  </span>
+                <li key={state.code} className="flex items-center gap-2.5 border-b border-line py-2.5">
+                  <span className="w-7 flex-shrink-0 text-step--1 font-extrabold text-primary">{state.code}</span>
+                  <span className="truncate text-step--1 font-semibold text-muted">{state.name}</span>
                 </li>
               ))}
             </ul>
+
             {props.excludedNote ? (
-              <p className="mt-5 text-step--1 leading-relaxed text-muted">{props.excludedNote}</p>
+              <p className="mt-6 text-step--1 leading-relaxed text-muted">{props.excludedNote}</p>
             ) : null}
           </div>
         ) : null}
 
         {props.markets.length ? (
-          <div>
-            <h3>{props.marketsHeading}</h3>
-            <ul className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3">
+          <div className="rounded-block border border-line bg-surface-alt p-7 text-left md:p-9">
+            <h3 className="text-step-1">{props.marketsHeading}</h3>
+            {/* These are city pages. Rendered as plain bold text they read as
+                static labels, so they carry a row, a hover state and an arrow. */}
+            <ul className="mt-6 grid gap-1 sm:grid-cols-2 lg:grid-cols-1">
               {props.markets.map((market) => (
                 <li key={market.label}>
                   {market.url ? (
                     <SmartLink
                       href={market.url}
-                      className="font-semibold text-ink underline-offset-4 hover:text-primary hover:underline"
+                      className="group flex items-center justify-between gap-4 rounded-card px-4 py-2.5 font-bold text-ink transition hover:bg-surface"
                     >
-                      {market.label}
+                      <span className="truncate">{market.label}</span>
+                      <span
+                        aria-hidden
+                        className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border border-line bg-surface text-step--1 text-subtle transition group-hover:border-primary group-hover:bg-primary group-hover:text-primary-contrast"
+                      >
+                        →
+                      </span>
                     </SmartLink>
                   ) : (
-                    <span className="font-semibold text-muted">{market.label}</span>
+                    <span className="flex px-4 py-2.5 font-bold text-muted">{market.label}</span>
                   )}
                 </li>
               ))}
