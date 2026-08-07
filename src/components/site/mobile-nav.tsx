@@ -83,7 +83,9 @@ export function MobileNav({
         role="dialog"
         aria-modal={open}
         aria-label="Site menu"
-        {...(open ? {} : { inert: '' as unknown as boolean })}
+        // React 19 takes a real boolean here; the old empty-string form is
+        // read as `false`, which would leave the closed panel focusable.
+        inert={!open}
         className={`fixed inset-y-0 right-0 z-[120] w-[min(330px,86vw)] overflow-y-auto bg-surface p-6 transition-transform duration-300 ease-smooth ${
           open ? 'translate-x-0' : 'translate-x-full'
         }`}

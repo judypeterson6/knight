@@ -113,6 +113,40 @@ export function loadSnapshot<T>(file: string, fallback: T): T {
   return JSON.parse(readFileSync(full, 'utf8')) as T
 }
 
+/** Splits a list into fixed-size batches. */
+function chunk<T>(items: T[], size: number): T[][] {
+  const out: T[][] = []
+  for (let i = 0; i < items.length; i += size) out.push(items.slice(i, i + size))
+  return out
+}
+
+/**
+ * Retries a query when the connection drops mid-seed.
+ *
+ * Shared MySQL/MariaDB hosts close idle or long-running connections, which
+ * surfaces as P1017 / P1001 partway through a long seed. Prisma reconnects on
+ * the next query, so a short backoff is enough — without this the seed dies
+ * halfway and leaves the database in a partial state.
+ */
+async function withRetry<T>(run: () => Promise<T>, attempts = 4): Promise<T> {
+  let lastError: unknown
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      return await run()
+    } catch (error) {
+      lastError = error
+      const code = (error as { code?: string }).code
+      const retryable = code === 'P1017' || code === 'P1001' || code === 'P1008' || code === 'P2024'
+      if (!retryable || attempt === attempts) throw error
+      const waitMs = 400 * attempt
+      console.warn(`    ! ${code} — reconnecting (attempt ${attempt + 1}/${attempts})`)
+      await new Promise((resolve) => setTimeout(resolve, waitMs))
+      await prisma.$connect().catch(() => undefined)
+    }
+  }
+  throw lastError
+}
+
 // ---------------------------------------------------------------------------
 // Seed
 // ---------------------------------------------------------------------------
@@ -155,30 +189,45 @@ async function main(): Promise<void> {
   console.log(`  admin user      ${admin.email}`)
 
   // --- Media ----------------------------------------------------------------
-  const mediaIdByPath = new Map<string, string>()
-  for (const record of mediaRecords) {
-    const row = await prisma.media.upsert({
-      where: { path: record.path },
-      create: {
-        path: record.path,
-        sourceUrl: record.sourceUrl,
-        filename: record.filename,
-        mimeType: record.mimeType,
-        width: record.width,
-        height: record.height,
-        bytes: record.bytes,
-        alt: record.alt,
-        // An asset that arrived from WordPress with no alt text is flagged, not
-        // silently treated as decorative — it surfaces in the admin SEO audit.
-        decorative: false,
-        title: record.title,
-        caption: record.caption,
-      },
-      update: { width: record.width, height: record.height, bytes: record.bytes },
-    })
-    mediaIdByPath.set(record.path, row.id)
+  //
+  // 916 individual upserts over a remote connection is what killed this on
+  // shared hosting (`P1017: Server has closed the connection`). Instead: read
+  // the existing paths once, bulk-insert only what is missing, and never
+  // rewrite rows that already exist — an editor's alt-text corrections survive
+  // a re-seed as a result. Round trips drop from ~916 to under ten.
+  const existingMedia = await withRetry(() => prisma.media.findMany({ select: { id: true, path: true } }))
+  const mediaIdByPath = new Map<string, string>(existingMedia.map((m) => [m.path, m.id]))
+
+  const newMedia = mediaRecords.filter((record) => !mediaIdByPath.has(record.path))
+  for (const batch of chunk(newMedia, 150)) {
+    await withRetry(() =>
+      prisma.media.createMany({
+        data: batch.map((record) => ({
+          path: record.path,
+          sourceUrl: record.sourceUrl,
+          filename: record.filename,
+          mimeType: record.mimeType,
+          width: record.width,
+          height: record.height,
+          bytes: record.bytes,
+          alt: record.alt,
+          // An asset that arrived from WordPress with no alt text is flagged, not
+          // silently treated as decorative — it surfaces in the admin SEO audit.
+          decorative: false,
+          title: record.title,
+          caption: record.caption,
+        })),
+        skipDuplicates: true,
+      }),
+    )
   }
-  console.log(`  media           ${mediaIdByPath.size}`)
+
+  if (newMedia.length) {
+    const refreshed = await withRetry(() => prisma.media.findMany({ select: { id: true, path: true } }))
+    mediaIdByPath.clear()
+    for (const m of refreshed) mediaIdByPath.set(m.path, m.id)
+  }
+  console.log(`  media           ${mediaIdByPath.size} (${newMedia.length} new)`)
 
   // --- Coach classes and coaches -------------------------------------------
   const CLASS_DESCRIPTIONS: Record<string, string> = {

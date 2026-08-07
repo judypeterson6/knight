@@ -38,7 +38,9 @@ export async function HeroBlock({ props, first }: { props: BlockPropsMap['Hero']
       <div
         className={cn(
           'relative isolate overflow-hidden bg-surface-dark',
-          isLanding ? 'min-h-[min(100svh,54rem)]' : 'min-h-[26rem]',
+          // The landing hero holds the H1, the statement and the quote form, so
+          // it needs real height; the page banner sits above a full block stack.
+          isLanding ? 'min-h-[min(100svh,58rem)]' : 'min-h-[34rem]',
         )}
       >
         {/* Background media. Decorative — every fact it carries is also text below. */}
@@ -76,10 +78,25 @@ export async function HeroBlock({ props, first }: { props: BlockPropsMap['Hero']
             isLanding ? 'py-28 md:py-32 lg:py-36' : 'pb-16 pt-32 md:pb-20 md:pt-40',
           )}
         >
-          <div className={cn('grid gap-10', isLanding && form ? 'lg:grid-cols-[1.1fr_minmax(0,26rem)]' : '')}>
-            <div className="max-w-3xl">
+          {/* items-center keeps the copy optically balanced against the quote
+              form card, instead of stranding it at the top of a tall column. */}
+          <div
+            className={cn(
+              'grid gap-10 lg:gap-14',
+              isLanding && form ? 'lg:grid-cols-[1.05fr_minmax(0,27rem)] lg:items-center' : '',
+            )}
+          >
+            <div className={cn(isLanding && form ? 'max-w-2xl' : 'max-w-3xl')}>
+              {/* Breadcrumb leads, where a breadcrumb belongs — it previously sat
+                  orphaned under the buttons. Navigation, not a marketing banner. */}
+              {props.breadcrumbLabel ? (
+                <nav aria-label="Breadcrumb" className="mb-5 text-step--1 text-on-dark-muted">
+                  {props.breadcrumbLabel}
+                </nav>
+              ) : null}
+
               {props.eyebrow ? (
-                <p className="mb-6 inline-flex items-center gap-3 rounded-pill border border-primary/50 bg-primary/15 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.18em] text-accent">
+                <p className="mb-5 inline-flex items-center gap-3 rounded-pill border border-primary/50 bg-primary/15 px-4 py-2 text-[0.78rem] font-bold uppercase tracking-[0.18em] text-accent">
                   <span aria-hidden className="h-2 w-2 rounded-full bg-primary" />
                   {props.eyebrow}
                 </p>
@@ -95,27 +112,31 @@ export async function HeroBlock({ props, first }: { props: BlockPropsMap['Hero']
 
               {/* The service statement: what is provided, on what equipment, over what area. */}
               {props.body ? (
-                <p className="mt-6 max-w-2xl text-[1.03rem] leading-relaxed text-on-dark-muted">{props.body}</p>
+                <p className="mt-5 max-w-2xl text-[1.03rem] leading-relaxed text-on-dark-muted">{props.body}</p>
               ) : null}
 
-              {/* Action block — highest-contrast element. Phone is real text in a tel: link. */}
-              <div className="mt-8 flex flex-wrap items-center gap-4">
-                <CtaRow ctas={props.ctas} />
+              {/* Action block. The phone is a real tel: link with the digits as
+                  text — styled as a solid button so it reads as the primary
+                  action when the page has no other CTA. */}
+              <div className="mt-8 flex flex-wrap items-center gap-3">
                 <a
                   href={telHref(phone)}
-                  className="inline-flex items-center gap-3 rounded-pill border border-white/35 px-6 py-4 font-bold text-on-dark transition hover:bg-white/10"
+                  className="inline-flex items-center gap-3 rounded-pill bg-primary px-6 py-3.5 text-primary-contrast shadow-cta transition hover:-translate-y-0.5 hover:bg-primary-hover"
                 >
-                  <Icon name="phone" className="h-5 w-5 text-primary" />
-                  <span>
-                    {props.phoneLabel ? <span className="block text-[0.8rem] font-semibold opacity-80">{props.phoneLabel}</span> : null}
-                    <span className="block">{formatPhone(phone)}</span>
+                  <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-white/20">
+                    <Icon name="phone" className="h-4 w-4" />
+                  </span>
+                  <span className="text-left leading-tight">
+                    {props.phoneLabel ? (
+                      <span className="block text-[0.72rem] font-semibold uppercase tracking-[0.1em] opacity-85">
+                        {props.phoneLabel}
+                      </span>
+                    ) : null}
+                    <span className="block text-[1.05rem] font-extrabold">{formatPhone(phone)}</span>
                   </span>
                 </a>
+                <CtaRow ctas={props.ctas} />
               </div>
-
-              {props.breadcrumbLabel ? (
-                <p className="mt-6 text-step--1 text-on-dark-muted">{props.breadcrumbLabel}</p>
-              ) : null}
 
               {/* Trust strip — text, not badge images. */}
               {props.stats.length ? (
@@ -133,12 +154,18 @@ export async function HeroBlock({ props, first }: { props: BlockPropsMap['Hero']
             </div>
 
             {isLanding && form ? (
-              <div className="rounded-block border border-line bg-surface p-6 shadow-raised md:p-8">
+              <aside
+                aria-labelledby={props.quoteFormTitle ? 'hero-quote-form' : undefined}
+                className="w-full rounded-block border border-line bg-surface p-6 shadow-raised md:p-7 lg:justify-self-end"
+              >
                 {props.quoteFormTitle ? (
-                  <h2 className="mb-5 text-step-2">{props.quoteFormTitle}</h2>
+                  <h2 id="hero-quote-form" className="mb-1 text-step-2">
+                    {props.quoteFormTitle}
+                  </h2>
                 ) : null}
+                <p className="mb-5 text-step--1 text-muted">Takes about a minute. Dispatch replies within the hour.</p>
                 <QuoteFormClient form={form} compact />
-              </div>
+              </aside>
             ) : null}
           </div>
         </div>

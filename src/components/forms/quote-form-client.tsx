@@ -18,7 +18,16 @@ import type { PublicForm, PublicFormField } from '@/lib/forms'
  * are marked aria-required, validation and step changes are announced through an
  * aria-live region, and focus moves to the new step's heading on advance.
  */
-export function QuoteFormClient({ form, compact = false }: { form: PublicForm; compact?: boolean }) {
+export function QuoteFormClient({
+  form,
+  compact = false,
+  hideDescription = false,
+}: {
+  form: PublicForm
+  compact?: boolean
+  /** Set when the surrounding block already says what the description says. */
+  hideDescription?: boolean
+}) {
   const [state, setState] = useState<'idle' | 'submitting' | 'sent' | 'error'>('idle')
   const [message, setMessage] = useState('')
   const [checked, setChecked] = useState<Record<string, boolean>>({})
@@ -159,7 +168,9 @@ export function QuoteFormClient({ form, compact = false }: { form: PublicForm; c
 
   return (
     <form ref={formRef} onSubmit={onSubmit}>
-      {form.description && stepIndex === 0 ? (
+      {/* The intro paragraph is skipped in compact placements (inside a hero),
+          where it pushes the fields below the fold for no added information. */}
+      {form.description && stepIndex === 0 && !compact && !hideDescription ? (
         <p className="mb-6 text-step-0 text-muted">{form.description}</p>
       ) : null}
 

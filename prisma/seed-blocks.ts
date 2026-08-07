@@ -148,6 +148,21 @@ export function escapeHtml(value: string): string {
  * Turns a migrated page's outline into sections — one per h1/h2 boundary,
  * preserving heading level, list structure and section order.
  */
+/**
+ * Headings in the outline that resolve to a feature grid rather than prose.
+ * Used to keep the same section from rendering twice.
+ */
+export function featureSections(outline: OutlineNode[]): FeatureSection[] {
+  const nodes = outline.filter(isBodyNode)
+  const found: FeatureSection[] = []
+  for (let i = 0; i < nodes.length; i += 1) {
+    if (nodes[i].tag !== 'h2' && nodes[i].tag !== 'h1') continue
+    const section = featureSectionAt(outline, i)
+    if (section) found.push(section)
+  }
+  return found
+}
+
 export function sectionsFrom(outline: OutlineNode[], skipHeadings: string[] = []): { heading: string; html: string }[] {
   const nodes = outline.filter(isBodyNode)
   const sections: { heading: string; html: string }[] = []
@@ -195,6 +210,8 @@ export function sectionsFrom(outline: OutlineNode[], skipHeadings: string[] = []
 const DUPLICATED_BY_A_BLOCK: RegExp[] = [
   /^how to book your\b/i, // card grid -> StepsHowItWorks
   /^how to book a\b.*\brental$/i, // ditto, nationwide wording
+  /^how to (hire|reserve|rent)\b/i, // city-page wording for the same 4 steps
+  /^booking your\b/i, // audience-page wording for the same 4 steps
   /^frequently asked questions/i, // -> FaqAccordion
   /^our most popular$/i, // split heading -> DestinationGrid
   /destinations$/i, // -> DestinationGrid
@@ -206,6 +223,106 @@ const DUPLICATED_BY_A_BLOCK: RegExp[] = [
 export function isDuplicatedByBlock(heading: string): boolean {
   const h = heading.trim()
   return DUPLICATED_BY_A_BLOCK.some((re) => re.test(h))
+}
+
+/**
+ * Trims a migrated opening paragraph to its first couple of sentences.
+ *
+ * The WordPress intros run 400-600 characters. Beside a quote form in the hero
+ * that pushes the fields off-screen, and the ranking spec asks for 2-3 factual
+ * sentences here, not a wall.
+ */
+export function leadSentences(text: string, max = 2): string {
+  const sentences = text.match(/[^.!?]+[.!?]+(\s|$)/g)
+  if (!sentences?.length) return text.slice(0, 240).trim()
+  return sentences.slice(0, max).join('').trim()
+}
+
+/**
+ * Sections whose body is a run of short h3 items — "What's included in every
+ * rental", "Why touring professionals choose us" — are feature lists, not
+ * prose. Rendered as RichText they became a wall of tiny sub-headings; as a
+ * FeatureGrid they get an icon card each, which is what the design does.
+ */
+export interface FeatureSection {
+  heading: string
+  intro: string
+  items: { icon: string; title: string; description: string }[]
+}
+
+/** Keyword -> icon, so each card gets something better than a generic tick. */
+const ICON_HINTS: [RegExp, string][] = [
+  [/driver|cdl|chauffeur/i, 'id-card'],
+  [/dispatch|support|24\/7|routing/i, 'headset'],
+  [/fleet|prevost|coach|chassis|bus/i, 'bus'],
+  [/truck|trailer|backline|gear|merch/i, 'truck'],
+  [/emc|dot|fmcsa|safety|certif|complian/i, 'shield-halved'],
+  [/state|coverage|nationwide|city|pickup|market/i, 'map-location-dot'],
+  [/bunk|sleep|bed/i, 'bed'],
+  [/galley|kitchen|food/i, 'utensils'],
+  [/shower|bathroom/i, 'shower'],
+  [/lounge|seat|sofa/i, 'couch'],
+  [/wifi|power|outlet|connect/i, 'plug'],
+  [/tv|entertain|sound/i, 'tv'],
+  [/climate|heat|air/i, 'temperature-half'],
+  [/price|cost|rate|payment|fee/i, 'credit-card'],
+  [/book|reserv|schedul|lease|term|continuity/i, 'calendar-check'],
+  [/inspect|maintain|service|mechanic/i, 'screwdriver-wrench'],
+  [/time|hour|clock/i, 'clock'],
+]
+
+export function iconFor(text: string): string {
+  for (const [pattern, icon] of ICON_HINTS) if (pattern.test(text)) return icon
+  return 'circle-check'
+}
+
+/**
+ * Pulls a feature list out of a page outline: an h2 followed by three or more
+ * h3s, each with a short paragraph. Returns null when the section is ordinary
+ * prose, which then renders as RichText as before.
+ */
+export function featureSectionAt(outline: OutlineNode[], startIndex: number): FeatureSection | null {
+  const nodes = outline.filter(isBodyNode)
+  const head = nodes[startIndex]
+  if (!head || (head.tag !== 'h2' && head.tag !== 'h1')) return null
+
+  const items: { icon: string; title: string; description: string }[] = []
+  let intro = ''
+  let pendingIntroHeading = false
+
+  for (let i = startIndex + 1; i < nodes.length; i += 1) {
+    const node = nodes[i]
+    if (node.tag === 'h1' || node.tag === 'h2') break
+
+    if (node.tag === 'h3') {
+      // A sub-heading phrased as a question ("Why touring professionals choose
+      // us") introduces the group; it is not one of the cards. Its copy folds
+      // into the section intro instead of becoming a card nobody can parse.
+      if (/^(why|how|what|when|where|who)\b/i.test(node.text.trim())) {
+        pendingIntroHeading = true
+        continue
+      }
+      items.push({ icon: iconFor(node.text), title: node.text, description: '' })
+      continue
+    }
+    if (node.tag === 'p') {
+      if (pendingIntroHeading) {
+        intro = intro ? `${intro} ${node.text}` : node.text
+        pendingIntroHeading = false
+      } else if (items.length) {
+        const last = items[items.length - 1]
+        last.description = last.description ? `${last.description} ${node.text}` : node.text
+      } else if (!intro) {
+        intro = node.text
+      }
+    }
+  }
+
+  // Three or more titled items with copy is a grid; anything less is prose.
+  const usable = items.filter((i) => i.title.trim() && i.description.trim())
+  if (usable.length < 3) return null
+
+  return { heading: head.text, intro, items: usable }
 }
 
 export function firstParagraph(outline: OutlineNode[]): string {
@@ -495,6 +612,28 @@ export interface BuildContext {
   img: MediaLookup
   fallbackHero: string
   mediaByPath: Map<string, MediaRecord>
+  /** Site-wide inclusions, used on pages that carry no feature list of their own. */
+  sharedFeatures: FeatureSection | null
+}
+
+/**
+ * Finds the "What's Included in Every Rental" section in the migrated corpus.
+ *
+ * Its own copy states the inclusions apply "regardless of class or lease
+ * length", so it is a fact about the operator rather than about one page. Only
+ * 4 of 44 migrated pages carry a feature list; the rest have nothing but the
+ * how-to-book steps, which already render as StepsHowItWorks. Reusing this one
+ * real section on those pages keeps every page consistent without inventing
+ * claims — and each copy seeds as an ordinary block, so it stays editable
+ * per page from /admin.
+ */
+export function sharedFeatureSection(pages: PageRecord[]): FeatureSection | null {
+  for (const page of pages) {
+    for (const section of featureSections(page.outline)) {
+      if (/included in every rental/i.test(section.heading)) return section
+    }
+  }
+  return null
 }
 
 export function buildContext(pages: PageRecord[], locations: LocationRecord[], media: MediaRecord[]): BuildContext {
@@ -504,6 +643,7 @@ export function buildContext(pages: PageRecord[], locations: LocationRecord[], m
     img: mediaLookup(media),
     fallbackHero: media.find((m) => /Outlaw/i.test(m.filename))?.path ?? media[0]?.path ?? '',
     mediaByPath: new Map(media.map((m) => [m.path, m])),
+    sharedFeatures: sharedFeatureSection(pages),
   }
 }
 
@@ -570,6 +710,7 @@ export function buildHomeBlocks(ctx: BuildContext): SeedBlock[] {
       quoteFormSlug: 'quote-request',
       quoteFormTitle: 'Get a quote',
       phoneLabel: '24/7 dispatch',
+      ctas: [cta('Explore the fleet', '/fleet', 'ghost')],
       stats: [
         { value: '48', label: 'States served' },
         { value: '20+', label: 'Coach fleet' },
@@ -1075,9 +1216,19 @@ export function buildGenericBlocks(page: PageRecord, ctx: BuildContext): SeedBlo
   const hero = heroImageFor(page, ctx.fallbackHero)
   const statement = firstParagraph(page.outline)
   const heading = h1For(page)
+  // Sections that are really feature lists become icon grids, so they are
+  // excluded from the prose sections to avoid rendering the same content twice.
+  const ownFeatures = featureSections(page.outline).filter((f) => !isDuplicatedByBlock(f.heading))
+  // A page with no feature list of its own still gets one, from the site-wide
+  // inclusions — see sharedFeatureSection. Pages that have their own keep it.
+  const features = ownFeatures.length || !ctx.sharedFeatures ? ownFeatures : [ctx.sharedFeatures]
+  const featureHeadings = new Set(features.map((f) => f.heading.toLowerCase().trim()))
+
   // Drop the migrated headings that StepsHowItWorks, FaqAccordion,
   // DestinationGrid, FleetGrid and CoverageMap render properly below.
-  const sections = sectionsFrom(page.outline, [heading]).filter((s) => !isDuplicatedByBlock(s.heading))
+  const sections = sectionsFrom(page.outline, [heading]).filter(
+    (s) => !isDuplicatedByBlock(s.heading) && !featureHeadings.has(s.heading.toLowerCase().trim()),
+  )
   const pool = sectionImagePool(page, ctx, hero)
 
   const faqGroup = isNationwide
@@ -1087,17 +1238,29 @@ export function buildGenericBlocks(page: PageRecord, ctx: BuildContext): SeedBlo
       : 'entertainer-coach'
 
   const blocks: SeedBlock[] = [
+    /**
+     * Service and location pages carry the quote form in the hero, so the
+     * action block sits in the viewport beside the H1 rather than after a
+     * scroll. The statement is cut to its opening sentences for the same
+     * reason — the full migrated intro pushed the fields off-screen.
+     */
     block('Hero', {
-      variant: 'page',
+      variant: 'landing',
       background: 'none',
       spacing: 'none',
       headingLevel: 'h1',
       eyebrow: page.title,
       heading,
-      body: statement.slice(0, 520),
+      body: leadSentences(statement),
       image: ctx.img(hero, `${heading} — Knights Coaches Prevost entertainer coach`),
       breadcrumbLabel: `Home / ${page.title}`,
-      phoneLabel: 'Dispatch',
+      phoneLabel: '24/7 dispatch',
+      // A secondary route out of the hero, so the action row is a considered
+      // pair rather than one stranded button.
+      ctas: [cta('Explore the fleet', '/fleet', 'ghost')],
+      showQuoteForm: true,
+      quoteFormSlug: 'quote-request',
+      quoteFormTitle: 'Get a quote',
     }),
     block('TrustStrip', { background: 'alt', spacing: 'sm', align: 'center', useTrustSettings: true }),
 
@@ -1126,6 +1289,22 @@ export function buildGenericBlocks(page: PageRecord, ctx: BuildContext): SeedBlo
       })
     }),
   ]
+
+  // Feature lists as icon grids, after the prose sections.
+  for (const [i, section] of features.entries()) {
+    blocks.push(
+      block('FeatureGrid', {
+        background: (sections.length + i) % 2 === 0 ? 'surface' : 'alt',
+        spacing: 'md',
+        align: 'center',
+        heading: section.heading,
+        headingLevel: 'h2',
+        body: section.intro,
+        columns: section.items.length % 4 === 0 ? 4 : 3,
+        items: section.items,
+      }),
+    )
+  }
 
   if (geo) {
     blocks.push(

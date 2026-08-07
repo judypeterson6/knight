@@ -76,6 +76,10 @@ export async function ContactBlockBlock({ props }: { props: BlockPropsMap['Conta
   const headingId = sectionHeadingId(props)
   const { QuoteFormClient } = await import('@/components/forms/quote-form-client')
 
+  const formNameIsRedundant =
+    !!form &&
+    [props.eyebrow, props.heading].some((text) => text.trim().toLowerCase() === form.name.trim().toLowerCase())
+
   const cards = [
     props.showPhone && {
       icon: 'phone',
@@ -143,11 +147,18 @@ export async function ContactBlockBlock({ props }: { props: BlockPropsMap['Conta
         })}
       </ul>
 
-      <div className="mt-12 grid gap-10 lg:grid-cols-[1.15fr_1fr]">
+      {/* The form gets roughly two thirds; the details column is short, so a
+          near-even split left a large empty band beside it. */}
+      <div className="mt-12 grid gap-10 lg:grid-cols-[minmax(0,1.9fr)_minmax(0,1fr)] lg:gap-14">
         {form ? (
           <div className="rounded-block border border-line bg-surface p-6 shadow-card md:p-10">
-            <h3 className="mb-6 text-step-3">{form.name}</h3>
-            <QuoteFormClient form={form} />
+            {/* The section eyebrow, heading and body already introduce this
+                form. Printing the form's own name and description again stacked
+                the same sentence three times above the first field, so each is
+                kept only when it is not already said — the heading stays in the
+                document outline either way. */}
+            <h3 className={cn('mb-6 text-step-3', formNameIsRedundant && 'sr-only')}>{form.name}</h3>
+            <QuoteFormClient form={form} hideDescription={Boolean(props.body.trim())} />
           </div>
         ) : null}
 
