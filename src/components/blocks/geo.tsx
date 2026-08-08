@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { publishedLocationWhere } from '@/lib/publish'
 import { cn } from '@/lib/utils'
 import type { BlockPropsMap } from '@/lib/blocks/schema'
-import { Card, CtaButton, Section, SectionHeading, sectionHeadingId, SmartImage, SmartLink } from '@/components/ui/primitives'
+import { Card, CtaButton, Prose, Section, SectionHeading, sectionHeadingId, SmartImage, SmartLink } from '@/components/ui/primitives'
 import { UsCoverageMap } from '@/components/ui/us-coverage-map'
 
 /**
@@ -72,7 +72,7 @@ export function CoverageMapBlock({ props }: { props: BlockPropsMap['CoverageMap'
             </ul>
 
             {props.excludedNote ? (
-              <p className="mt-6 text-step--1 leading-relaxed text-muted">{props.excludedNote}</p>
+              <Prose html={props.excludedNote} className="mt-6 text-step--1 leading-relaxed text-muted" />
             ) : null}
           </div>
         ) : null}

@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { createContext, useContext, useId, useRef, useState } from 'react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import type { BlockType } from '@/lib/blocks/schema'
+import { RichTextEditor } from '@/components/admin/rich-text-editor'
 
 export interface MediaOption {
   id: string
@@ -14,6 +15,19 @@ export interface MediaOption {
   width: number | null
   height: number | null
 }
+
+/**
+ * Assets uploaded during this editing session.
+ *
+ * The media list is fetched on the server when the page loads, so an image
+ * uploaded from inside a block would not appear in any other picker until a
+ * full reload. Holding the new records here keeps every picker on the screen in
+ * step without re-fetching or threading a callback through the whole field tree.
+ */
+const SessionMediaContext = createContext<{ extra: MediaOption[]; add: (item: MediaOption) => void }>({
+  extra: [],
+  add: () => {},
+})
 
 /**
  * Right-rail inspector.
@@ -47,8 +61,12 @@ export function PropsInspector({
 
   const layoutKeys = ['background', 'spacing', 'align', 'anchor', 'className']
   const contentKeys = Object.keys(props).filter((k) => !layoutKeys.includes(k))
+  const [sessionMedia, setSessionMedia] = useState<MediaOption[]>([])
 
   return (
+    <SessionMediaContext.Provider
+      value={{ extra: sessionMedia, add: (item) => setSessionMedia((prev) => [item, ...prev]) }}
+    >
     <div>
       <h2 className="text-step-0 font-extrabold">{label}</h2>
       <p className="mt-1 text-step--1 leading-relaxed text-muted">{description}</p>
@@ -86,6 +104,7 @@ export function PropsInspector({
         </div>
       </details>
     </div>
+    </SessionMediaContext.Provider>
   )
 }
 
@@ -167,15 +186,19 @@ function PropField({
   }
 
   if (typeof value === 'string') {
-    return (
-      <Text
-        label={humanize(name)}
-        value={value}
-        multiline={LONG_KEYS.has(name)}
-        onChange={onChange}
-        help={name === 'html' ? 'Raw HTML. Sanitised on render.' : undefined}
-      />
-    )
+    // Prose fields get the same editor the blog uses, so bold, links, lists and
+    // headings are available in every block rather than only in RichText. The
+    // renderer keeps plain values on their original markup, so existing copy is
+    // untouched until someone actually applies formatting.
+    if (LONG_KEYS.has(name)) {
+      return (
+        <div>
+          <p className="kc-label">{humanize(name)}</p>
+          <RichTextEditor value={value} onChange={onChange} media={media} />
+        </div>
+      )
+    }
+    return <Text label={humanize(name)} value={value} onChange={onChange} />
   }
 
   if (isImageValue(value)) {
@@ -345,6 +368,11 @@ function ImagePicker({
   const src = String(value.src ?? '')
   const alt = String(value.alt ?? '')
   const decorative = value.decorative === true
+  const session = useContext(SessionMediaContext)
+
+  // Session uploads first, so an image just uploaded from this field is at the
+  // top of the list rather than buried in 900-odd migrated assets.
+  const options = [...session.extra, ...media.filter((m) => !session.extra.some((e) => e.path === m.path))]
 
   return (
     <fieldset className="rounded-control border border-line p-3">
@@ -369,7 +397,7 @@ function ImagePicker({
         id={`img-${label}`}
         value={src}
         onChange={(e) => {
-          const chosen = media.find((m) => m.path === e.target.value)
+          const chosen = options.find((m) => m.path === e.target.value)
           onChange({
             ...value,
             src: e.target.value,
@@ -382,13 +410,27 @@ function ImagePicker({
         className="kc-field"
       >
         <option value="">None</option>
-        {media.map((option) => (
+        {options.map((option) => (
           <option key={option.id} value={option.path}>
             {option.filename}
             {option.alt ? '' : ' (no alt text)'}
           </option>
         ))}
       </select>
+
+      <MediaUploader
+        onUploaded={(item) => {
+          session.add(item)
+          onChange({
+            ...value,
+            src: item.path,
+            alt: item.alt,
+            decorative: item.decorative,
+            width: item.width ?? 1024,
+            height: item.height ?? 691,
+          })
+        }}
+      />
 
       <div className="mt-3">
         <Text
@@ -422,6 +464,125 @@ function ImagePicker({
         <Text label="Caption" value={String(value.caption ?? '')} onChange={(v) => onChange({ ...value, caption: v })} help="Rendered as a figcaption. Say what the image shows." />
       </div>
     </fieldset>
+  )
+}
+
+/**
+ * Upload straight into the block being edited.
+ *
+ * Every image field previously offered only the assets already in the library,
+ * so adding a new picture meant leaving the page for /admin/media and coming
+ * back. The upload posts to the same endpoint the media library uses, which is
+ * what enforces the type and size limits and refuses an image with no alt text
+ * — that rule is not re-implemented here, only surfaced.
+ */
+function MediaUploader({ onUploaded }: { onUploaded: (item: MediaOption) => void }) {
+  const fieldId = useId()
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [file, setFile] = useState<File | null>(null)
+  const [alt, setAlt] = useState('')
+  const [decorative, setDecorative] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [message, setMessage] = useState('')
+
+  const ready = Boolean(file) && (alt.trim().length > 0 || decorative)
+
+  async function upload() {
+    if (!file || !ready) return
+    setBusy(true)
+    setMessage('Uploading…')
+
+    const body = new FormData()
+    body.append('files', file)
+    body.append('alt', alt.trim())
+    body.append('decorative', String(decorative))
+
+    try {
+      const res = await fetch('/api/admin/media', { method: 'POST', body })
+      const json = (await res.json()) as { ok: boolean; error?: string; data?: MediaOption[] }
+      if (!json.ok || !json.data?.length) {
+        setMessage(json.error ?? 'Upload failed.')
+        return
+      }
+      onUploaded(json.data[0])
+      setFile(null)
+      setAlt('')
+      setDecorative(false)
+      if (inputRef.current) inputRef.current.value = ''
+      setMessage('Uploaded and selected.')
+    } catch {
+      setMessage('Upload failed — check your connection and try again.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <details className="mt-3 rounded-control border border-dashed border-line p-3">
+      <summary className="cursor-pointer text-step--1 font-bold text-primary">Upload a new image</summary>
+
+      <div className="mt-3 space-y-3">
+        <div>
+          <label htmlFor={`${fieldId}-file`} className="kc-label">
+            Image file
+          </label>
+          <input
+            id={`${fieldId}-file`}
+            ref={inputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml"
+            onChange={(e) => {
+              setFile(e.target.files?.[0] ?? null)
+              setMessage('')
+            }}
+            className="kc-field file:mr-3 file:rounded-control file:border-0 file:bg-surface-alt file:px-3 file:py-1.5 file:text-step--1 file:font-bold"
+          />
+          <p className="mt-1.5 text-step--1 text-subtle">PNG, JPEG, WebP, AVIF or SVG, up to 15 MB.</p>
+        </div>
+
+        <Text
+          label="Alt text"
+          value={alt}
+          onChange={(v) => {
+            setAlt(v)
+            if (v.trim()) setDecorative(false)
+          }}
+          help="What the image conveys, in a sentence."
+        />
+
+        <label className="flex items-center gap-3 text-step--1 font-semibold">
+          <input
+            type="checkbox"
+            checked={decorative}
+            onChange={(e) => {
+              setDecorative(e.target.checked)
+              if (e.target.checked) setAlt('')
+            }}
+            className="h-[18px] w-[18px] accent-[var(--color-primary)]"
+          />
+          Decorative — carries no information
+        </label>
+
+        <button
+          type="button"
+          onClick={() => void upload()}
+          disabled={!ready || busy}
+          className="kc-btn kc-btn-primary w-full !py-2 !text-step--1 disabled:opacity-50"
+        >
+          {busy ? 'Uploading…' : 'Upload and use'}
+        </button>
+
+        <p role="status" aria-live="polite" className={cn('text-step--1', message ? 'text-muted' : 'sr-only')}>
+          {message}
+        </p>
+
+        {file && !ready ? (
+          <p className="text-step--1 font-bold text-danger">
+            Add alt text, or mark the image decorative, before uploading.
+          </p>
+        ) : null}
+      </div>
+    </details>
   )
 }
 

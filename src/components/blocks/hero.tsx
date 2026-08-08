@@ -3,7 +3,7 @@ import { getSettings } from '@/lib/settings'
 import { getForm } from '@/lib/forms'
 import { cn, formatPhone, telHref } from '@/lib/utils'
 import type { BlockPropsMap } from '@/lib/blocks/schema'
-import { CtaButton, CtaRow, Section, SectionHeading, sectionHeadingId, SmartLink } from '@/components/ui/primitives'
+import { CtaButton, CtaRow, Prose, Section, SectionHeading, sectionHeadingId, SmartLink } from '@/components/ui/primitives'
 import { Icon } from '@/components/ui/icon'
 import { QuoteFormClient } from '@/components/forms/quote-form-client'
 
@@ -112,7 +112,7 @@ export async function HeroBlock({ props, first }: { props: BlockPropsMap['Hero']
 
               {/* The service statement: what is provided, on what equipment, over what area. */}
               {props.body ? (
-                <p className="mt-5 max-w-2xl text-[1.03rem] leading-relaxed text-on-dark-muted">{props.body}</p>
+                <Prose html={props.body} className="mt-5 max-w-2xl text-[1.03rem] leading-relaxed text-on-dark-muted" />
               ) : null}
 
               {/* Action block. The phone is a real tel: link with the digits as
@@ -224,7 +224,7 @@ export function ServiceStatementBlock({ props }: { props: BlockPropsMap['Service
         <div>
           <SectionHeading id={headingId} eyebrow={props.eyebrow} heading={props.heading} level={props.headingLevel} />
           {props.statement ? (
-            <p className="mt-5 max-w-prose text-[1.03rem] leading-[1.85] text-muted">{props.statement}</p>
+            <Prose html={props.statement} className="mt-5 max-w-prose text-[1.03rem] leading-[1.85] text-muted" />
           ) : null}
           {props.subheading ? <p className="mt-4 text-step-1 font-semibold">{props.subheading}</p> : null}
         </div>

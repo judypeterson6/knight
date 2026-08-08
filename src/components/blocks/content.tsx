@@ -1,6 +1,6 @@
 import { cn, sanitizeHtml } from '@/lib/utils'
 import type { BlockPropsMap } from '@/lib/blocks/schema'
-import { CtaRow, Figure, Section, SectionHeading, sectionHeadingId, SmartImage } from '@/components/ui/primitives'
+import { CtaRow, Figure, Prose, Section, SectionHeading, sectionHeadingId, SmartImage } from '@/components/ui/primitives'
 
 /**
  * RichText — the workhorse for migrated WordPress body copy. Heading levels,
@@ -23,14 +23,13 @@ export function RichTextBlock({ props }: { props: BlockPropsMap['RichText'] }) {
       />
       {props.heading ? <div aria-hidden className="mt-5 h-[3px] w-14 rounded bg-primary" /> : null}
       {props.body ? (
-        <p
+        <Prose
+          html={props.body}
           className={cn(
             'mt-6 text-[1.03rem] leading-[1.85]',
             props.background === 'dark' ? 'text-on-dark-muted' : 'text-muted',
           )}
-        >
-          {props.body}
-        </p>
+        />
       ) : null}
       {props.html ? (
         <div

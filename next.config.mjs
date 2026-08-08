@@ -1,7 +1,15 @@
+import { dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // There is another package-lock.json in the user profile directory above this
+  // project. Next walks up looking for one and picked that as the workspace
+  // root, which would trace the wrong files into the standalone output. Pin it
+  // to this directory instead.
+  outputFileTracingRoot: dirname(fileURLToPath(import.meta.url)),
   images: {
     // Local /public/uploads is the default store. Remote patterns cover assets that
     // still point at the legacy WordPress origin before the media migration runs.

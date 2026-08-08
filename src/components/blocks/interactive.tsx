@@ -5,7 +5,7 @@ import { getForm } from '@/lib/forms'
 import { cn, excerptFrom, formatDate, formatPhone, isoDate, telHref } from '@/lib/utils'
 import type { BlockPropsMap } from '@/lib/blocks/schema'
 import type { BlockContext } from '@/lib/blocks/context'
-import { Card, CtaButton, Section, SectionHeading, sectionHeadingId, SmartImage, SmartLink } from '@/components/ui/primitives'
+import { Card, CtaButton, Prose, Section, SectionHeading, sectionHeadingId, SmartImage, SmartLink } from '@/components/ui/primitives'
 import { Icon } from '@/components/ui/icon'
 import { FaqAccordionClient } from '@/components/blocks/faq-accordion-client'
 
@@ -47,7 +47,7 @@ export async function FaqAccordionBlock({ props }: { props: BlockPropsMap['FaqAc
             <Icon name="headset" className="h-6 w-6" />
           </span>
           <h3 className="text-on-dark">{props.supportTitle}</h3>
-          <p className="mt-2 text-step--1 leading-relaxed text-on-dark-muted">{props.supportBody}</p>
+          <Prose html={props.supportBody} className="mt-2 text-step--1 leading-relaxed text-on-dark-muted" />
           <a href={telHref(organization.phone)} className="kc-btn kc-btn-primary mt-6 w-full">
             {props.supportPhoneLabel || 'Call'} {formatPhone(organization.phone)}
           </a>

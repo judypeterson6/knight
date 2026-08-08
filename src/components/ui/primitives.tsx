@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
-import { cn } from '@/lib/utils'
+import { cn, sanitizeHtml } from '@/lib/utils'
 import type { AnyBlockProps, ctaSchema, imageSchema } from '@/lib/blocks/schema'
 import type { z } from 'zod'
 
@@ -96,6 +96,28 @@ export function Eyebrow({
   )
 }
 
+/** Tags that cannot legally sit inside a <p>. */
+const BLOCK_LEVEL_HTML = /<(p|div|ul|ol|h[1-6]|blockquote|figure|table|hr|pre)\b/i
+
+/**
+ * Body copy that may or may not carry formatting.
+ *
+ * These fields are edited in the rich-text editor, so their value can be either
+ * a bare sentence (everything migrated from WordPress) or real HTML. Plain text
+ * keeps the original single <p>, which is what every existing block renders;
+ * only content that actually uses block-level markup gets promoted to a prose
+ * container, because a <p> nested inside a <p> is invalid and the browser
+ * silently breaks the outer one apart.
+ */
+export function Prose({ html, className }: { html: string; className?: string }) {
+  if (!html) return null
+  const clean = sanitizeHtml(html)
+  if (BLOCK_LEVEL_HTML.test(clean)) {
+    return <div className={cn('kc-prose', className)} dangerouslySetInnerHTML={{ __html: clean }} />
+  }
+  return <p className={className} dangerouslySetInnerHTML={{ __html: clean }} />
+}
+
 /**
  * Section heading. `level` is explicit rather than inferred so a page can
  * guarantee exactly one <h1> and no skipped levels.
@@ -137,9 +159,10 @@ export function SectionHeading({
         </p>
       ) : null}
       {body ? (
-        <p className={cn('mt-4 text-step-0 leading-relaxed', onDark ? 'text-on-dark-muted' : 'text-muted')}>
-          {body}
-        </p>
+        <Prose
+          html={body}
+          className={cn('mt-4 text-step-0 leading-relaxed', onDark ? 'text-on-dark-muted' : 'text-muted')}
+        />
       ) : null}
     </div>
   )
