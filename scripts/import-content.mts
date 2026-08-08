@@ -78,6 +78,18 @@ const PAGES: PageSpec[] = [
     faqGroup: 'booking-process',
     heroAlt: 'Tour manager reviewing an itinerary before booking an entertainer coach',
   },
+  {
+    file: 'tour-bus-pricing-models.md',
+    path: '/entertainer-coach-rental/pricing-models',
+    slug: 'pricing-models',
+    title: 'Tour Bus Pricing Models',
+    pageType: 'service',
+    seoTitle: 'Tour Bus Pricing Models: Day, Week or Full Tour',
+    seoDescription:
+      'Compare day-rate, weekly and full-tour entertainer coach pricing to see which structure costs least for your routing and number of shows.',
+    faqGroup: 'pricing-models',
+    heroAlt: 'Comparison of daily and full-tour entertainer coach lease rates',
+  },
 ]
 
 // --- markdown parsing -------------------------------------------------------
