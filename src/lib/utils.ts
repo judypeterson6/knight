@@ -23,8 +23,33 @@ export function slugify(input: string): string {
     .slice(0, 190)
 }
 
+/**
+ * The site's canonical origin: https, no www, no trailing slash.
+ *
+ * Normalised here rather than trusted from the environment, because this one
+ * string is the base for every canonical tag, OG URL, sitemap entry and
+ * JSON-LD @id. A stray `www.` or `http://` in the variable would otherwise
+ * publish a origin that disagrees with what the middleware redirects to, and
+ * every one of those URLs would point at a 301 instead of the real page.
+ *
+ * localhost keeps its scheme and port so development works normally.
+ */
+export function siteOrigin(): string {
+  const raw = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').trim()
+  try {
+    const url = new URL(raw)
+    const host = url.host.toLowerCase()
+    if (host.startsWith('localhost') || host.startsWith('127.0.0.1') || host.startsWith('[::1]')) {
+      return `${url.protocol}//${host}`
+    }
+    return `https://${host.replace(/^www\./, '')}`
+  } catch {
+    return 'http://localhost:3000'
+  }
+}
+
 export function absoluteUrl(routePath: string): string {
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/+$/, '')
+  const base = siteOrigin()
   return routePath === '/' ? base : `${base}${normalizeRoute(routePath)}`
 }
 

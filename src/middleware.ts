@@ -5,7 +5,8 @@ import { NextResponse, type NextRequest } from 'next/server'
  *
  * Responsibilities, in order:
  *   1. Serve the IndexNow key file at /<key>.txt.
- *   2. Normalise trailing slashes so every old WordPress URL (which ended in a
+ *   2. Canonicalise the host and scheme: one origin, https, no www.
+ *   3. Normalise trailing slashes so every old WordPress URL (which ended in a
  *      slash) resolves to its unslashed equivalent with a 301.
  *   3. Look up database-backed redirects through an internal API route.
  *      Middleware runs on the edge runtime and cannot open a MySQL connection,
@@ -17,6 +18,26 @@ import { NextResponse, type NextRequest } from 'next/server'
  */
 
 const PUBLIC_FILE = /\.(?:png|jpe?g|gif|svg|webp|avif|ico|css|js|map|woff2?|ttf|mp4|webm|xml|txt|json)$/i
+
+/**
+ * The one host this site answers on, from NEXT_PUBLIC_SITE_URL.
+ *
+ * Returns null when that points at localhost, so development is never
+ * redirected. Middleware runs on the edge runtime, so this reads the inlined
+ * public variable rather than importing anything server-side.
+ */
+function canonicalHost(): { host: string } | null {
+  const raw = process.env.NEXT_PUBLIC_SITE_URL
+  if (!raw) return null
+  try {
+    const url = new URL(raw)
+    const host = url.host.toLowerCase().replace(/^www\./, '')
+    if (host.startsWith('localhost') || host.startsWith('127.0.0.1')) return null
+    return { host }
+  } catch {
+    return null
+  }
+}
 
 export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl
@@ -33,7 +54,38 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // --- 2. Trailing-slash normalisation -------------------------------------
+  // --- 2. Canonical host and scheme ----------------------------------------
+  //
+  // One origin: https://knightscoaches.com. www and http are 301'd onto it so
+  // the same page is never reachable at four addresses, which would split
+  // ranking signals and make the canonical tag argue with the URL it was
+  // served from.
+  //
+  // The scheme comes from x-forwarded-proto because TLS terminates at the
+  // proxy — request.nextUrl.protocol reads http on every request behind one.
+  // Localhost and preview hosts are left alone so development still works.
+  const canonical = canonicalHost()
+  if (canonical) {
+    const host = (request.headers.get('host') ?? '').toLowerCase()
+    const proto = (request.headers.get('x-forwarded-proto') ?? request.nextUrl.protocol.replace(':', '')).toLowerCase()
+    const isLocal = host.startsWith('localhost') || host.startsWith('127.0.0.1') || host.startsWith('[::1]')
+    const hostMatches = host === canonical.host
+    const protoMatches = proto === 'https'
+
+    if (!isLocal && (!hostMatches || !protoMatches)) {
+      // Only redirect hosts we actually own, so a preview deployment or a
+      // health check on an unrelated hostname is not bounced away.
+      if (hostMatches || host === `www.${canonical.host}`) {
+        const url = new URL(request.nextUrl.toString())
+        url.protocol = 'https:'
+        url.host = canonical.host
+        url.port = ''
+        return NextResponse.redirect(url, 301)
+      }
+    }
+  }
+
+  // --- 3. Trailing-slash normalisation -------------------------------------
   if (pathname.length > 1 && pathname.endsWith('/')) {
     const url = request.nextUrl.clone()
     url.pathname = pathname.replace(/\/+$/, '')

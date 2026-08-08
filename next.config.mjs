@@ -30,6 +30,21 @@ const nextConfig = {
         source: '/uploads/:path*',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
+      {
+        // The middleware 301s http to https, but that still sends the first
+        // request in the clear. HSTS makes the browser rewrite the scheme
+        // itself on every later visit, so the redirect stops being reachable.
+        //
+        // preload is deliberately omitted: submitting to the preload list is a
+        // one-way door for the whole domain including every subdomain, and
+        // that is the site owner's decision to make, not a build default.
+        source: '/:path*',
+        headers: [
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        ],
+      },
     ]
   },
 }
