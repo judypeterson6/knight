@@ -140,6 +140,30 @@ export const trustSchema = z.object({
 
 export const customCssSchema = z.object({ global: z.string() })
 
+/**
+ * Outbound mail (SMTP).
+ *
+ * Held in settings rather than only in environment variables so a mail server
+ * can be changed without a redeploy. Anything left blank falls back to the
+ * matching SMTP_* variable, so an existing environment-based setup keeps
+ * working untouched.
+ *
+ * `password` is write-only over the API: it is never returned to the browser,
+ * and submitting an empty value leaves the stored one in place.
+ */
+export const mailSchema = z.object({
+  host: z.string(),
+  port: z.number().int().min(1).max(65535),
+  /** Implicit TLS on connect (port 465). STARTTLS on 587 leaves this false. */
+  secure: z.boolean(),
+  user: z.string(),
+  password: z.string(),
+  fromName: z.string(),
+  fromEmail: z.string(),
+  /** Where form submissions are emailed. Blank falls back to the org address. */
+  notifyTo: z.string(),
+})
+
 export type ThemeSettings = z.infer<typeof themeSchema>
 export type FontSettings = z.infer<typeof fontsSchema>
 export type HeadingSettings = z.infer<typeof headingsSchema>
@@ -149,6 +173,7 @@ export type SeoSettings = z.infer<typeof seoSchema>
 export type ScriptSettings = z.infer<typeof scriptsSchema>
 export type TrustSettings = z.infer<typeof trustSchema>
 export type CustomCssSettings = z.infer<typeof customCssSchema>
+export type MailSettings = z.infer<typeof mailSchema>
 
 export interface SettingsMap {
   theme: ThemeSettings
@@ -160,6 +185,7 @@ export interface SettingsMap {
   scripts: ScriptSettings
   trust: TrustSettings
   customCss: CustomCssSettings
+  mail: MailSettings
 }
 
 export type SettingKey = keyof SettingsMap
@@ -305,6 +331,19 @@ export const DEFAULTS: SettingsMap = {
   } satisfies TrustSettings,
 
   customCss: { global: '' },
+
+  // Blank by design: an empty host means "fall back to SMTP_* in the
+  // environment", which is how mail was configured before this group existed.
+  mail: {
+    host: '',
+    port: 587,
+    secure: false,
+    user: '',
+    password: '',
+    fromName: 'Knights Coaches',
+    fromEmail: 'no-reply@knightscoaches.com',
+    notifyTo: '',
+  } satisfies MailSettings,
 }
 
 export const SCHEMAS = {
@@ -317,6 +356,7 @@ export const SCHEMAS = {
   scripts: scriptsSchema,
   trust: trustSchema,
   customCss: customCssSchema,
+  mail: mailSchema,
 } satisfies Record<SettingKey, z.ZodTypeAny>
 
 export function schemaFor(key: SettingKey): z.ZodTypeAny {

@@ -146,20 +146,70 @@ export function faqNode(items: { question: string; answer: string }[]): Json | u
   }
 }
 
+/**
+ * Service node for a service or city page.
+ *
+ * `areaServed` is the point of the city pages — without it every one of them
+ * described the same nationwide service and nothing distinguished Miami from
+ * Seattle. When a city is given the node names that city; otherwise it falls
+ * back to the country.
+ *
+ * `providerMobility: dynamic` is the correct signal for a service-area
+ * business: the coaches travel to the customer, there is no branch office in
+ * each city, and claiming one would be false.
+ *
+ * The offer catalogue lists the real coach classes. No price is attached
+ * anywhere — every coach has a null rate because the business publishes only a
+ * quote-on-request band, and inventing a figure here would put a price in
+ * search results that nobody agreed to honour.
+ */
 export async function serviceNode(input: {
   name: string
   description: string
   serviceType: string
   route: string
+  city?: { name: string; state: string } | null
 }): Promise<Json> {
+  const classes = await prisma.coachClass
+    .findMany({ orderBy: { order: 'asc' }, select: { name: true, slug: true, description: true } })
+    .catch(() => [])
+
   return {
     '@type': 'Service',
+    '@id': `${absoluteUrl(input.route)}#service`,
     name: input.name,
     serviceType: input.serviceType,
     description: input.description,
     url: absoluteUrl(input.route),
     provider: { '@id': `${absoluteUrl('/')}#organization` },
-    areaServed: { '@type': 'Country', name: 'United States' },
+    providerMobility: 'dynamic',
+    areaServed: input.city
+      ? {
+          '@type': 'City',
+          name: `${input.city.name}, ${input.city.state}`,
+          address: {
+            '@type': 'PostalAddress',
+            addressLocality: input.city.name,
+            addressRegion: input.city.state,
+            addressCountry: 'US',
+          },
+        }
+      : { '@type': 'Country', name: 'United States' },
+    hasOfferCatalog: classes.length
+      ? {
+          '@type': 'OfferCatalog',
+          name: 'Coach classes',
+          itemListElement: classes.map((coachClass) => ({
+            '@type': 'Offer',
+            itemOffered: {
+              '@type': 'Service',
+              name: `${coachClass.name} class entertainer coach`,
+              description: coachClass.description ?? undefined,
+              url: absoluteUrl(`/fleet?class=${coachClass.slug}`),
+            },
+          })),
+        }
+      : undefined,
   }
 }
 

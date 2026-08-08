@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import type { BlockType } from '@/lib/blocks/schema'
 import { PropsInspector, type MediaOption } from '@/components/admin/props-inspector'
 import { SchemaOverrideEditor } from '@/components/admin/schema-override-editor'
+import { META_DESCRIPTION_MAX, META_TITLE_MAX } from '@/lib/admin-schemas'
 
 export interface BuilderBlock {
   id: string
@@ -544,11 +545,39 @@ function SeoPanel({
 
   return (
     <section className="space-y-4 rounded-card border border-line bg-surface p-6">
-      <Field label="Meta title" value={form.title} onChange={(v) => setForm({ ...form, title: v })} help={`${form.title.length} characters. Aim for under 60.`} />
-      <Field label="Meta description" value={form.description} onChange={(v) => setForm({ ...form, description: v })} multiline help={`${form.description.length} characters. Aim for 120–160.`} />
+      {/* The counters are the whole point: the save is rejected past the limit,
+          so the number has to be visible while typing, not after a failed POST. */}
+      <Field
+        label="Meta title"
+        value={form.title}
+        onChange={(v) => setForm({ ...form, title: v })}
+        help={counterHelp(form.title.length, META_TITLE_MAX, 'Search results cut off around here.')}
+        invalid={form.title.length > META_TITLE_MAX}
+      />
+      <Field
+        label="Meta description"
+        value={form.description}
+        onChange={(v) => setForm({ ...form, description: v })}
+        multiline
+        help={counterHelp(form.description.length, META_DESCRIPTION_MAX, 'Aim for 120–160.')}
+        invalid={form.description.length > META_DESCRIPTION_MAX}
+      />
       <Field label="Canonical" value={form.canonical} onChange={(v) => setForm({ ...form, canonical: v })} help={`Defaults to ${route}.`} />
-      <Field label="OG title" value={form.ogTitle} onChange={(v) => setForm({ ...form, ogTitle: v })} />
-      <Field label="OG description" value={form.ogDescription} onChange={(v) => setForm({ ...form, ogDescription: v })} multiline />
+      <Field
+        label="OG title"
+        value={form.ogTitle}
+        onChange={(v) => setForm({ ...form, ogTitle: v })}
+        help={counterHelp(form.ogTitle.length, META_TITLE_MAX, 'Falls back to the meta title.')}
+        invalid={form.ogTitle.length > META_TITLE_MAX}
+      />
+      <Field
+        label="OG description"
+        value={form.ogDescription}
+        onChange={(v) => setForm({ ...form, ogDescription: v })}
+        multiline
+        help={counterHelp(form.ogDescription.length, 200, 'Falls back to the meta description.')}
+        invalid={form.ogDescription.length > 200}
+      />
       <Field label="OG image path" value={form.ogImage} onChange={(v) => setForm({ ...form, ogImage: v })} />
 
       <div>
@@ -590,12 +619,20 @@ function SeoPanel({
   )
 }
 
+/** "42 / 60 characters" plus a note, or the overage once past the limit. */
+function counterHelp(length: number, max: number, note: string): string {
+  return length > max
+    ? `${length} / ${max} characters — ${length - max} too many. Trim before saving.`
+    : `${length} / ${max} characters. ${note}`
+}
+
 export function Field({
   label,
   value,
   onChange,
   help,
   multiline,
+  invalid,
   type = 'text',
 }: {
   label: string
@@ -603,20 +640,43 @@ export function Field({
   onChange: (value: string) => void
   help?: string
   multiline?: boolean
+  /** Marks the field over its limit: red help text and aria-invalid for AT. */
+  invalid?: boolean
   type?: string
 }) {
   const id = `field-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
+  const helpId = help ? `${id}-help` : undefined
   return (
     <div>
       <label htmlFor={id} className="kc-label">
         {label}
       </label>
       {multiline ? (
-        <textarea id={id} rows={3} value={value} onChange={(e) => onChange(e.target.value)} className="kc-field resize-y" />
+        <textarea
+          id={id}
+          rows={3}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          aria-invalid={invalid || undefined}
+          aria-describedby={helpId}
+          className={cn('kc-field resize-y', invalid && 'border-danger')}
+        />
       ) : (
-        <input id={id} type={type} value={value} onChange={(e) => onChange(e.target.value)} className="kc-field" />
+        <input
+          id={id}
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          aria-invalid={invalid || undefined}
+          aria-describedby={helpId}
+          className={cn('kc-field', invalid && 'border-danger')}
+        />
       )}
-      {help ? <p className="mt-1.5 text-step--1 text-subtle">{help}</p> : null}
+      {help ? (
+        <p id={helpId} className={cn('mt-1.5 text-step--1', invalid ? 'font-bold text-danger' : 'text-subtle')}>
+          {help}
+        </p>
+      ) : null}
     </div>
   )
 }

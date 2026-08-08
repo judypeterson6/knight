@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { getSettings } from '@/lib/settings'
-import { escapeHtml, sendMail } from '@/lib/mail'
+import { escapeHtml, mailConfig, sendMail } from '@/lib/mail'
 import { checkRateLimit, clientIp, verifyTurnstile } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'
@@ -122,7 +122,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
   }
 
   const { organization } = await getSettings()
-  const to = form.notifyEmail || process.env.FORM_NOTIFY_EMAIL || organization.email
+  // Most specific wins: this form's own address, then the site-wide one set in
+  // /admin/mail, then the legacy environment variable, then the org address.
+  const { notifyTo } = await mailConfig()
+  const to = form.notifyEmail || notifyTo || process.env.FORM_NOTIFY_EMAIL || organization.email
   const lines = Object.entries(clean).map(([k, v]) => `${k}: ${v}`)
 
   const mail = await sendMail({

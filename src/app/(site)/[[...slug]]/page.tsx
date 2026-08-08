@@ -105,13 +105,27 @@ export default async function DynamicPage({ params, searchParams }: Props) {
       await localBusinessNode(),
     )
   } else if (page.pageType === 'service' || page.pageType === 'location') {
+    // A city page describes the service *in that city*. Without areaServed
+    // every one of the 22 city pages emitted an identical nationwide Service
+    // and nothing told Miami apart from Seattle.
+    const city =
+      page.pageType === 'location'
+        ? await prisma.location
+            .findUnique({ where: { path: page.path }, select: { city: true, state: true } })
+            .catch(() => null)
+        : null
+
     pageNodes.push(
       await serviceNode({
         name: page.title,
         description,
         serviceType: 'Entertainer coach and tour bus rental',
         route: page.path,
+        city: city ? { name: city.city, state: city.state } : null,
       }),
+      // The one real premises, linked by @id. Coaches travel out from it; no
+      // branch is claimed in any city — that is what providerMobility says.
+      await localBusinessNode(),
     )
   } else if (page.pageType === 'fleet-listing') {
     pageNodes.push(webPageNode({ type: 'CollectionPage', name: page.title, description, route: page.path }))

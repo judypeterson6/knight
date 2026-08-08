@@ -243,14 +243,41 @@ export const profileUpdateSchema = z.object({
 
 // --- SEO -------------------------------------------------------------------
 
+/**
+ * Meta title and description limits.
+ *
+ * Google truncates the title around 60 characters and the description around
+ * 160 on desktop. Anything past that is written but never read, and a cut-off
+ * sentence in a result listing reads worse than a shorter complete one, so the
+ * cap is enforced rather than suggested.
+ *
+ * Open Graph titles are allowed the same 60 for consistency with the meta
+ * title they mirror; OG descriptions get a little more room because Facebook
+ * and LinkedIn show roughly 200.
+ */
+export const META_TITLE_MAX = 60
+export const META_DESCRIPTION_MAX = 160
+const OG_DESCRIPTION_MAX = 200
+
 export const seoUpdateSchema = z.object({
   entityType: z.enum(['PAGE', 'POST', 'COACH', 'CATEGORY', 'LOCATION']),
   entityId: z.string().min(1),
-  title: z.string().max(300).nullable().optional(),
-  description: z.string().max(5_000).nullable().optional(),
+  title: z
+    .string()
+    .max(META_TITLE_MAX, `Meta title must be ${META_TITLE_MAX} characters or fewer — search results cut off after that.`)
+    .nullable()
+    .optional(),
+  description: z
+    .string()
+    .max(
+      META_DESCRIPTION_MAX,
+      `Meta description must be ${META_DESCRIPTION_MAX} characters or fewer — search results cut off after that.`,
+    )
+    .nullable()
+    .optional(),
   canonical: z.string().max(600).nullable().optional(),
-  ogTitle: z.string().max(300).nullable().optional(),
-  ogDescription: z.string().max(5_000).nullable().optional(),
+  ogTitle: z.string().max(META_TITLE_MAX).nullable().optional(),
+  ogDescription: z.string().max(OG_DESCRIPTION_MAX).nullable().optional(),
   ogImage: z.string().max(600).nullable().optional(),
   robots: z.enum(['INDEX_FOLLOW', 'NOINDEX_FOLLOW', 'INDEX_NOFOLLOW', 'NOINDEX_NOFOLLOW']).default('INDEX_FOLLOW'),
   schemaType: z.string().max(80).nullable().optional(),

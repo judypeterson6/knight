@@ -57,6 +57,7 @@ const GROUPS: NavGroup[] = [
   {
     heading: 'System',
     items: [
+      { label: 'Mail (SMTP)', href: '/admin/mail', minRole: 'ADMIN' },
       { label: 'Users', href: '/admin/users', minRole: 'ADMIN' },
       { label: 'My profile', href: '/admin/profile', minRole: 'AUTHOR' },
     ],

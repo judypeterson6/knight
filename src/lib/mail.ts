@@ -1,5 +1,6 @@
 import 'server-only'
 import nodemailer from 'nodemailer'
+import { getSettings } from '@/lib/settings'
 
 /**
  * Outbound mail. Submissions are persisted to MySQL before this is called, so a
@@ -7,22 +8,73 @@ import nodemailer from 'nodemailer'
  * surfaced in the admin inbox instead.
  */
 
-let transporter: nodemailer.Transporter | null = null
+export interface MailConfig {
+  host: string
+  port: number
+  secure: boolean
+  user: string
+  password: string
+  from: string
+  notifyTo: string
+  /** Where the settings came from, for the admin screen to report. */
+  source: 'settings' | 'environment' | 'none'
+}
 
-function getTransporter(): nodemailer.Transporter | null {
-  if (transporter) return transporter
-  const host = process.env.SMTP_HOST
-  if (!host) return null
+/**
+ * Resolves the SMTP configuration.
+ *
+ * The settings group wins when a host is set there, so mail can be repointed
+ * from /admin/mail without a redeploy. With no host in settings it falls back
+ * to the SMTP_* environment variables, which is how this was configured
+ * before, so an existing deployment keeps working with nothing to change.
+ */
+export async function mailConfig(): Promise<MailConfig> {
+  const { mail, organization } = await getSettings()
 
-  transporter = nodemailer.createTransport({
+  if (mail.host) {
+    return {
+      host: mail.host,
+      port: mail.port,
+      secure: mail.secure,
+      user: mail.user,
+      password: mail.password,
+      from: mail.fromEmail ? `${mail.fromName} <${mail.fromEmail}>` : mail.fromName,
+      notifyTo: mail.notifyTo || organization.email,
+      source: 'settings',
+    }
+  }
+
+  const host = process.env.SMTP_HOST ?? ''
+  return {
     host,
     port: Number(process.env.SMTP_PORT || 587),
     secure: process.env.SMTP_SECURE === 'true',
-    auth: process.env.SMTP_USER
-      ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASSWORD }
-      : undefined,
+    user: process.env.SMTP_USER ?? '',
+    password: process.env.SMTP_PASSWORD ?? '',
+    from: process.env.SMTP_FROM || 'Knights Coaches <no-reply@knightscoaches.com>',
+    notifyTo: organization.email,
+    source: host ? 'environment' : 'none',
+  }
+}
+
+/**
+ * A transport is built per send rather than cached.
+ *
+ * The configuration now lives in the database, so a cached transport would
+ * keep using the old server after an admin changed it. Creating one is cheap;
+ * nodemailer pools the underlying connection itself.
+ */
+async function getTransporter(): Promise<{ transport: nodemailer.Transporter; config: MailConfig } | null> {
+  const config = await mailConfig()
+  if (!config.host) return null
+
+  const transport = nodemailer.createTransport({
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
+    auth: config.user ? { user: config.user, pass: config.password } : undefined,
   })
-  return transporter
+  return { transport, config }
 }
 
 export interface MailResult {
@@ -37,13 +89,13 @@ export async function sendMail(input: {
   html?: string
   replyTo?: string
 }): Promise<MailResult> {
-  const transport = getTransporter()
-  if (!transport) {
-    return { sent: false, error: 'SMTP is not configured (SMTP_HOST is empty)' }
+  const resolved = await getTransporter()
+  if (!resolved) {
+    return { sent: false, error: 'SMTP is not configured — set a host in /admin/mail or SMTP_HOST' }
   }
   try {
-    await transport.sendMail({
-      from: process.env.SMTP_FROM || 'Knights Coaches <no-reply@knightscoaches.com>',
+    await resolved.transport.sendMail({
+      from: resolved.config.from,
       to: input.to,
       replyTo: input.replyTo,
       subject: input.subject,

@@ -113,6 +113,30 @@ export function loadSnapshot<T>(file: string, fallback: T): T {
   return JSON.parse(readFileSync(full, 'utf8')) as T
 }
 
+/**
+ * Trims a migrated meta title or description to its published limit.
+ *
+ * The admin now rejects anything over 60/160, because search results cut off
+ * around there. A handful of migrated values run past it — 2 titles and 7
+ * descriptions — and leaving them would make those pages unsavable until
+ * someone hand-edited a field they had not touched.
+ *
+ * The cut lands on a word boundary and no ellipsis is added: these strings are
+ * keyword-front-loaded, so the tail is the least load-bearing part, and a
+ * trailing "…" would waste a character on punctuation the SERP already adds.
+ */
+function clampMeta(value: string | null | undefined, max: number): string | null {
+  if (!value) return value ?? null
+  const text = value.trim()
+  if (text.length <= max) return text
+  const cut = text.slice(0, max)
+  const lastSpace = cut.lastIndexOf(' ')
+  return (lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).replace(/[\s,;:.\-–—]+$/, '')
+}
+
+const META_TITLE_MAX = 60
+const META_DESCRIPTION_MAX = 160
+
 /** Splits a list into fixed-size batches. */
 function chunk<T>(items: T[], size: number): T[][] {
   const out: T[][] = []
@@ -472,15 +496,19 @@ async function main(): Promise<void> {
         create: {
           entityType: 'PAGE',
           entityId: page.id,
-          title: input.seo.title,
-          description: input.seo.description,
+          title: clampMeta(input.seo.title, META_TITLE_MAX),
+          description: clampMeta(input.seo.description, META_DESCRIPTION_MAX),
           canonical: input.seo.canonical,
-          ogTitle: input.seo.ogTitle,
-          ogDescription: input.seo.ogDescription,
+          ogTitle: clampMeta(input.seo.ogTitle, META_TITLE_MAX),
+          ogDescription: clampMeta(input.seo.ogDescription, 200),
           ogImage: input.seo.ogImage,
           robots: input.seo.robots as RobotsDirective,
         },
-        update: { title: input.seo.title, description: input.seo.description, ogImage: input.seo.ogImage },
+        update: {
+          title: clampMeta(input.seo.title, META_TITLE_MAX),
+          description: clampMeta(input.seo.description, META_DESCRIPTION_MAX),
+          ogImage: input.seo.ogImage,
+        },
       })
     }
     pageCount += 1
@@ -549,14 +577,17 @@ async function main(): Promise<void> {
       create: {
         entityType: 'POST',
         entityId: row.id,
-        title: post.seo.title,
-        description: post.seo.description,
+        title: clampMeta(post.seo.title, META_TITLE_MAX),
+        description: clampMeta(post.seo.description, META_DESCRIPTION_MAX),
         canonical: `/blog/${post.slug}`,
         ogImage: post.seo.ogImage,
         robots: post.seo.robots as RobotsDirective,
         schemaType: 'BlogPosting',
       },
-      update: { title: post.seo.title, description: post.seo.description },
+      update: {
+        title: clampMeta(post.seo.title, META_TITLE_MAX),
+        description: clampMeta(post.seo.description, META_DESCRIPTION_MAX),
+      },
     })
   }
 

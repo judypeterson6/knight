@@ -203,15 +203,19 @@ export function sectionsFrom(outline: OutlineNode[], skipHeadings: string[] = []
  * page. Keeping them as RichText too produced the section twice — once as a
  * proper component, once as raw text with an image bolted on.
  *
- * The narrative "How to book an entertainer coach" paragraph is deliberately NOT
- * matched: the source carries both a prose explanation and a card grid, and only
- * the card grid is replaced by StepsHowItWorks.
+ * Every phrasing of the booking section is matched, including the narrative
+ * "How to book an entertainer coach" paragraph. That paragraph and the card
+ * grid describe the same four steps, so keeping both printed the process twice
+ * — once as a numbered component and once as an unbroken wall of text. The
+ * detail from the prose is not lost: bookingSteps() reads it into the step
+ * descriptions.
  */
 const DUPLICATED_BY_A_BLOCK: RegExp[] = [
   /^how to book your\b/i, // card grid -> StepsHowItWorks
-  /^how to book a\b.*\brental$/i, // ditto, nationwide wording
-  /^how to (hire|reserve|rent)\b/i, // city-page wording for the same 4 steps
+  /^how to book an?\b/i, // "How to Book an Entertainer Coach", "a VIP Charter"
+  /^how to (hire|reserve|rent|lease)\b/i, // city and leasing wording, same 4 steps
   /^booking your\b/i, // audience-page wording for the same 4 steps
+  /steps to booking\b/i, // "4 Simple Steps to Booking Your Entertainer Coach"
   /^frequently asked questions/i, // -> FaqAccordion
   /^our most popular$/i, // split heading -> DestinationGrid
   /destinations$/i, // -> DestinationGrid
@@ -223,6 +227,61 @@ const DUPLICATED_BY_A_BLOCK: RegExp[] = [
 export function isDuplicatedByBlock(heading: string): boolean {
   const h = heading.trim()
   return DUPLICATED_BY_A_BLOCK.some((re) => re.test(h))
+}
+
+/** Headings that introduce the booking process, in any of its migrated wordings. */
+const BOOKING_HEADING = /^(how to (book|hire|reserve|rent|lease)\b|booking your\b|\d+ simple steps to booking\b)/i
+
+/** Icons for the four booking steps, in the order the source describes them. */
+const STEP_ICONS = ['bus', 'file-signature', 'credit-card', 'road']
+
+export interface BookingStep {
+  icon: string
+  title: string
+  description: string
+}
+
+/**
+ * The page's own booking steps, read out of its outline.
+ *
+ * Every page hardcoded the same four generic sentences, which threw away the
+ * real detail the source carries — what the quote needs, what comes back, what
+ * the contract itemises. This reads the h3/paragraph pairs under whichever
+ * booking heading the page uses, so each page describes its own process.
+ *
+ * Returns null when the page has no structured steps, and the caller falls back
+ * to the generic four.
+ */
+export function bookingSteps(outline: OutlineNode[]): BookingStep[] | null {
+  const nodes = outline.filter(isBodyNode)
+  const steps: BookingStep[] = []
+
+  for (let i = 0; i < nodes.length; i += 1) {
+    const node = nodes[i]
+    if (node.tag !== 'h2' && node.tag !== 'h1') continue
+    if (!BOOKING_HEADING.test(node.text.trim())) continue
+
+    for (let j = i + 1; j < nodes.length; j += 1) {
+      const child = nodes[j]
+      if (child.tag === 'h1' || child.tag === 'h2') break
+      if (child.tag === 'h3') {
+        steps.push({ icon: '', title: child.text.trim(), description: '' })
+        continue
+      }
+      if (child.tag === 'p' && steps.length) {
+        const last = steps[steps.length - 1]
+        last.description = last.description ? `${last.description} ${child.text}` : child.text
+      }
+    }
+    if (steps.length >= 3) break
+    steps.length = 0
+  }
+
+  const usable = steps.filter((s) => s.title && s.description)
+  if (usable.length < 3) return null
+
+  // Icons follow position, matching the order the process actually runs in.
+  return usable.map((step, index) => ({ ...step, icon: STEP_ICONS[index] ?? iconFor(step.title) }))
 }
 
 /**
@@ -1231,6 +1290,13 @@ export function buildGenericBlocks(page: PageRecord, ctx: BuildContext): SeedBlo
   )
   const pool = sectionImagePool(page, ctx, hero)
 
+  // The booking section, taken from the page's own copy. Its heading is reused
+  // so a city page still reads "How to book your Miami tour coach".
+  const steps = bookingSteps(page.outline)
+  const bookingHeading =
+    page.outline.filter(isBodyNode).find((n) => (n.tag === 'h2' || n.tag === 'h1') && BOOKING_HEADING.test(n.text.trim()))
+      ?.text.trim() ?? 'How to book'
+
   const faqGroup = isNationwide
     ? 'nationwide'
     : page.route.startsWith('/tour-bus-rental')
@@ -1345,8 +1411,10 @@ export function buildGenericBlocks(page: PageRecord, ctx: BuildContext): SeedBlo
       spacing: 'md',
       align: 'center',
       eyebrow: 'How it works',
-      heading: 'How to book',
-      items: [
+      heading: bookingHeading,
+      // The page's own steps where the source has them, so each page describes
+      // its actual process rather than repeating four generic sentences.
+      items: steps ?? [
         { icon: 'bus', title: 'Select your bus', description: 'Tell us your dates, cities, crew size and floor-plan preference.' },
         { icon: 'file-signature', title: 'Booking and confirm', description: 'We send three matching coaches, each priced line by line.' },
         { icon: 'credit-card', title: 'Booking payment', description: 'A deposit and signed contract confirm the booking.' },
