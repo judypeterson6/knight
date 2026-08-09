@@ -162,6 +162,18 @@ const PAGES: PageSpec[] = [
     faqGroup: 'nashville',
     heroAlt: 'Entertainer coach on Broadway in downtown Nashville',
   },
+  {
+    file: 'entertainer-coach-rental-agreement.md',
+    path: '/entertainer-coach-rental/rental-agreement',
+    slug: 'rental-agreement',
+    title: 'Entertainer Coach Rental Agreement',
+    pageType: 'service',
+    seoTitle: 'Entertainer Coach Rental Agreement Explained',
+    seoDescription:
+      'What a tour bus lease contract covers: term, mileage, fuel, driver, damage, indemnity and insurance clauses. Read before you sign.',
+    faqGroup: 'rental-agreement',
+    heroAlt: 'Signed entertainer coach lease agreement on a desk with a tour itinerary',
+  },
 ]
 
 // --- markdown parsing -------------------------------------------------------
