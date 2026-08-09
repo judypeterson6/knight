@@ -126,6 +126,18 @@ const PAGES: PageSpec[] = [
     faqGroup: '12-bunk',
     heroAlt: 'Bunk alley of a 12-bunk entertainer coach with privacy curtains',
   },
+  {
+    file: 'prevost-entertainer-coach.md',
+    path: '/prevost-entertainer-coach',
+    slug: 'prevost-entertainer-coach',
+    title: 'Prevost Entertainer Coach',
+    pageType: 'service',
+    seoTitle: 'Prevost Entertainer Coach Rental: X3-45 and H3-45',
+    seoDescription:
+      'Prevost is the US touring standard. Compare X3-45, H3-45 and XLII entertainer conversions available for lease nationwide.',
+    faqGroup: 'prevost-chassis',
+    heroAlt: 'Prevost entertainer coach shell used for touring conversions',
+  },
 ]
 
 // --- markdown parsing -------------------------------------------------------
