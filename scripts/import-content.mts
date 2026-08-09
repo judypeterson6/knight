@@ -114,6 +114,18 @@ const PAGES: PageSpec[] = [
     faqGroup: 'coach-fleet',
     heroAlt: 'Interior floor plan layouts of entertainer coaches with bunks and lounges',
   },
+  {
+    file: '12-bunk-entertainer-coach.md',
+    path: '/entertainer-coach-fleet/12-bunk',
+    slug: '12-bunk',
+    title: '12-Bunk Entertainer Coach',
+    pageType: 'service',
+    seoTitle: '12-Bunk Entertainer Coach Rental for Bands and Crew',
+    seoDescription:
+      'The touring workhorse: 12 bunks, front and rear lounges, galley and full bath. Sleeps a band plus crew on one bus. Check availability.',
+    faqGroup: '12-bunk',
+    heroAlt: 'Bunk alley of a 12-bunk entertainer coach with privacy curtains',
+  },
 ]
 
 // --- markdown parsing -------------------------------------------------------
