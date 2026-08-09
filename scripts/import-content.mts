@@ -150,6 +150,18 @@ const PAGES: PageSpec[] = [
     faqGroup: 'bands-musicians',
     heroAlt: 'Band loading instruments into the bays of a tour bus',
   },
+  {
+    file: 'nashville-entertainer-coach-rental.md',
+    path: '/entertainer-coach-rental/nashville',
+    slug: 'nashville',
+    title: 'Nashville Entertainer Coach Rental',
+    pageType: 'location',
+    seoTitle: 'Nashville Entertainer Coach Rental: Tour Bus Leasing',
+    seoDescription:
+      'Nashville is the center of the US touring coach industry. Lease a Prevost entertainer coach out of Music City for any national routing.',
+    faqGroup: 'nashville',
+    heroAlt: 'Entertainer coach on Broadway in downtown Nashville',
+  },
 ]
 
 // --- markdown parsing -------------------------------------------------------

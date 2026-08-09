@@ -70,7 +70,7 @@ Deadhead depends on where the coach starts.
 
 ## Where coaches pick up and drop off
 
-Pickup and drop-off cover the continental US, with staging concentrated where tours start: Nashville, Los Angeles, Atlanta, New York, Chicago, Austin, Las Vegas and Miami. Alaska and Hawaii sit outside the operating area, since no commercial route takes a 45-foot coach to either.
+Pickup and drop-off cover the continental US, with staging concentrated where tours start: Los Angeles, Atlanta, New York, Chicago, Austin, Las Vegas and Miami. Alaska and Hawaii sit outside the operating area, since no commercial route takes a 45-foot coach to either.
 
 Legs crossing into Canada are quoted case by case, since driver eligibility and coach paperwork change at the border. One-way routings ending far from the origin yard carry a drop charge, quoted up front.
 
@@ -114,7 +114,7 @@ Two lead times matter: wraps and interior customization need at least **30 days*
 
 ### Which states do you cover?
 
-**All 48 continental states plus the District of Columbia.** Staging is heaviest around Nashville, Atlanta, Los Angeles and New York, which keeps deadhead down for tours starting in those regions. Canadian legs are priced individually.
+**All 48 continental states plus the District of Columbia.** Staging is heaviest around Atlanta, Los Angeles, New York and Chicago, which keeps deadhead down for tours starting in those regions. Canadian legs are priced individually.
 
 ### Rear lounge or stateroom, which should I book?
 

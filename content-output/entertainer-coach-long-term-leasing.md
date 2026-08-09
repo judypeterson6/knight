@@ -107,7 +107,7 @@ Contracts confirm on a deposit and a signed agreement. Booking **60 or more days
 
 ### Which cities can a leased coach stage from?
 
-**Pickup and drop-off run across 48 states and the District of Columbia**, with heaviest staging around Nashville, Atlanta, Los Angeles, New York and Chicago. Alaska and Hawaii sit outside the operating area. Canadian legs are priced separately, since driver eligibility and paperwork change at the border.
+**Pickup and drop-off run across 48 states and the District of Columbia**, with heaviest staging around Atlanta, Los Angeles, New York and Chicago. Alaska and Hawaii sit outside the operating area. Canadian legs are priced separately, since driver eligibility and paperwork change at the border.
 
 ## Request your term sheet
 
