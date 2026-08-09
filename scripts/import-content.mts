@@ -102,6 +102,18 @@ const PAGES: PageSpec[] = [
     faqGroup: 'rental-cost',
     heroAlt: 'Cost breakdown chart for renting an entertainer coach in the USA',
   },
+  {
+    file: 'entertainer-coach-fleet.md',
+    path: '/entertainer-coach-fleet',
+    slug: 'entertainer-coach-fleet',
+    title: 'Entertainer Coach Fleet',
+    pageType: 'service',
+    seoTitle: 'Entertainer Coach Fleet: Floor Plans and Bunk Counts',
+    seoDescription:
+      'Browse entertainer coach layouts from 6-bunk star coaches to 14-bunk crew buses, with slide-out and non-slide options. Compare and request.',
+    faqGroup: 'coach-fleet',
+    heroAlt: 'Interior floor plan layouts of entertainer coaches with bunks and lounges',
+  },
 ]
 
 // --- markdown parsing -------------------------------------------------------
