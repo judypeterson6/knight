@@ -90,6 +90,18 @@ const PAGES: PageSpec[] = [
     faqGroup: 'pricing-models',
     heroAlt: 'Comparison of daily and full-tour entertainer coach lease rates',
   },
+  {
+    file: 'entertainer-coach-rental-cost.md',
+    path: '/entertainer-coach-rental/cost',
+    slug: 'cost',
+    title: 'Entertainer Coach Rental Cost',
+    pageType: 'service',
+    seoTitle: 'Entertainer Coach Rental Cost: 2026 Price Guide',
+    seoDescription:
+      'Entertainer coach day rates typically run several hundred to a few thousand dollars plus driver and fuel. See the full cost breakdown.',
+    faqGroup: 'rental-cost',
+    heroAlt: 'Cost breakdown chart for renting an entertainer coach in the USA',
+  },
 ]
 
 // --- markdown parsing -------------------------------------------------------
