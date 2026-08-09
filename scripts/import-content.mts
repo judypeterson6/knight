@@ -138,6 +138,18 @@ const PAGES: PageSpec[] = [
     faqGroup: 'prevost-chassis',
     heroAlt: 'Prevost entertainer coach shell used for touring conversions',
   },
+  {
+    file: 'band-tour-bus-rental.md',
+    path: '/who-we-serve/bands-musicians',
+    slug: 'bands-musicians',
+    title: 'Band Tour Bus Rental',
+    pageType: 'service',
+    seoTitle: 'Band Tour Bus Rental: Sleeper Coaches for Musicians',
+    seoDescription:
+      'Sleeper coaches built for the grind: bunks for the band, gear bays, galley and a driver who knows load-in times. Get a routing quote.',
+    faqGroup: 'bands-musicians',
+    heroAlt: 'Band loading instruments into the bays of a tour bus',
+  },
 ]
 
 // --- markdown parsing -------------------------------------------------------
