@@ -314,6 +314,12 @@
     margin-top: 2rem;
     font-size: var(--fs-2);
   }
+  /* Contents-list links jump to these headings. Without a scroll margin the
+     fixed header covers the target, landing the reader mid-paragraph. */
+  .kc-prose h2[id],
+  .kc-prose h3[id] {
+    scroll-margin-top: 7rem;
+  }
   .kc-prose h4 {
     color: var(--color-text);
     margin-top: 1.5rem;

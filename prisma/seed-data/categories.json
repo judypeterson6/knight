@@ -2,7 +2,7 @@
   {
     "wpId": 1,
     "slug": "blog",
-    "name": "Blog",
+    "name": "Guides",
     "description": "Your blog category",
     "parentWpId": null
   }
