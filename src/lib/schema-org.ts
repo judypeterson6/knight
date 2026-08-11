@@ -116,7 +116,7 @@ export async function webSiteNode(): Promise<Json> {
     publisher: { '@id': `${absoluteUrl('/')}#organization` },
     potentialAction: {
       '@type': 'SearchAction',
-      target: { '@type': 'EntryPoint', urlTemplate: `${absoluteUrl('/blog')}?q={search_term_string}` },
+      target: { '@type': 'EntryPoint', urlTemplate: `${absoluteUrl('/guides')}?q={search_term_string}` },
       'query-input': 'required name=search_term_string',
     },
   }
@@ -274,8 +274,8 @@ export function blogPostingNode(post: {
     '@type': 'BlogPosting',
     headline: post.title,
     description: post.description,
-    url: absoluteUrl(`/blog/${post.slug}`),
-    mainEntityOfPage: { '@type': 'WebPage', '@id': absoluteUrl(`/blog/${post.slug}`) },
+    url: absoluteUrl(`/guides/${post.slug}`),
+    mainEntityOfPage: { '@type': 'WebPage', '@id': absoluteUrl(`/guides/${post.slug}`) },
     image: post.image ? absoluteUrl(post.image) : undefined,
     datePublished: post.publishedAt?.toISOString(),
     dateModified: post.updatedAt.toISOString(),

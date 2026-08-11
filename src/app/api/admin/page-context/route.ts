@@ -31,7 +31,7 @@ export async function GET(request: Request): Promise<Response> {
     })
     .catch(() => null)
 
-  // Not every public URL is a Page row — /fleet/[slug] and /blog/[slug] are
+  // Not every public URL is a Page row — /fleet/[slug] and /guides/[slug] are
   // their own routes. Returning null lets the toolbar render its read-only state
   // rather than an error.
   return ok(page)

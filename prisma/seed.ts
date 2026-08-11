@@ -116,7 +116,7 @@ export function loadSnapshot<T>(file: string, fallback: T): T {
 /**
  * Trims a migrated meta title or description to its published limit.
  *
- * The admin now rejects anything over 60/160, because search results cut off
+ * The admin now rejects anything over 60/150, because search results cut off
  * around there. A handful of migrated values run past it — 2 titles and 7
  * descriptions — and leaving them would make those pages unsavable until
  * someone hand-edited a field they had not touched.
@@ -135,7 +135,7 @@ function clampMeta(value: string | null | undefined, max: number): string | null
 }
 
 const META_TITLE_MAX = 60
-const META_DESCRIPTION_MAX = 160
+const META_DESCRIPTION_MAX = 150
 
 /** Splits a list into fixed-size batches. */
 function chunk<T>(items: T[], size: number): T[][] {

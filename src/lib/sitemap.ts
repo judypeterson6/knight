@@ -102,7 +102,7 @@ export async function sitemapEntries(type: SitemapType): Promise<SitemapEntry[]>
       ])
       return posts
         .filter((post) => !overrides.get(post.id)?.excluded)
-        .map((post) => entry('posts', `/blog/${post.slug}`, post.updatedAt, overrides.get(post.id)))
+        .map((post) => entry('posts', `/guides/${post.slug}`, post.updatedAt, overrides.get(post.id)))
     }
 
     if (type === 'categories') {
@@ -113,7 +113,7 @@ export async function sitemapEntries(type: SitemapType): Promise<SitemapEntry[]>
       return categories
         .filter((category) => !overrides.get(category.id)?.excluded)
         .map((category) =>
-          entry('categories', `/blog/category/${category.slug}`, category.updatedAt, overrides.get(category.id)),
+          entry('categories', `/guides/category/${category.slug}`, category.updatedAt, overrides.get(category.id)),
         )
     }
 

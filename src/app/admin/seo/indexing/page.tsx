@@ -21,7 +21,7 @@ export default async function IndexingAdmin() {
 
   const allUrls = [
     ...pages.map((p) => p.path),
-    ...posts.map((p) => `/blog/${p.slug}`),
+    ...posts.map((p) => `/guides/${p.slug}`),
     ...coaches.map((c) => `/fleet/${c.slug}`),
   ]
 

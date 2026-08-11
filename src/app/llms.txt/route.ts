@@ -59,7 +59,7 @@ export async function GET(): Promise<Response> {
     ...coaches.map((c) => line(c.name, `/fleet/${c.slug}`, c.chassis)),
     '',
     '## Guides',
-    ...posts.map((p) => line(p.title, `/blog/${p.slug}`, p.excerpt?.slice(0, 120) || undefined)),
+    ...posts.map((p) => line(p.title, `/guides/${p.slug}`, p.excerpt?.slice(0, 120) || undefined)),
     '',
     '## Optional',
     line('Sitemap index', '/sitemap.xml'),

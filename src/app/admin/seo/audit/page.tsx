@@ -52,7 +52,7 @@ export default async function SeoAudit() {
   }
 
   for (const page of pages) record('PAGE', page.id, page.title, page.path, page.title)
-  for (const post of posts) record('POST', post.id, post.title, `/blog/${post.slug}`, post.title)
+  for (const post of posts) record('POST', post.id, post.title, `/guides/${post.slug}`, post.title)
   for (const coach of coaches) record('COACH', coach.id, coach.name, `/fleet/${coach.slug}`, coach.name)
 
   const duplicateTitles = [...titleCounts.values()].filter((group) => group.length > 1)
@@ -61,10 +61,10 @@ export default async function SeoAudit() {
   // post, category, static route or redirect.
   const validPaths = new Set<string>([
     ...pages.map((p) => p.path),
-    ...posts.map((p) => `/blog/${p.slug}`),
+    ...posts.map((p) => `/guides/${p.slug}`),
     ...coaches.map((c) => `/fleet/${c.slug}`),
     ...redirects.map((r) => r.from),
-    '/blog',
+    '/guides',
     '/sitemap',
     '/privacy-policy',
     '/terms',
@@ -81,7 +81,7 @@ export default async function SeoAudit() {
       if (!url.startsWith('/')) continue
       const clean = url.split('#')[0].split('?')[0].replace(/\/$/, '') || '/'
       linkedPaths.add(clean)
-      if (clean.startsWith('/blog/category/')) continue
+      if (clean.startsWith('/guides/category/')) continue
       if (!validPaths.has(clean)) {
         const page = pageById.get(block.pageId)
         brokenLinks.push({
@@ -105,7 +105,7 @@ export default async function SeoAudit() {
 
   const thinExcerpts: Finding[] = posts
     .filter((post) => excerptFrom(post.excerpt ?? '', 400).length < 60)
-    .map((post) => ({ label: post.title, href: `/blog/${post.slug}`, detail: 'Excerpt is short or empty — it is the opening answer under the H1.' }))
+    .map((post) => ({ label: post.title, href: `/guides/${post.slug}`, detail: 'Excerpt is short or empty — it is the opening answer under the H1.' }))
 
   const groups: { title: string; description: string; findings: Finding[] }[] = [
     { title: 'Missing meta description', description: 'These URLs fall back to the site default.', findings: missingDescription },

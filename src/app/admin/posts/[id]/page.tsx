@@ -37,7 +37,7 @@ export default async function PostEditorPage({ params }: { params: Promise<{ id:
     <>
       <AdminPageHeader
         title={isNew ? 'New post' : post!.title}
-        description={isNew ? 'Write a guide. Categories only — there is no tag system.' : `/blog/${post!.slug}`}
+        description={isNew ? 'Write a guide. Categories only — there is no tag system.' : `/guides/${post!.slug}`}
       />
       <PostEditor
         postId={isNew ? null : post!.id}

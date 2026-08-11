@@ -58,6 +58,9 @@ export function MailSettingsEditor({
   }
 
   const usingEnv = !form.host && Boolean(envHost)
+  // Mirrors recipientList() on the server so the count shown here matches what
+  // actually gets mailed.
+  const recipientCount = form.notifyTo.split(/[,;]/).filter((a) => a.includes('@')).length
 
   return (
     <div className="space-y-5">
@@ -126,10 +129,13 @@ export function MailSettingsEditor({
         </div>
         <Field
           label="Send form submissions to"
-          type="email"
           value={form.notifyTo}
           onChange={(v) => setForm({ ...form, notifyTo: v })}
-          help="Blank uses the organisation email from the site settings."
+          help={
+            recipientCount > 1
+              ? `${recipientCount} recipients. Every one receives a copy of each submission.`
+              : 'One address, or several separated by commas. Blank uses the organisation email.'
+          }
         />
       </section>
 

@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return buildMetadata({
     entityType: 'POST',
     entityId: post.id,
-    route: `/blog/${post.slug}`,
+    route: `/guides/${post.slug}`,
     fallbackTitle: post.title,
     fallbackDescription: post.excerpt || excerptFrom(post.body, 160),
     fallbackImage: post.featuredImage?.path ?? null,
@@ -81,9 +81,9 @@ export default async function BlogPost({ params }: Props) {
       }),
       breadcrumbNode([
         { name: 'Home', url: '/' },
-        { name: 'Blog', url: '/blog' },
-        ...(post.category ? [{ name: post.category.name, url: `/blog/category/${post.category.slug}` }] : []),
-        { name: post.title, url: `/blog/${post.slug}` },
+        { name: 'Blog', url: '/guides' },
+        ...(post.category ? [{ name: post.category.name, url: `/guides/category/${post.category.slug}` }] : []),
+        { name: post.title, url: `/guides/${post.slug}` },
       ]),
     ],
     { type: 'POST', id: post.id },
@@ -105,7 +105,7 @@ export default async function BlogPost({ params }: Props) {
                 </li>
                 <li aria-hidden>/</li>
                 <li>
-                  <SmartLink href="/blog" className="hover:text-primary">
+                  <SmartLink href="/guides" className="hover:text-primary">
                     Blog
                   </SmartLink>
                 </li>
@@ -113,7 +113,7 @@ export default async function BlogPost({ params }: Props) {
                   <>
                     <li aria-hidden>/</li>
                     <li>
-                      <SmartLink href={`/blog/category/${post.category.slug}`} className="hover:text-primary">
+                      <SmartLink href={`/guides/category/${post.category.slug}`} className="hover:text-primary">
                         {post.category.name}
                       </SmartLink>
                     </li>
@@ -189,7 +189,7 @@ export default async function BlogPost({ params }: Props) {
             limit: 3,
           })}
           ctx={{
-            route: `/blog/${post.slug}`,
+            route: `/guides/${post.slug}`,
             currentPostSlug: post.slug,
             currentCategorySlug: post.category?.slug,
           }}

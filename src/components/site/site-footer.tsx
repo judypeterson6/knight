@@ -150,6 +150,14 @@ export async function SiteFooter() {
                 Sitemap
               </SmartLink>
             </li>
+            {/* The XML index is for crawlers, so it is a plain anchor rather
+                than a client-routed link, and it is labelled as the machine
+                version so a visitor is not surprised by raw XML. */}
+            <li>
+              <a href="/sitemap.xml" className="transition hover:text-primary">
+                Sitemap (XML)
+              </a>
+            </li>
           </ul>
         </div>
       </div>

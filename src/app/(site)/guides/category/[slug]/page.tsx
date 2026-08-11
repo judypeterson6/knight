@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return buildMetadata({
     entityType: 'CATEGORY',
     entityId: category.id,
-    route: `/blog/category/${category.slug}`,
+    route: `/guides/category/${category.slug}`,
     fallbackTitle: `${category.name} guides`,
     fallbackDescription: category.description || `Guides filed under ${category.name}.`,
   })
@@ -63,12 +63,12 @@ export default async function CategoryArchive({ params }: Props) {
         type: 'CollectionPage',
         name: `${category.name} guides`,
         description: category.description || `Guides filed under ${category.name}.`,
-        route: `/blog/category/${category.slug}`,
+        route: `/guides/category/${category.slug}`,
       }),
       breadcrumbNode([
         { name: 'Home', url: '/' },
-        { name: 'Blog', url: '/blog' },
-        { name: category.name, url: `/blog/category/${category.slug}` },
+        { name: 'Blog', url: '/guides' },
+        { name: category.name, url: `/guides/category/${category.slug}` },
       ]),
     ],
     { type: 'CATEGORY', id: category.id },
@@ -88,7 +88,7 @@ export default async function CategoryArchive({ params }: Props) {
             </li>
             <li aria-hidden>/</li>
             <li>
-              <SmartLink href="/blog" className="hover:text-primary">
+              <SmartLink href="/guides" className="hover:text-primary">
                 Blog
               </SmartLink>
             </li>
@@ -110,7 +110,7 @@ export default async function CategoryArchive({ params }: Props) {
         {posts.length === 0 ? (
           <p className="mt-12 rounded-card border border-line bg-surface-alt p-8 text-muted">
             Nothing published in this category yet.{' '}
-            <SmartLink href="/blog" className="font-bold text-primary underline">
+            <SmartLink href="/guides" className="font-bold text-primary underline">
               Browse all guides
             </SmartLink>
             .
@@ -120,7 +120,7 @@ export default async function CategoryArchive({ params }: Props) {
             {posts.map((post) => (
               <Card key={post.id} as="li" className="overflow-hidden">
                 <article>
-                  <SmartLink href={`/blog/${post.slug}`}>
+                  <SmartLink href={`/guides/${post.slug}`}>
                     {post.featuredImage ? (
                       <SmartImage
                         image={{
@@ -138,7 +138,7 @@ export default async function CategoryArchive({ params }: Props) {
                   </SmartLink>
                   <div className="p-6">
                     <h2 className="text-step-2">
-                      <SmartLink href={`/blog/${post.slug}`} className="hover:text-primary">
+                      <SmartLink href={`/guides/${post.slug}`} className="hover:text-primary">
                         {post.title}
                       </SmartLink>
                     </h2>

@@ -32,7 +32,7 @@ async function usagesOf(mediaId: string, mediaPath: string) {
 
   return [
     ...coaches.map((c) => ({ kind: 'Coach gallery', label: c.coach.name, href: `/admin/fleet/${c.coachId}` })),
-    ...posts.map((p) => ({ kind: 'Post featured image', label: p.title, href: `/blog/${p.slug}` })),
+    ...posts.map((p) => ({ kind: 'Post featured image', label: p.title, href: `/guides/${p.slug}` })),
     ...pages.map((p) => ({ kind: 'Page hero', label: p.title, href: p.path })),
     ...blocks.map((p) => ({ kind: 'Page block', label: p.title, href: p.path })),
     ...testimonials.map((t) => ({ kind: 'Testimonial avatar', label: t.name, href: '/admin/testimonials' })),

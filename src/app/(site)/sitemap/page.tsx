@@ -51,9 +51,9 @@ export default async function HtmlSitemap() {
     { heading: 'Fleet', links: coaches.map((c) => ({ href: `/fleet/${c.slug}`, label: c.name })) },
     {
       heading: 'Blog categories',
-      links: categories.map((c) => ({ href: `/blog/category/${c.slug}`, label: c.name })),
+      links: categories.map((c) => ({ href: `/guides/category/${c.slug}`, label: c.name })),
     },
-    { heading: 'Guides', links: posts.map((p) => ({ href: `/blog/${p.slug}`, label: p.title })) },
+    { heading: 'Guides', links: posts.map((p) => ({ href: `/guides/${p.slug}`, label: p.title })) },
   ].filter((group) => group.links.length > 0)
 
   return (

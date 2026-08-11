@@ -19,9 +19,9 @@ export async function revalidatePageRoute(route: string, action: IndexingAction 
 }
 
 export async function revalidatePost(slug: string, action: IndexingAction = 'URL_UPDATED'): Promise<void> {
-  const route = `/blog/${slug}`
+  const route = `/guides/${slug}`
   revalidatePath(route)
-  revalidatePath('/blog')
+  revalidatePath('/guides')
   void notifySearchEngines([route], action).catch(() => undefined)
 }
 

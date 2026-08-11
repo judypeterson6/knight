@@ -160,7 +160,11 @@ export const mailSchema = z.object({
   password: z.string(),
   fromName: z.string(),
   fromEmail: z.string(),
-  /** Where form submissions are emailed. Blank falls back to the org address. */
+  /**
+   * Where form submissions are emailed. Accepts several addresses separated by
+   * commas; every one of them receives a copy. Blank falls back to the
+   * organisation address.
+   */
   notifyTo: z.string(),
 })
 

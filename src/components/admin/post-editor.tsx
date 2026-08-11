@@ -190,7 +190,7 @@ export function PostEditor({
             />
           </div>
 
-          <Text label="Slug" value={form.slug} onChange={(v) => update({ slug: slugify(v) })} help={`/blog/${form.slug || '…'}`} />
+          <Text label="Slug" value={form.slug} onChange={(v) => update({ slug: slugify(v) })} help={`/guides/${form.slug || '…'}`} />
 
           <div>
             <label htmlFor="post-category" className="kc-label">

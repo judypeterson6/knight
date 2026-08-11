@@ -36,33 +36,45 @@
     "note": "Duplicate topic URL consolidated onto one canonical route"
   },
   {
-    "from": "/guides/route-tour-around-coach-drive-times",
-    "to": "/blog/route-tour-around-coach-drive-times",
+    "from": "/blog/route-tour-around-coach-drive-times",
+    "to": "/guides/route-tour-around-coach-drive-times",
     "kind": "PERMANENT",
-    "note": "Blog post route"
+    "note": "Blog path retired; guides is canonical"
   },
   {
-    "from": "/guides/entertainer-coach-replaces-hotel-nights",
-    "to": "/blog/entertainer-coach-replaces-hotel-nights",
+    "from": "/blog/entertainer-coach-replaces-hotel-nights",
+    "to": "/guides/entertainer-coach-replaces-hotel-nights",
     "kind": "PERMANENT",
-    "note": "Blog post route"
+    "note": "Blog path retired; guides is canonical"
   },
   {
-    "from": "/guides/entertainer-coach-age-mileage",
-    "to": "/blog/entertainer-coach-age-mileage",
+    "from": "/blog/entertainer-coach-age-mileage",
+    "to": "/guides/entertainer-coach-age-mileage",
     "kind": "PERMANENT",
-    "note": "Blog post route"
+    "note": "Blog path retired; guides is canonical"
   },
   {
-    "from": "/guides/day-rooms-showers-and-truck-stops-on-tour",
-    "to": "/blog/day-rooms-showers-and-truck-stops-on-tour",
+    "from": "/blog/day-rooms-showers-and-truck-stops-on-tour",
+    "to": "/guides/day-rooms-showers-and-truck-stops-on-tour",
     "kind": "PERMANENT",
-    "note": "Blog post route"
+    "note": "Blog path retired; guides is canonical"
   },
   {
-    "from": "/guides/bus-call-overnight-drives-day-sheets",
-    "to": "/blog/bus-call-overnight-drives-day-sheets",
+    "from": "/blog/bus-call-overnight-drives-day-sheets",
+    "to": "/guides/bus-call-overnight-drives-day-sheets",
     "kind": "PERMANENT",
-    "note": "Blog post route"
+    "note": "Blog path retired; guides is canonical"
+  },
+  {
+    "from": "/blog",
+    "to": "/guides",
+    "kind": "PERMANENT",
+    "note": "Blog path retired; guides is canonical"
+  },
+  {
+    "from": "/blog/category",
+    "to": "/guides",
+    "kind": "PERMANENT",
+    "note": "Blog path retired; guides is canonical"
   }
 ]

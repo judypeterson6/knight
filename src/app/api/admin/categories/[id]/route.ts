@@ -10,6 +10,6 @@ export const { GET, PATCH, DELETE } = createItemHandlers({
   createSchema: categoryCreateSchema,
   updateSchema: categoryUpdateSchema,
   onChange: () => {
-    revalidatePath('/blog')
+    revalidatePath('/guides')
   },
 })

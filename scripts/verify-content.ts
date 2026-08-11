@@ -166,8 +166,8 @@ console.log(`  posts               ${posts.length} checked`)
 const knownRoutes = new Set<string>([
   ...pages.map((p) => p.route),
   ...coaches.map((c) => `/fleet/${c.slug}`),
-  ...posts.map((p) => `/blog/${p.slug}`),
-  '/blog',
+  ...posts.map((p) => `/guides/${p.slug}`),
+  '/guides',
   '/sitemap',
   '/privacy-policy',
   '/terms',

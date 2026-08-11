@@ -8,6 +8,21 @@ import { getSettings } from '@/lib/settings'
  * surfaced in the admin inbox instead.
  */
 
+/**
+ * Splits a recipient list into individual addresses.
+ *
+ * The notify field accepts several addresses separated by commas or
+ * semicolons so a submission can reach dispatch, sales and an owner at once.
+ * Blank entries and stray whitespace are dropped rather than producing an
+ * invalid header.
+ */
+export function recipientList(value: string): string[] {
+  return value
+    .split(/[,;]/)
+    .map((address) => address.trim())
+    .filter((address) => address.includes('@'))
+}
+
 export interface MailConfig {
   host: string
   port: number

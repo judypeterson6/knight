@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: `Touring Guides | ${seo.siteName}`,
     description:
       'Practical guides on routing tours around coach drive times, bus call and day sheets, entertainer coach age and mileage, and life on the road.',
-    alternates: { canonical: '/blog' },
+    alternates: { canonical: '/guides' },
   }
 }
 
@@ -49,11 +49,11 @@ export default async function BlogArchive({ searchParams }: Props) {
       type: 'CollectionPage',
       name: 'Touring guides',
       description: 'Guides on touring logistics, coach specification and life on the road.',
-      route: '/blog',
+      route: '/guides',
     }),
     breadcrumbNode([
       { name: 'Home', url: '/' },
-      { name: 'Blog', url: '/blog' },
+      { name: 'Blog', url: '/guides' },
     ]),
   ])
 
@@ -76,7 +76,7 @@ export default async function BlogArchive({ searchParams }: Props) {
               {categories.map((category) => (
                 <li key={category.id}>
                   <SmartLink
-                    href={`/blog/category/${category.slug}`}
+                    href={`/guides/category/${category.slug}`}
                     className="rounded-pill border border-line px-4 py-2 text-step--1 font-bold transition hover:border-primary hover:text-primary"
                   >
                     {category.name}
@@ -96,7 +96,7 @@ export default async function BlogArchive({ searchParams }: Props) {
             {posts.map((post) => (
               <Card key={post.id} as="li" className="overflow-hidden">
                 <article>
-                  <SmartLink href={`/blog/${post.slug}`}>
+                  <SmartLink href={`/guides/${post.slug}`}>
                     {post.featuredImage ? (
                       <SmartImage
                         image={{
@@ -115,14 +115,14 @@ export default async function BlogArchive({ searchParams }: Props) {
                   <div className="p-6">
                     {post.category ? (
                       <SmartLink
-                        href={`/blog/category/${post.category.slug}`}
+                        href={`/guides/category/${post.category.slug}`}
                         className="text-[0.72rem] font-extrabold uppercase tracking-[0.14em] text-primary"
                       >
                         {post.category.name}
                       </SmartLink>
                     ) : null}
                     <h2 className="mt-2 text-step-2">
-                      <SmartLink href={`/blog/${post.slug}`} className="hover:text-primary">
+                      <SmartLink href={`/guides/${post.slug}`} className="hover:text-primary">
                         {post.title}
                       </SmartLink>
                     </h2>
@@ -146,7 +146,7 @@ export default async function BlogArchive({ searchParams }: Props) {
         {totalPages > 1 ? (
           <nav aria-label="Pagination" className="mt-12 flex items-center justify-center gap-3">
             {current > 1 ? (
-              <SmartLink href={current === 2 ? '/blog' : `/blog?page=${current - 1}`} className="kc-btn kc-btn-outline">
+              <SmartLink href={current === 2 ? '/guides' : `/guides?page=${current - 1}`} className="kc-btn kc-btn-outline">
                 Previous
               </SmartLink>
             ) : null}
@@ -154,7 +154,7 @@ export default async function BlogArchive({ searchParams }: Props) {
               Page {current} of {totalPages}
             </p>
             {current < totalPages ? (
-              <SmartLink href={`/blog?page=${current + 1}`} className="kc-btn kc-btn-outline">
+              <SmartLink href={`/guides?page=${current + 1}`} className="kc-btn kc-btn-outline">
                 Next
               </SmartLink>
             ) : null}

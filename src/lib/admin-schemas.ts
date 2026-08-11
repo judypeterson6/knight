@@ -247,7 +247,7 @@ export const profileUpdateSchema = z.object({
  * Meta title and description limits.
  *
  * Google truncates the title around 60 characters and the description around
- * 160 on desktop. Anything past that is written but never read, and a cut-off
+ * 150 on desktop. Anything past that is written but never read, and a cut-off
  * sentence in a result listing reads worse than a shorter complete one, so the
  * cap is enforced rather than suggested.
  *
@@ -256,7 +256,7 @@ export const profileUpdateSchema = z.object({
  * and LinkedIn show roughly 200.
  */
 export const META_TITLE_MAX = 60
-export const META_DESCRIPTION_MAX = 160
+export const META_DESCRIPTION_MAX = 150
 const OG_DESCRIPTION_MAX = 200
 
 export const seoUpdateSchema = z.object({
@@ -331,7 +331,17 @@ export const formUpdateSchema = z.object({
   submitLabel: z.string().max(120).optional(),
   successTitle: z.string().max(200).optional(),
   successBody: z.string().max(5_000).optional(),
-  notifyEmail: z.string().email().max(320).nullable().optional(),
+  // Accepts several addresses separated by commas, so one form can notify
+  // dispatch and sales together. Each entry is validated individually.
+  notifyEmail: z
+    .string()
+    .max(1000)
+    .nullable()
+    .optional()
+    .refine(
+      (v) => !v || v.split(/[,;]/).every((a) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(a.trim())),
+      'Enter one email address, or several separated by commas',
+    ),
   enabled: z.boolean().optional(),
 })
 

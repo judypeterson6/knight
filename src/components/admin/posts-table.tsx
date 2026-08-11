@@ -185,7 +185,7 @@ export function PostsTable({
                   <Link href={`/admin/posts/${post.id}`} className="font-bold text-primary hover:underline">
                     {post.title}
                   </Link>
-                  <span className="block font-mono text-[0.7rem] text-subtle">/blog/{post.slug}</span>
+                  <span className="block font-mono text-[0.7rem] text-subtle">/guides/{post.slug}</span>
                 </td>
                 <td className="px-4 py-3 text-muted">{post.category || '—'}</td>
                 <td className="px-4 py-3 text-muted">{post.author || '—'}</td>
@@ -208,7 +208,7 @@ export function PostsTable({
                       Edit
                     </Link>
                     <Link
-                      href={`/blog/${post.slug}`}
+                      href={`/guides/${post.slug}`}
                       className="font-bold text-muted hover:text-primary hover:underline"
                     >
                       View

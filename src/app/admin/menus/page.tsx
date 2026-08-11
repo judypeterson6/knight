@@ -21,8 +21,8 @@ export default async function MenusAdmin() {
   const targets = [
     ...pages.map((p) => ({ group: 'Pages', label: p.title, url: p.path })),
     ...coaches.map((c) => ({ group: 'Fleet', label: c.name, url: `/fleet/${c.slug}` })),
-    ...categories.map((c) => ({ group: 'Categories', label: c.name, url: `/blog/category/${c.slug}` })),
-    ...posts.map((p) => ({ group: 'Posts', label: p.title, url: `/blog/${p.slug}` })),
+    ...categories.map((c) => ({ group: 'Categories', label: c.name, url: `/guides/category/${c.slug}` })),
+    ...posts.map((p) => ({ group: 'Posts', label: p.title, url: `/guides/${p.slug}` })),
   ]
 
   const toDraft = (items: typeof header extends null ? never : NonNullable<typeof header>['items']): MenuItemDraft[] =>

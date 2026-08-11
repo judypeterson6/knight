@@ -251,7 +251,7 @@ export async function RelatedPostsBlock({
         {posts.map((post) => (
           <Card key={post.id} as="li" className="overflow-hidden">
             <article>
-              <SmartLink href={`/blog/${post.slug}`} className="block">
+              <SmartLink href={`/guides/${post.slug}`} className="block">
                 {post.featuredImage ? (
                   <SmartImage
                     image={{
@@ -270,14 +270,14 @@ export async function RelatedPostsBlock({
               <div className="p-6">
                 {post.category ? (
                   <SmartLink
-                    href={`/blog/category/${post.category.slug}`}
+                    href={`/guides/category/${post.category.slug}`}
                     className="text-[0.72rem] font-extrabold uppercase tracking-[0.14em] text-primary"
                   >
                     {post.category.name}
                   </SmartLink>
                 ) : null}
                 <h3 className="mt-2 text-step-1">
-                  <SmartLink href={`/blog/${post.slug}`} className="hover:text-primary">
+                  <SmartLink href={`/guides/${post.slug}`} className="hover:text-primary">
                     {post.title}
                   </SmartLink>
                 </h3>

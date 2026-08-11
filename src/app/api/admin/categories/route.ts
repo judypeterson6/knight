@@ -11,6 +11,6 @@ export const { GET, POST } = createCollectionHandlers({
   updateSchema: categoryUpdateSchema,
   listArgs: { orderBy: { order: 'asc' }, include: { _count: { select: { posts: true } } } },
   onChange: () => {
-    revalidatePath('/blog')
+    revalidatePath('/guides')
   },
 })
