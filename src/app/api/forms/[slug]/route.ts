@@ -1,7 +1,9 @@
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { getSettings } from '@/lib/settings'
-import { escapeHtml, mailConfig, recipientList, sendMail } from '@/lib/mail'
+import { mailConfig, recipientList, sendMail } from '@/lib/mail'
+import { submissionEmail } from '@/lib/mail-template'
+import { absoluteUrl } from '@/lib/utils'
 import { checkRateLimit, clientIp, verifyTurnstile } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'
@@ -139,16 +141,21 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
   const { notifyTo } = await mailConfig()
   const recipients = recipientList(form.notifyEmail || notifyTo || process.env.FORM_NOTIFY_EMAIL || organization.email)
   const to = recipients.join(', ')
-  const lines = Object.entries(clean).map(([k, v]) => `${k}: ${v}`)
+  const { subject, text, html } = submissionEmail({
+    formName: form.name,
+    organizationName: organization.name,
+    siteUrl: new URL(absoluteUrl('/')).host,
+    fields: clean,
+    submittedAt: submission.createdAt,
+    ip,
+  })
 
   const mail = await sendMail({
     to,
     replyTo: emailValue ? clean[emailValue] : undefined,
-    subject: `[${organization.name}] ${form.name}`,
-    text: lines.join('\n'),
-    html: `<h2>${escapeHtml(form.name)}</h2><table>${Object.entries(clean)
-      .map(([k, v]) => `<tr><th align="left">${escapeHtml(k)}</th><td>${escapeHtml(v)}</td></tr>`)
-      .join('')}</table>`,
+    subject,
+    text,
+    html,
   })
 
   await prisma.formSubmission

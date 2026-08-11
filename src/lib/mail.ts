@@ -95,6 +95,10 @@ async function getTransporter(): Promise<{ transport: nodemailer.Transporter; co
 export interface MailResult {
   sent: boolean
   error: string | null
+  /** Recipients the server acknowledged, from the SMTP response. */
+  accepted?: string[]
+  /** Raw SMTP reply, e.g. "250 2.0.0 Ok: queued as 4hK6Mf2SKmz2ys2". */
+  response?: string | null
 }
 
 export async function sendMail(input: {
@@ -109,7 +113,7 @@ export async function sendMail(input: {
     return { sent: false, error: 'SMTP is not configured — set a host in /admin/mail or SMTP_HOST' }
   }
   try {
-    await resolved.transport.sendMail({
+    const info = await resolved.transport.sendMail({
       from: resolved.config.from,
       to: input.to,
       replyTo: input.replyTo,
@@ -117,7 +121,18 @@ export async function sendMail(input: {
       text: input.text,
       html: input.html,
     })
-    return { sent: true, error: null }
+
+    // "Sent" previously meant only that sendMail did not throw, which hid the
+    // case where a server accepts the connection and rejects a recipient. The
+    // SMTP response is recorded so a submission that never arrived can be told
+    // apart from one that was never accepted.
+    const rejected = (info.rejected ?? []).map(String)
+    if (rejected.length) {
+      return { sent: false, error: `Rejected by the mail server: ${rejected.join(', ')}` }
+    }
+
+    const accepted = (info.accepted ?? []).map(String)
+    return { sent: true, error: null, accepted, response: info.response ?? null }
   } catch (error) {
     return { sent: false, error: (error as Error).message }
   }
