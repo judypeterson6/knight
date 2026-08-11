@@ -81,7 +81,17 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
   const validated = z.object(shape).safeParse(data)
   if (!validated.success) {
     const first = validated.error.errors[0]
-    return Response.json({ ok: false, error: first?.message ?? 'Please check the form and try again.' }, { status: 400 })
+    // A field absent from the payload trips Zod's own "Required" before the
+    // per-field message can fire, which tells the visitor nothing about which
+    // field to fix. Map the failing path back to its label.
+    const label = form.fields.find((f) => f.name === first?.path[0])?.label
+    const message =
+      first?.message && first.message !== 'Required'
+        ? first.message
+        : label
+          ? `${label} is required`
+          : 'Please check the form and try again.'
+    return Response.json({ ok: false, error: message }, { status: 400 })
   }
 
   // Keep only fields the form actually declares.

@@ -579,7 +579,7 @@ async function main(): Promise<void> {
         entityId: row.id,
         title: clampMeta(post.seo.title, META_TITLE_MAX),
         description: clampMeta(post.seo.description, META_DESCRIPTION_MAX),
-        canonical: `/blog/${post.slug}`,
+        canonical: `/guides/${post.slug}`,
         ogImage: post.seo.ogImage,
         robots: post.seo.robots as RobotsDirective,
         schemaType: 'BlogPosting',
@@ -791,7 +791,7 @@ async function seedMenus(): Promise<void> {
     { label: 'Entertainer Coach', url: '/entertainer-coach' },
     { label: 'Tour Bus Rental', url: '/tour-bus-rental' },
     { label: 'Nationwide', url: '/tour-bus-rental/nationwide' },
-    { label: 'Blog', url: '/blog' },
+    { label: 'Guides', url: '/guides' },
     { label: 'Contact Us', url: '/contact-us' },
   ]
   for (const [order, item] of headerItems.entries()) {
@@ -814,7 +814,7 @@ async function seedMenus(): Promise<void> {
         { label: 'Home', url: '/' },
         { label: 'About Us', url: '/about-us' },
         { label: 'Fleet', url: '/fleet' },
-        { label: 'Blog', url: '/blog' },
+        { label: 'Guides', url: '/guides' },
         { label: 'Contact', url: '/contact-us' },
       ],
     },
