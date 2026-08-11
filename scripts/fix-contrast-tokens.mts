@@ -21,9 +21,9 @@
  *   subtle       #6b655c  5.77  helper text
  */
 
-import { PrismaClient } from '@prisma/client'
+import { createClient } from './_db.mts'
 
-const prisma = new PrismaClient()
+const prisma = createClient()
 
 /** Target value, and the values it is safe to overwrite. */
 const FIXES: Record<string, { to: string; from: string[] }> = {

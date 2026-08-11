@@ -11,21 +11,26 @@ import { normalizeRoute } from '@/lib/utils'
  */
 export const runtime = 'nodejs'
 
+/**
+ * Reads the redirect table, or throws.
+ *
+ * Deliberately does not swallow a query failure. Returning an empty map inside
+ * the cached function would pin "no redirects exist" in place for the next ten
+ * minutes, so a brief outage would keep every legacy URL 404ing long after the
+ * database recovered. The fallback belongs outside the cache, where it is not
+ * stored and the next request retries.
+ */
 const loadRedirects = unstable_cache(
   async (): Promise<Record<string, { to: string; status: number }>> => {
-    try {
-      const rows = await prisma.redirect.findMany({
-        where: { enabled: true },
-        select: { from: true, to: true, kind: true },
-      })
-      const map: Record<string, { to: string; status: number }> = {}
-      for (const row of rows) {
-        map[normalizeRoute(row.from)] = { to: row.to, status: row.kind === 'TEMPORARY' ? 302 : 301 }
-      }
-      return map
-    } catch {
-      return {}
+    const rows = await prisma.redirect.findMany({
+      where: { enabled: true },
+      select: { from: true, to: true, kind: true },
+    })
+    const map: Record<string, { to: string; status: number }> = {}
+    for (const row of rows) {
+      map[normalizeRoute(row.from)] = { to: row.to, status: row.kind === 'TEMPORARY' ? 302 : 301 }
     }
+    return map
   },
   ['redirects'],
   { tags: ['redirects'], revalidate: 600 },
@@ -35,7 +40,10 @@ export async function GET(request: Request): Promise<Response> {
   const from = new URL(request.url).searchParams.get('from')
   if (!from) return Response.json({}, { status: 400 })
 
-  const table = await loadRedirects()
+  // A failed read means "we do not know", not "there is no redirect". Answering
+  // with an empty map lets the request through to the page, which is the safe
+  // outcome, and nothing is cached so the next request tries again.
+  const table = await loadRedirects().catch(() => ({}) as Record<string, { to: string; status: number }>)
   const hit = table[normalizeRoute(from)]
   if (!hit) return Response.json({})
 

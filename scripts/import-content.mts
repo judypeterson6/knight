@@ -22,10 +22,11 @@
 
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
-import { PrismaClient, type ContentStatus } from '@prisma/client'
+import { type ContentStatus } from '@prisma/client'
+import { createClient } from './_db.mts'
 import { blockSchemas, type BlockType } from '../src/lib/blocks/schema'
 
-const prisma = new PrismaClient()
+const prisma = createClient()
 const ROOT = path.resolve(process.cwd())
 const DIR = path.join(ROOT, 'content-output')
 

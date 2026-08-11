@@ -2,7 +2,7 @@
   "name": "knightscoaches",
   "version": "1.0.0",
   "private": true,
-  "description": "knightscoaches.com — entertainer coach rental. Next.js 15 + React 19 + MySQL/Prisma rebuild of the WordPress site.",
+  "description": "knightscoaches.com \u2014 entertainer coach rental. Next.js 15 + React 19 + MySQL/Prisma rebuild of the WordPress site.",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
@@ -16,7 +16,9 @@
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
     "setup": "prisma migrate deploy && prisma db seed",
-    "gen:map": "tsx scripts/generate-us-map.ts"
+    "gen:map": "tsx scripts/generate-us-map.ts",
+    "db:status": "tsx scripts/db-status.mts",
+    "content:import": "tsx scripts/import-content.mts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

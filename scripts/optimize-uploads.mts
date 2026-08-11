@@ -21,9 +21,9 @@
 import { readdir, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import sharp from 'sharp'
-import { PrismaClient } from '@prisma/client'
+import { createClient } from './_db.mts'
 
-const prisma = new PrismaClient()
+const prisma = createClient()
 const ROOT = process.cwd()
 const UPLOADS = path.join(ROOT, 'public', 'uploads')
 

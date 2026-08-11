@@ -16,9 +16,9 @@
  * settings group is disturbed.
  */
 
-import { PrismaClient } from '@prisma/client'
+import { createClient } from './_db.mts'
 
-const prisma = new PrismaClient()
+const prisma = createClient()
 
 const GOOGLE_VERIFICATION = 'yHpmNm3hQ6_qpJgHbv5tlLQZT0A5XeCloRo7KfAGNxk'
 

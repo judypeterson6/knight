@@ -11,9 +11,9 @@
 
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
-import { PrismaClient } from '@prisma/client'
+import { createClient } from './_db.mts'
 
-const prisma = new PrismaClient()
+const prisma = createClient()
 
 const TITLE_MAX = 60
 const DESCRIPTION_MAX = 150
