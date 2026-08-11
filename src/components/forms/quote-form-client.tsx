@@ -158,7 +158,7 @@ export function QuoteFormClient({
             setChecked({})
             setStepIndex(0)
           }}
-          className="mt-6 font-bold text-primary underline underline-offset-2"
+          className="mt-6 font-bold text-primary-deep underline underline-offset-2"
         >
           Send another request
         </button>

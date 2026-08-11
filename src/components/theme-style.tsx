@@ -1,6 +1,6 @@
 import { getSettings } from '@/lib/settings'
 
-/** Turns "#bf5218" + alpha into an rgb(... / a) string for soft/glow tokens. */
+/** Turns "#eb6e2c" + alpha into an rgb(... / a) string for soft/glow tokens. */
 function withAlpha(hex: string, alpha: number): string {
   const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim())
   if (!m) return hex
@@ -44,6 +44,7 @@ export async function ThemeStyle() {
   const css = `:root{
 --color-primary:${theme.primary};
 --color-primary-hover:${theme.primaryHover};
+--color-primary-deep:${theme.primaryDeep};
 --color-primary-contrast:${theme.primaryContrast};
 --color-primary-soft:${withAlpha(theme.primary, 0.12)};
 --color-primary-glow:${withAlpha(theme.primary, 0.32)};

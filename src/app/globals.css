@@ -9,8 +9,9 @@
  * renders correctly before an admin has ever touched /admin/appearance.
  */
 :root {
-  --color-primary: #bf5218;
-  --color-primary-hover: #a8460f;
+  --color-primary: #eb6e2c;
+  --color-primary-hover: #d85f1e;
+  --color-primary-deep: #a8460f;
   --color-primary-soft: rgb(235 110 44 / 0.12);
   --color-primary-glow: rgb(235 110 44 / 0.32);
   --color-primary-contrast: #ffffff;
@@ -208,7 +209,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.625rem;
-    color: var(--color-primary);
+    color: var(--color-primary-deep);
     font-weight: 800;
     font-size: 0.8125rem;
     letter-spacing: 0.2em;
@@ -260,7 +261,7 @@
   }
   .kc-btn-outline:hover {
     border-color: var(--color-primary);
-    color: var(--color-primary);
+    color: var(--color-primary-deep);
   }
 
   .kc-btn-ghost-dark {

@@ -65,7 +65,7 @@ export function CoverageMapBlock({ props }: { props: BlockPropsMap['CoverageMap'
             <ul className="mt-6 grid grid-cols-2 gap-x-7 sm:grid-cols-3">
               {props.states.map((state) => (
                 <li key={state.code} className="flex items-center gap-2.5 border-b border-line py-2.5">
-                  <span className="w-7 flex-shrink-0 text-step--1 font-extrabold text-primary">{state.code}</span>
+                  <span className="w-7 flex-shrink-0 text-step--1 font-extrabold text-primary-deep">{state.code}</span>
                   <span className="truncate text-step--1 font-semibold text-muted">{state.name}</span>
                 </li>
               ))}
@@ -178,7 +178,7 @@ export async function DestinationGridBlock({ props }: { props: BlockPropsMap['De
                 <div className="flex items-center justify-between gap-3 p-5">
                   <div className="min-w-0">
                     <h3 className="text-step-1">
-                      <SmartLink href={location.path ?? '#'} className="hover:text-primary">
+                      <SmartLink href={location.path ?? '#'} className="hover:text-primary-deep">
                         {label}
                       </SmartLink>
                     </h3>

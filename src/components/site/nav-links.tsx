@@ -37,8 +37,8 @@ export function NavLinks({ items }: { items: NavLink[] }) {
             target={item.target ?? undefined}
             className={
               active
-                ? 'text-[0.94rem] font-bold text-primary'
-                : 'text-[0.94rem] font-semibold text-ink transition hover:text-primary'
+                ? 'text-[0.94rem] font-bold text-primary-deep'
+                : 'text-[0.94rem] font-semibold text-ink transition hover:text-primary-deep'
             }
           >
             {item.label}

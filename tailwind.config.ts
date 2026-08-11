@@ -14,6 +14,7 @@ const config: Config = {
         primary: {
           DEFAULT: 'var(--color-primary)',
           hover: 'var(--color-primary-hover)',
+          deep: 'var(--color-primary-deep)',
           soft: 'var(--color-primary-soft)',
           contrast: 'var(--color-primary-contrast)',
         },

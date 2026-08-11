@@ -74,7 +74,7 @@ export function AuthorCard({ author, role }: { author: AuthorSummary; role?: str
         <div className="min-w-0">
           <p className="text-[0.72rem] font-extrabold uppercase tracking-[0.14em] text-subtle">Written by</p>
           <h2 className="mt-1 text-step-1">{author.name}</h2>
-          {role ? <p className="mt-0.5 text-step--1 font-semibold text-primary">{role}</p> : null}
+          {role ? <p className="mt-0.5 text-step--1 font-semibold text-primary-deep">{role}</p> : null}
           <p className="mt-3 text-step--1 leading-relaxed text-muted">{author.bio}</p>
         </div>
       </div>

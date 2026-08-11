@@ -79,7 +79,7 @@ export async function SiteFooter() {
                         href={link.url}
                         rel={link.rel ?? undefined}
                         target={link.target ?? undefined}
-                        className="inline-flex w-fit items-center gap-2.5 text-step--1 font-medium text-on-dark-muted transition hover:text-primary"
+                        className="inline-flex w-fit items-center gap-2.5 text-step--1 font-medium text-on-dark-muted transition hover:text-primary-deep"
                       >
                         <span aria-hidden className="text-primary">
                           &rsaquo;
@@ -105,14 +105,14 @@ export async function SiteFooter() {
               </span>
               <a
                 href={telHref(organization.phone)}
-                className="flex gap-3 text-step--1 text-on-dark-muted transition hover:text-primary"
+                className="flex gap-3 text-step--1 text-on-dark-muted transition hover:text-primary-deep"
               >
                 <Icon name="phone" className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
                 {formatPhone(organization.phone)}
               </a>
               <a
                 href={`mailto:${organization.email}`}
-                className="flex gap-3 text-step--1 text-on-dark-muted transition hover:text-primary"
+                className="flex gap-3 text-step--1 text-on-dark-muted transition hover:text-primary-deep"
               >
                 <Icon name="envelope" className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
                 {organization.email}
@@ -131,22 +131,22 @@ export async function SiteFooter() {
           </p>
           <ul className="flex flex-wrap gap-x-5 gap-y-2">
             <li>
-              <SmartLink href="/privacy-policy" className="transition hover:text-primary">
+              <SmartLink href="/privacy-policy" className="transition hover:text-primary-deep">
                 Privacy policy
               </SmartLink>
             </li>
             <li>
-              <SmartLink href="/terms" className="transition hover:text-primary">
+              <SmartLink href="/terms" className="transition hover:text-primary-deep">
                 Terms
               </SmartLink>
             </li>
             <li>
-              <SmartLink href="/disclaimer" className="transition hover:text-primary">
+              <SmartLink href="/disclaimer" className="transition hover:text-primary-deep">
                 Disclaimer
               </SmartLink>
             </li>
             <li>
-              <SmartLink href="/sitemap" className="transition hover:text-primary">
+              <SmartLink href="/sitemap" className="transition hover:text-primary-deep">
                 Sitemap
               </SmartLink>
             </li>
@@ -154,7 +154,7 @@ export async function SiteFooter() {
                 than a client-routed link, and it is labelled as the machine
                 version so a visitor is not surprised by raw XML. */}
             <li>
-              <a href="/sitemap.xml" className="transition hover:text-primary">
+              <a href="/sitemap.xml" className="transition hover:text-primary-deep">
                 Sitemap (XML)
               </a>
             </li>

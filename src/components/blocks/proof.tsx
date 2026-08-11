@@ -172,7 +172,7 @@ export function ServiceCardsBlock({ props }: { props: BlockPropsMap['ServiceCard
                 </p>
               ) : null}
               <h3>
-                <SmartLink href={item.cta.url} className="hover:text-primary">
+                <SmartLink href={item.cta.url} className="hover:text-primary-deep">
                   {item.title}
                 </SmartLink>
               </h3>
@@ -189,7 +189,7 @@ export function ServiceCardsBlock({ props }: { props: BlockPropsMap['ServiceCard
               ) : null}
               <SmartLink
                 href={item.cta.url}
-                className="mt-auto pt-6 font-bold text-primary underline-offset-4 hover:underline"
+                className="mt-auto pt-6 font-bold text-primary-deep underline-offset-4 hover:underline"
               >
                 {item.cta.label || `About ${item.title}`} <span aria-hidden>→</span>
               </SmartLink>
@@ -262,7 +262,7 @@ export async function TestimonialsBlock({ props }: { props: BlockPropsMap['Testi
                 ) : null}
                 <div>
                   <p className="font-extrabold">{item.name}</p>
-                  <p className="text-step--1 font-bold text-primary">{item.role}</p>
+                  <p className="text-step--1 font-bold text-primary-deep">{item.role}</p>
                 </div>
               </footer>
             </article>

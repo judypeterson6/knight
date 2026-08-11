@@ -192,14 +192,15 @@ export function CtaBannerBlock({ props }: { props: BlockPropsMap['CtaBanner'] })
           className="pointer-events-none absolute -top-6 right-10 h-36 w-36 text-white/10"
           strokeWidth={1}
         />
+        {/* The body is deliberately not handed to SectionHeading here. On a
+            dark surface that helper uses a warm grey, and on an orange panel
+            the grey washes out to roughly 2:1. White at 20px semibold clears
+            the 3:1 bar that applies to large text, and reads better anyway. */}
         <div className="relative max-w-2xl">
-          <SectionHeading
-            id={headingId}
-            heading={props.heading}
-            level={props.headingLevel}
-            body={props.body}
-            onDark
-          />
+          <SectionHeading id={headingId} heading={props.heading} level={props.headingLevel} onDark />
+          {props.body ? (
+            <Prose html={props.body} className="mt-4 text-step-1 font-semibold leading-relaxed text-on-dark" />
+          ) : null}
         </div>
         <div className="relative flex flex-wrap gap-4">
           {props.ctas.map((cta, i) => (
@@ -275,7 +276,7 @@ export async function QuoteFormBlock({ props }: { props: BlockPropsMap['QuoteFor
         {props.showPhone ? (
           <p className="mt-6 text-center text-step-0 text-muted">
             {props.phoneLabel}{' '}
-            <a href={telHref(organization.phone)} className="font-bold text-primary underline underline-offset-2">
+            <a href={telHref(organization.phone)} className="font-bold text-primary-deep underline underline-offset-2">
               {formatPhone(organization.phone)}
             </a>
           </p>
@@ -313,7 +314,7 @@ export async function TrustStripBlock({ props }: { props: BlockPropsMap['TrustSt
           return (
             <li key={item.label} className="flex items-center gap-2.5 text-step--1">
               {item.url ? (
-                <SmartLink href={item.url} className="flex items-center gap-2.5 hover:text-primary">
+                <SmartLink href={item.url} className="flex items-center gap-2.5 hover:text-primary-deep">
                   {label}
                 </SmartLink>
               ) : (

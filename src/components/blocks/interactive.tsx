@@ -277,7 +277,7 @@ export async function RelatedPostsBlock({
                   </SmartLink>
                 ) : null}
                 <h3 className="mt-2 text-step-1">
-                  <SmartLink href={`/guides/${post.slug}`} className="hover:text-primary">
+                  <SmartLink href={`/guides/${post.slug}`} className="hover:text-primary-deep">
                     {post.title}
                   </SmartLink>
                 </h3>

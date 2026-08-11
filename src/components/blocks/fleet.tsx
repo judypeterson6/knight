@@ -187,7 +187,7 @@ export async function FleetGridBlock({
       {coaches.length === 0 ? (
         <p className="rounded-card border border-line bg-surface-alt p-8 text-center text-muted">
           No coaches match those filters. Try widening the bunk count or price, or{' '}
-          <SmartLink href="/contact-us" className="font-bold text-primary underline">
+          <SmartLink href="/contact-us" className="font-bold text-primary-deep underline">
             ask us to match you to a coach
           </SmartLink>
           .
@@ -236,7 +236,7 @@ export async function FleetGridBlock({
 
                   <div className="p-6">
                     <h3 className="text-step-2">
-                      <SmartLink href={href} className="hover:text-primary">
+                      <SmartLink href={href} className="hover:text-primary-deep">
                         {coach.name}
                       </SmartLink>
                     </h3>
@@ -276,7 +276,7 @@ export async function FleetGridBlock({
                       </div>
                       <div className="col-span-2 flex items-center gap-2.5">
                         <dt className="font-semibold text-muted">Daily rate</dt>
-                        <dd className="font-extrabold text-primary">
+                        <dd className="font-extrabold text-primary-deep">
                           {price ? `${price} per day` : 'Quoted per tour'}
                         </dd>
                       </div>

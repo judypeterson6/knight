@@ -21,6 +21,9 @@ import { z } from 'zod'
 export const themeSchema = z.object({
   primary: z.string(),
   primaryHover: z.string(),
+  /** Darker shade for primary used as small text, where the brand orange
+      cannot reach 4.5:1. The brand colour itself stays for fills and headings. */
+  primaryDeep: z.string(),
   primaryContrast: z.string(),
   secondary: z.string(),
   accent: z.string(),
@@ -213,8 +216,9 @@ const heading = (
 
 export const DEFAULTS: SettingsMap = {
   theme: {
-    primary: '#bf5218',
-    primaryHover: '#a8460f',
+    primary: '#eb6e2c',
+    primaryHover: '#d85f1e',
+    primaryDeep: '#a8460f',
     primaryContrast: '#ffffff',
     secondary: '#14110e',
     accent: '#ffc9a3',

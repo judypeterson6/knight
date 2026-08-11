@@ -6,12 +6,6 @@
     "note": "Duplicate topic URL consolidated onto one canonical route"
   },
   {
-    "from": "/entertainer-coach-rental",
-    "to": "/entertainer-coach",
-    "kind": "PERMANENT",
-    "note": "Duplicate topic URL consolidated onto one canonical route"
-  },
-  {
     "from": "/nationwide-tour-bus-rentals",
     "to": "/tour-bus-rental/nationwide",
     "kind": "PERMANENT",

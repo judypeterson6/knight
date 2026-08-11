@@ -59,7 +59,7 @@ export function TableOfContents({ items }: { items: TocItem[] }) {
                   'block border-l-2 py-1.5 text-step--1 leading-snug transition',
                   item.level === 3 ? 'pl-7' : 'pl-4',
                   active
-                    ? 'border-primary font-bold text-primary'
+                    ? 'border-primary font-bold text-primary-deep'
                     : 'border-transparent text-muted hover:border-line hover:text-ink',
                 )}
               >
