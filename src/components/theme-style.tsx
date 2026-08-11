@@ -1,6 +1,6 @@
 import { getSettings } from '@/lib/settings'
 
-/** Turns "#eb6e2c" + alpha into an rgb(... / a) string for soft/glow tokens. */
+/** Turns "#bf5218" + alpha into an rgb(... / a) string for soft/glow tokens. */
 function withAlpha(hex: string, alpha: number): string {
   const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim())
   if (!m) return hex

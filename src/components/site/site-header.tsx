@@ -43,8 +43,12 @@ export async function SiteHeader() {
           }))}
         />
 
+        {/* The label text is hidden below the sm breakpoint, which left the
+            link with nothing but an icon and no accessible name. An explicit
+            aria-label names it at every viewport. */}
         <a
           href={telHref(organization.phone)}
+          aria-label={`Call ${organization.name} on ${formatPhone(organization.phone)}`}
           className="-my-1.5 -mr-1.5 ml-4 flex items-center gap-3.5 rounded-[12px] bg-primary px-5 text-primary-contrast transition hover:bg-primary-hover md:px-6"
         >
           <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-white/20">

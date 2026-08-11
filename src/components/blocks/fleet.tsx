@@ -246,25 +246,33 @@ export async function FleetGridBlock({
 
                     {/* Spec as crawlable text, not baked into the photograph. */}
                     <dl className="mt-5 grid grid-cols-2 gap-3 border-y border-line py-5 text-step--1">
-                      <div className="flex items-center gap-2.5">
-                        <Icon name="bed" className="h-4 w-4 flex-shrink-0 text-primary" />
+                      <div>
                         <dt className="sr-only">Bunks</dt>
-                        <dd className="font-semibold">{coach.bunks} bunks</dd>
+                        <dd className="flex items-center gap-2.5 font-semibold">
+                          <Icon name="bed" className="h-4 w-4 flex-shrink-0 text-primary" />
+                          {coach.bunks} bunks
+                        </dd>
                       </div>
-                      <div className="flex items-center gap-2.5">
-                        <Icon name="slide-out" className="h-4 w-4 flex-shrink-0 text-primary" />
+                      <div>
                         <dt className="sr-only">Slide-outs</dt>
-                        <dd className="font-semibold">{coach.slideOuts}</dd>
+                        <dd className="flex items-center gap-2.5 font-semibold">
+                          <Icon name="slide-out" className="h-4 w-4 flex-shrink-0 text-primary" />
+                          {coach.slideOuts}
+                        </dd>
                       </div>
-                      <div className="flex items-center gap-2.5">
-                        <Icon name="couch" className="h-4 w-4 flex-shrink-0 text-primary" />
+                      <div>
                         <dt className="sr-only">Rear configuration</dt>
-                        <dd className="font-semibold">{coach.rearConfig}</dd>
+                        <dd className="flex items-center gap-2.5 font-semibold">
+                          <Icon name="couch" className="h-4 w-4 flex-shrink-0 text-primary" />
+                          {coach.rearConfig}
+                        </dd>
                       </div>
-                      <div className="flex items-center gap-2.5">
-                        <Icon name="circle-check" className="h-4 w-4 flex-shrink-0 text-primary" />
+                      <div>
                         <dt className="sr-only">Availability</dt>
-                        <dd className="font-semibold">{coach.available ? 'Available' : 'On contract'}</dd>
+                        <dd className="flex items-center gap-2.5 font-semibold">
+                          <Icon name="circle-check" className="h-4 w-4 flex-shrink-0 text-primary" />
+                          {coach.available ? 'Available' : 'On contract'}
+                        </dd>
                       </div>
                       <div className="col-span-2 flex items-center gap-2.5">
                         <dt className="font-semibold text-muted">Daily rate</dt>

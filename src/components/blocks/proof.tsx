@@ -36,11 +36,20 @@ export function StatCountersBlock({ props }: { props: BlockPropsMap['StatCounter
           props.columns === 4 && 'lg:grid-cols-4',
         )}
       >
+        {/* A <dl> may only contain dt/dd pairs, script, template or div. The
+            term has to precede its definition in the DOM, so the visual order
+            (big number first) is produced with `order` rather than by writing
+            the dd first. The detail is a second dd on the same term, never a
+            <p>, which is not permitted here. */}
         {props.items.map((item) => (
-          <div key={item.label} className="bg-surface px-5 py-8 text-center">
-            <dd className="text-[clamp(1.8rem,3vw,2.4rem)] font-extrabold leading-none text-primary">{item.value}</dd>
-            <dt className="mt-2.5 text-[0.78rem] font-bold uppercase tracking-[0.08em] text-muted">{item.label}</dt>
-            {item.detail ? <p className="mt-2 text-step--1 text-subtle">{item.detail}</p> : null}
+          <div key={item.label} className="flex flex-col bg-surface px-5 py-8 text-center">
+            <dt className="order-2 mt-2.5 text-[0.78rem] font-bold uppercase tracking-[0.08em] text-muted">
+              {item.label}
+            </dt>
+            <dd className="order-1 text-[clamp(1.8rem,3vw,2.4rem)] font-extrabold leading-none text-primary">
+              {item.value}
+            </dd>
+            {item.detail ? <dd className="order-3 mt-2 text-step--1 text-subtle">{item.detail}</dd> : null}
           </div>
         ))}
       </dl>
@@ -226,11 +235,11 @@ export async function TestimonialsBlock({ props }: { props: BlockPropsMap['Testi
         {items.map((item) => (
           <li key={item.id}>
             <article className="flex h-full flex-col rounded-block border border-line bg-surface p-8 shadow-card">
-              <p
-                className="text-[0.95rem] font-bold tracking-[0.3em] text-[#f5a623]"
-                aria-label={`Rated ${item.rating} out of 5`}
-              >
-                <span aria-hidden>{'★'.repeat(item.rating)}</span>
+              {/* No aria-label here: it is prohibited on a <p>, which carries no
+                  ARIA role. The stars are decorative and the line below states
+                  the rating as real text, so nothing is lost by hiding them. */}
+              <p aria-hidden className="text-[0.95rem] font-bold tracking-[0.3em] text-[#a06a05]">
+                {'★'.repeat(item.rating)}
               </p>
               <p className="mt-1 text-step--1 text-subtle">{item.rating} out of 5</p>
               <blockquote className="mt-5 flex-1 text-step-1 font-bold leading-relaxed text-ink">

@@ -209,8 +209,8 @@ const heading = (
 
 export const DEFAULTS: SettingsMap = {
   theme: {
-    primary: '#eb6e2c',
-    primaryHover: '#d85f1e',
+    primary: '#bf5218',
+    primaryHover: '#a8460f',
     primaryContrast: '#ffffff',
     secondary: '#14110e',
     accent: '#ffc9a3',
@@ -219,8 +219,8 @@ export const DEFAULTS: SettingsMap = {
     surfaceAlt: '#faf8f5',
     surfaceDark: '#14110e',
     text: '#14110e',
-    muted: '#7a746c',
-    subtle: '#9a938a',
+    muted: '#5f5a53',
+    subtle: '#6b655c',
     border: '#eee7dd',
     onDark: '#ffffff',
     onDarkMuted: '#b7afa6',

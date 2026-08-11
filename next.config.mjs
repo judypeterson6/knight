@@ -13,7 +13,19 @@ const nextConfig = {
   images: {
     // Local /public/uploads is the default store. Remote patterns cover assets that
     // still point at the legacy WordPress origin before the media migration runs.
-    formats: ['image/webp'],
+    //
+    // AVIF first, WebP as the fallback. The migrated library is largely PNG
+    // photographs running 2 to 3 MB each, and AVIF typically lands 20 to 30
+    // percent under WebP on that kind of source, which is the single biggest
+    // lever on LCP here.
+    formats: ['image/avif', 'image/webp'],
+    // Optimised variants are derived from immutable files under /uploads, so
+    // there is no reason to re-encode them on a short cycle.
+    minimumCacheTTL: 31536000,
+    // Next 15 requires declaring any quality value used with next/image.
+    // 70 is for imagery sitting behind a dark gradient, where the loss is
+    // invisible; 75 is the default; 90 is for fleet detail shots.
+    qualities: [70, 75, 90],
     remotePatterns: [
       { protocol: 'https', hostname: 'knightscoaches.com', pathname: '/wp-content/uploads/**' },
       { protocol: 'https', hostname: 'www.knightscoaches.com', pathname: '/wp-content/uploads/**' },

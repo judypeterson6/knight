@@ -63,6 +63,11 @@ export async function HeroBlock({ props, first }: { props: BlockPropsMap['Hero']
             aria-hidden
             fill
             priority={first}
+            // The hero sits under a gradient running from 0.9 to 0.35 opacity,
+            // so compression artefacts are not visible. Dropping the quality
+            // here cuts the largest-contentful-paint payload with no visible
+            // cost; detail imagery elsewhere keeps the default.
+            quality={70}
             sizes="100vw"
             className="absolute inset-0 -z-10 object-cover"
           />
@@ -142,11 +147,13 @@ export async function HeroBlock({ props, first }: { props: BlockPropsMap['Hero']
               {props.stats.length ? (
                 <dl className="mt-12 flex flex-wrap gap-x-12 gap-y-6 border-t border-white/15 pt-8">
                   {props.stats.map((stat) => (
-                    <div key={stat.label}>
-                      <dd className="text-[2rem] font-extrabold leading-none text-on-dark">{stat.value}</dd>
-                      <dt className="mt-2 text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-on-dark-muted">
+                    <div key={stat.label} className="flex flex-col">
+                      {/* The term must precede its definition in the DOM; the
+                          big figure is lifted above it with `order`. */}
+                      <dt className="order-2 mt-2 text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-on-dark-muted">
                         {stat.label}
                       </dt>
+                      <dd className="order-1 text-[2rem] font-extrabold leading-none text-on-dark">{stat.value}</dd>
                     </div>
                   ))}
                 </dl>

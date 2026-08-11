@@ -9,8 +9,8 @@
  * renders correctly before an admin has ever touched /admin/appearance.
  */
 :root {
-  --color-primary: #eb6e2c;
-  --color-primary-hover: #d85f1e;
+  --color-primary: #bf5218;
+  --color-primary-hover: #a8460f;
   --color-primary-soft: rgb(235 110 44 / 0.12);
   --color-primary-glow: rgb(235 110 44 / 0.32);
   --color-primary-contrast: #ffffff;
@@ -23,8 +23,8 @@
   --color-surface-dark: #14110e;
 
   --color-text: #14110e;
-  --color-muted: #7a746c;
-  --color-subtle: #9a938a;
+  --color-muted: #5f5a53;
+  --color-subtle: #6b655c;
   --color-border: #eee7dd;
   --color-on-dark: #ffffff;
   --color-on-dark-muted: #b7afa6;
