@@ -22,7 +22,7 @@ export default async function PageEditor({ params }: { params: Promise<{ id: str
 
   const [seo, media, revisions] = await Promise.all([
     prisma.seoMeta.findUnique({ where: { entityType_entityId: { entityType: 'PAGE', entityId: page.id } } }).catch(() => null),
-    prisma.media.findMany({ orderBy: { createdAt: 'desc' }, take: 300, select: { id: true, path: true, alt: true, decorative: true, filename: true, width: true, height: true } }).catch(() => []),
+    prisma.media.findMany({ orderBy: { createdAt: 'desc' }, take: 300, select: { id: true, path: true, alt: true, decorative: true, filename: true, width: true, height: true, mimeType: true } }).catch(() => []),
     prisma.pageRevision
       .findMany({
         where: { pageId: page.id },

@@ -7,8 +7,17 @@ import { slugify } from '@/lib/utils'
 
 export const runtime = 'nodejs'
 
-const MAX_BYTES = 15 * 1024 * 1024
-const ALLOWED = new Set(['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/avif', 'image/svg+xml'])
+const MAX_IMAGE_BYTES = 15 * 1024 * 1024
+// Video gets more room because a usable hero loop does not fit in 15 MB, but
+// the ceiling is deliberate: anything past this belongs on a video host, not
+// in the site's own uploads directory.
+const MAX_VIDEO_BYTES = 64 * 1024 * 1024
+
+const ALLOWED_IMAGES = new Set(['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/avif', 'image/svg+xml'])
+// MP4 plays everywhere; WebM is smaller where the browser takes it.
+const ALLOWED_VIDEO = new Set(['video/mp4', 'video/webm'])
+
+const isVideo = (type: string) => ALLOWED_VIDEO.has(type)
 
 /** Media library listing, with a search filter. */
 export async function GET(request: Request): Promise<Response> {
@@ -55,7 +64,12 @@ export async function POST(request: Request): Promise<Response> {
 
   const alt = String(form.get('alt') ?? '').trim()
   const decorative = form.get('decorative') === 'true'
-  if (!alt && !decorative) {
+
+  // Alt text describes an image. A background video carries no information a
+  // screen reader can use and is rendered aria-hidden, so it is stored as
+  // decorative rather than being blocked on a field that does not apply.
+  const videoOnly = files.every((f) => isVideo(f.type))
+  if (!videoOnly && !alt && !decorative) {
     return fail('Alt text is required. Tick "decorative" only if the image carries no information.', 422)
   }
 
@@ -67,8 +81,14 @@ export async function POST(request: Request): Promise<Response> {
 
   const created = []
   for (const file of files) {
-    if (file.size > MAX_BYTES) return fail(`${file.name} is larger than 15 MB`, 413)
-    if (!ALLOWED.has(file.type)) return fail(`${file.name} is not an accepted image type`, 415)
+    const video = isVideo(file.type)
+    const limit = video ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES
+    if (file.size > limit) {
+      return fail(`${file.name} is larger than ${Math.round(limit / 1024 / 1024)} MB`, 413)
+    }
+    if (!ALLOWED_IMAGES.has(file.type) && !video) {
+      return fail(`${file.name} is not an accepted image or video type`, 415)
+    }
 
     const ext = path.extname(file.name) || '.png'
     const stem = slugify(path.basename(file.name, ext)) || 'upload'
@@ -88,7 +108,9 @@ export async function POST(request: Request): Promise<Response> {
 
     let width: number | null = null
     let height: number | null = null
-    if (file.type !== 'image/svg+xml') {
+    // sharp reads images. Probing a video would need ffmpeg, and the hero uses
+    // object-cover so intrinsic dimensions are not needed to render it.
+    if (!video && file.type !== 'image/svg+xml') {
       try {
         const meta = await sharp(buffer).metadata()
         width = meta.width ?? null
@@ -106,8 +128,8 @@ export async function POST(request: Request): Promise<Response> {
         width,
         height,
         bytes: buffer.byteLength,
-        alt: decorative ? '' : alt,
-        decorative,
+        alt: video ? '' : decorative ? '' : alt,
+        decorative: video ? true : decorative,
         title: String(form.get('title') ?? '') || null,
         caption: String(form.get('caption') ?? '') || null,
       },

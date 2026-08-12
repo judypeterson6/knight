@@ -5,6 +5,7 @@ import { cn, formatPhone, telHref } from '@/lib/utils'
 import type { BlockPropsMap } from '@/lib/blocks/schema'
 import { CtaButton, CtaRow, Prose, Section, SectionHeading, sectionHeadingId, SmartLink } from '@/components/ui/primitives'
 import { Icon } from '@/components/ui/icon'
+import { HeroVideo } from '@/components/ui/hero-video'
 import { QuoteFormClient } from '@/components/forms/quote-form-client'
 
 /**
@@ -43,19 +44,24 @@ export async function HeroBlock({ props, first }: { props: BlockPropsMap['Hero']
           isLanding ? 'min-h-[min(100svh,58rem)]' : 'min-h-[34rem]',
         )}
       >
-        {/* Background media. Decorative — every fact it carries is also text below. */}
-        {props.videoSrc ? (
-          <video
-            className="absolute inset-0 -z-10 h-full w-full object-cover"
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster={props.image.src || undefined}
+        {/* Background media. Decorative — every fact it carries is also text below.
+            With a video set, the image still renders underneath as the poster,
+            so the hero is complete before the video has loaded and stays
+            complete if it never does. */}
+        {props.videoSrc && props.image.src ? (
+          <Image
+            src={props.image.src}
+            alt=""
             aria-hidden
-          >
-            <source src={props.videoSrc} type="video/mp4" />
-          </video>
+            fill
+            priority={first}
+            quality={70}
+            sizes="100vw"
+            className="absolute inset-0 -z-10 object-cover"
+          />
+        ) : null}
+        {props.videoSrc ? (
+          <HeroVideo src={props.videoSrc} poster={props.image.src || undefined} />
         ) : props.image.src ? (
           <Image
             src={props.image.src}

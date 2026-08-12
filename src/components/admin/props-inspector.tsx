@@ -14,6 +14,14 @@ export interface MediaOption {
   filename: string
   width: number | null
   height: number | null
+  /** Present on newer queries; used to separate video from images. */
+  mimeType?: string
+}
+
+/** Video is matched on type where known, falling back to the extension. */
+export function isVideoAsset(item: { mimeType?: string; path: string }): boolean {
+  if (item.mimeType) return item.mimeType.startsWith('video/')
+  return /\.(mp4|webm)$/i.test(item.path)
 }
 
 /**
@@ -183,6 +191,10 @@ function PropField({
   }
   if (name === 'columns') {
     return <Select label="Columns" value={String(value)} options={['2', '3', '4']} onChange={(v) => onChange(Number(v))} />
+  }
+
+  if (name === 'videoSrc') {
+    return <VideoPicker value={String(value)} media={media} onChange={onChange} />
   }
 
   if (typeof value === 'string') {
@@ -583,6 +595,126 @@ function MediaUploader({ onUploaded }: { onUploaded: (item: MediaOption) => void
         ) : null}
       </div>
     </details>
+  )
+}
+
+/**
+ * Background video for a hero.
+ *
+ * Separate from ImagePicker because the two are not interchangeable: a video
+ * has no alt text (the hero renders it aria-hidden), it needs the poster image
+ * set alongside it, and the size ceiling is far higher.
+ */
+function VideoPicker({
+  value,
+  media,
+  onChange,
+}: {
+  value: string
+  media: MediaOption[]
+  onChange: (value: string) => void
+}) {
+  const fieldId = useId()
+  const inputRef = useRef<HTMLInputElement>(null)
+  const session = useContext(SessionMediaContext)
+  const [file, setFile] = useState<File | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [message, setMessage] = useState('')
+
+  const videos = [...session.extra, ...media].filter(isVideoAsset)
+
+  async function upload() {
+    if (!file) return
+    setBusy(true)
+    setMessage('Uploading. Large files take a moment.')
+
+    const body = new FormData()
+    body.append('files', file)
+    // A background video carries no information a screen reader can use, so it
+    // is stored decorative and the API does not ask for alt text.
+    body.append('decorative', 'true')
+
+    try {
+      const res = await fetch('/api/admin/media', { method: 'POST', body })
+      const json = (await res.json()) as { ok: boolean; error?: string; data?: MediaOption[] }
+      if (!json.ok || !json.data?.length) {
+        setMessage(json.error ?? 'Upload failed.')
+        return
+      }
+      session.add(json.data[0])
+      onChange(json.data[0].path)
+      setFile(null)
+      if (inputRef.current) inputRef.current.value = ''
+      setMessage('Uploaded and selected.')
+    } catch {
+      setMessage('Upload failed. Check your connection and try again.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <fieldset className="rounded-control border border-line p-3">
+      <legend className="px-1 text-step--1 font-bold">Background video</legend>
+
+      {value ? (
+        <video src={value} className="mb-3 h-28 w-full rounded-control bg-surface-dark object-cover" muted playsInline />
+      ) : null}
+
+      <label htmlFor={`${fieldId}-pick`} className="kc-label">
+        Video
+      </label>
+      <select
+        id={`${fieldId}-pick`}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="kc-field"
+      >
+        <option value="">None (use the image below)</option>
+        {videos.map((v) => (
+          <option key={v.id} value={v.path}>
+            {v.filename}
+          </option>
+        ))}
+      </select>
+
+      <details className="mt-3 rounded-control border border-dashed border-line p-3">
+        <summary className="cursor-pointer text-step--1 font-bold text-primary-deep">Upload a video</summary>
+        <div className="mt-3 space-y-3">
+          <input
+            id={`${fieldId}-file`}
+            ref={inputRef}
+            type="file"
+            accept="video/mp4,video/webm"
+            onChange={(e) => {
+              setFile(e.target.files?.[0] ?? null)
+              setMessage('')
+            }}
+            className="kc-field file:mr-3 file:rounded-control file:border-0 file:bg-surface-alt file:px-3 file:py-1.5 file:text-step--1 file:font-bold"
+          />
+          <p className="text-step--1 text-subtle">
+            MP4 or WebM, up to 64 MB. Keep it short and silent: it loops, plays muted and is decoration. Ten to twenty
+            seconds at 1080p is plenty.
+          </p>
+          <button
+            type="button"
+            onClick={() => void upload()}
+            disabled={!file || busy}
+            className="kc-btn kc-btn-primary w-full !py-2 !text-step--1 disabled:opacity-50"
+          >
+            {busy ? 'Uploading…' : 'Upload and use'}
+          </button>
+          <p role="status" aria-live="polite" className={cn('text-step--1', message ? 'text-muted' : 'sr-only')}>
+            {message}
+          </p>
+        </div>
+      </details>
+
+      <p className="mt-3 text-step--1 text-subtle">
+        Set the image below as well. It is the poster: it shows while the video loads, if the video fails, and for
+        visitors who have asked for reduced motion.
+      </p>
+    </fieldset>
   )
 }
 
