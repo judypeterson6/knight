@@ -222,6 +222,12 @@ const DUPLICATED_BY_A_BLOCK: RegExp[] = [
   /^our prevost coach fleet/i, // -> FleetGrid
   /coverage across \d+ states$/i, // -> CoverageMap
   /^(send us (a )?message|get in touch|contact us)$/i, // contact chrome, not body copy
+  // Demo staff from the WordPress theme, migrated as if they were real people.
+  // "Ivan Itchinos" and "Mark Ateer" each arrived as their own section with the
+  // name set as an H2, putting two invented employees in the page outline. The
+  // heading above them goes too, since without them it introduces nothing.
+  /^(ivan itchinos|mark ateer)$/i,
+  /^our expert team$/i,
 ]
 
 export function isDuplicatedByBlock(heading: string): boolean {
