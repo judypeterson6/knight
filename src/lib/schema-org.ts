@@ -34,6 +34,18 @@ export function prune<T>(value: T): T {
   return value
 }
 
+/**
+ * E.164-with-separators, the form Google's docs use.
+ *
+ * The two business nodes used to format the same number two different ways —
+ * "+1-855-734-5700" on Organization and "+1-8557345700" on LocalBusiness —
+ * because each rebuilt the string itself and only one applied the grouping.
+ */
+function telephone(raw: string): string {
+  const digits = raw.replace(/\D/g, '').replace(/^1/, '')
+  return `+1-${digits.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3')}`
+}
+
 export async function organizationNode(): Promise<Json> {
   const { organization, branding, seo } = await getSettings()
 
@@ -56,7 +68,7 @@ export async function organizationNode(): Promise<Json> {
       height: branding.footerLogo.height,
     },
     image: absoluteUrl(seo.defaultOgImage || branding.defaultOgImage),
-    telephone: `+1-${organization.phone.replace(/\D/g, '').replace(/^1/, '').replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3')}`,
+    telephone: telephone(organization.phone),
     email: organization.email,
     address: {
       '@type': 'PostalAddress',
@@ -86,7 +98,7 @@ export async function localBusinessNode(): Promise<Json> {
     name: organization.name,
     image: absoluteUrl(branding.defaultOgImage),
     url: absoluteUrl('/'),
-    telephone: `+1-${organization.phone.replace(/\D/g, '').replace(/^1/, '')}`,
+    telephone: telephone(organization.phone),
     email: organization.email,
     address: {
       '@type': 'PostalAddress',
@@ -269,9 +281,24 @@ export function blogPostingNode(post: {
   publishedAt: Date | null
   updatedAt: Date
   authorName: string | null
+  /** Category name, emitted as articleSection. */
+  section?: string | null
+  /** Rendered article HTML, used only to count words. */
+  body?: string | null
 }): Json {
+  // Word count from the rendered text, not the markup, so tags and attributes
+  // are not counted as words.
+  const words = post.body
+    ? post.body
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&[a-z]+;/gi, ' ')
+        .split(/\s+/)
+        .filter(Boolean).length
+    : undefined
+
   return {
     '@type': 'BlogPosting',
+    '@id': `${absoluteUrl(`/guides/${post.slug}`)}#article`,
     headline: post.title,
     description: post.description,
     url: absoluteUrl(`/guides/${post.slug}`),
@@ -281,6 +308,62 @@ export function blogPostingNode(post: {
     dateModified: post.updatedAt.toISOString(),
     author: post.authorName ? { '@type': 'Person', name: post.authorName } : { '@id': `${absoluteUrl('/')}#organization` },
     publisher: { '@id': `${absoluteUrl('/')}#organization` },
+    // Ties the article to the blog it belongs to, so the guides index and the
+    // articles under it read as one collection rather than unrelated pages.
+    isPartOf: { '@id': `${absoluteUrl('/guides')}#blog` },
+    articleSection: post.section ?? undefined,
+    wordCount: words,
+    inLanguage: 'en-US',
+  }
+}
+
+/**
+ * The guides index as a Blog rather than a bare CollectionPage, with its posts
+ * listed in order. Every entry points at a URL that exists; nothing is
+ * summarised here that is not published.
+ */
+export function blogNode(input: {
+  name: string
+  description: string
+  posts: { title: string; slug: string; publishedAt: Date | null }[]
+}): Json {
+  return {
+    '@type': 'Blog',
+    '@id': `${absoluteUrl('/guides')}#blog`,
+    name: input.name,
+    description: input.description,
+    url: absoluteUrl('/guides'),
+    publisher: { '@id': `${absoluteUrl('/')}#organization` },
+    inLanguage: 'en-US',
+    blogPost: input.posts.map((p) => ({
+      '@type': 'BlogPosting',
+      '@id': `${absoluteUrl(`/guides/${p.slug}`)}#article`,
+      headline: p.title,
+      url: absoluteUrl(`/guides/${p.slug}`),
+      datePublished: p.publishedAt?.toISOString(),
+    })),
+  }
+}
+
+/**
+ * An ordered list of the things a listing page lists.
+ *
+ * /fleet previously emitted a CollectionPage that named no members, so nothing
+ * connected the page to the twenty-one coach pages under it.
+ */
+export function itemListNode(input: { route: string; items: { name: string; url: string }[] }): Json | undefined {
+  if (!input.items.length) return undefined
+  return {
+    '@type': 'ItemList',
+    '@id': `${absoluteUrl(input.route)}#list`,
+    numberOfItems: input.items.length,
+    itemListOrder: 'https://schema.org/ItemListOrderAscending',
+    itemListElement: input.items.map((item, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: item.name,
+      url: absoluteUrl(item.url),
+    })),
   }
 }
 

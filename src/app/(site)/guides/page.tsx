@@ -3,7 +3,7 @@ import { publishedPostWhere } from '@/lib/publish'
 import { prisma } from '@/lib/prisma'
 import { getSettings } from '@/lib/settings'
 import { excerptFrom, formatDate, isoDate, readingMinutes } from '@/lib/utils'
-import { buildGraph, breadcrumbNode, organizationNode, webPageNode } from '@/lib/schema-org'
+import { blogNode, buildGraph, breadcrumbNode, organizationNode } from '@/lib/schema-org'
 import { JsonLd } from '@/components/seo/json-ld'
 import { Card, Section, SectionHeading, SmartImage, SmartLink } from '@/components/ui/primitives'
 
@@ -45,11 +45,12 @@ export default async function BlogArchive({ searchParams }: Props) {
 
   const graph = await buildGraph([
     await organizationNode(),
-    webPageNode({
-      type: 'CollectionPage',
+    // A Blog rather than a bare CollectionPage, listing the posts it holds so
+    // the index and the articles under it read as one collection.
+    blogNode({
       name: 'Touring guides',
       description: 'Guides on touring logistics, coach specification and life on the road.',
-      route: '/guides',
+      posts: posts.map((post) => ({ title: post.title, slug: post.slug, publishedAt: post.publishedAt })),
     }),
     breadcrumbNode([
       { name: 'Home', url: '/' },

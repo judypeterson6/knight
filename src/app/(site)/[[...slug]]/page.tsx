@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { publishedPageWhere } from '@/lib/publish'
+import { publishedCoachWhere, publishedPageWhere } from '@/lib/publish'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getPage, breadcrumbsFor } from '@/lib/pages'
@@ -8,6 +8,7 @@ import {
   breadcrumbNode,
   buildGraph,
   faqNode,
+  itemListNode,
   localBusinessNode,
   organizationNode,
   serviceNode,
@@ -128,6 +129,24 @@ export default async function DynamicPage({ params, searchParams }: Props) {
       await localBusinessNode(),
     )
   } else if (page.pageType === 'fleet-listing') {
+    // The CollectionPage named no members, so nothing tied this page to the
+    // coach pages beneath it. The list is built from the fleet itself, so it
+    // cannot drift from what the page actually shows.
+    const coaches = await prisma.coach
+      .findMany({
+        where: publishedCoachWhere(),
+        orderBy: [{ featured: 'desc' }, { displayOrder: 'asc' }],
+        select: { name: true, slug: true },
+      })
+      .catch(() => [])
+
+    pageNodes.push(
+      webPageNode({ type: 'CollectionPage', name: page.title, description, route: page.path }),
+      itemListNode({ route: page.path, items: coaches.map((c) => ({ name: c.name, url: `/fleet/${c.slug}` })) }),
+    )
+  } else if (page.pageType === 'reviews') {
+    // Not a Service. The reviews themselves already hang off the Organization
+    // node, which is what a rich result reads.
     pageNodes.push(webPageNode({ type: 'CollectionPage', name: page.title, description, route: page.path }))
   } else {
     pageNodes.push(webPageNode({ type: 'WebPage', name: page.title, description, route: page.path }))

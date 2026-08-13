@@ -259,7 +259,7 @@ await withDb(async (prisma) => {
 
   await writePage(
     prisma,
-    { path: '/reviews', slug: 'reviews', title: 'Client Reviews', pageType: 'service' },
+    { path: '/reviews', slug: 'reviews', title: 'Client Reviews', pageType: 'reviews' },
     [
       {
         type: 'Hero',

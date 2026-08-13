@@ -118,6 +118,8 @@ export default async function GuidePost({ params }: Props) {
         publishedAt: post.publishedAt,
         updatedAt: post.updatedAt,
         authorName: post.author?.name ?? null,
+        section: post.category?.name ?? null,
+        body: post.body,
       }),
       breadcrumbNode([
         { name: 'Home', url: '/' },
