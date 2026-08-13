@@ -1,12 +1,12 @@
 [
   {
-    "slug": "outlaw",
-    "name": "Outlaw",
-    "className": "Elite",
-    "chassis": "Prevost X3-45",
+    "slug": "prowler",
+    "name": "Prowler",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
     "bunks": 12,
-    "slideOuts": "Double Slide",
-    "rearConfig": "Master Suite",
+    "slideOuts": "Single slide out",
+    "rearConfig": "",
     "amenities": [
       "12 curtained sleeper bunks",
       "Full galley with refrigeration and prep space",
@@ -17,24 +17,24 @@
       "CDL-certified professional driver included"
     ],
     "dailyPrice": null,
-    "tagline": "Most Booked",
-    "description": "Outlaw is a custom Prevost X3-45 entertainer coach conversion configured with 12 bunks, a double slide layout and a master suite at the rear. It carries a full galley, a front lounge, a stand-up bathroom with an onboard shower, and sleeps the crew while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch.",
+    "tagline": null,
+    "description": "Prowler is a Prevost entertainer coach converted with twelve bunks and a single slide-out that widens the main lounge once the coach is parked. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
     "images": [
-      "/uploads/2026/05/Outlaw-Tour-Bus-1024x691.webp"
+      "/uploads/2026/05/Prowler-Entertainer-Coach-1.webp"
     ],
     "featured": true,
     "displayOrder": 0
   },
   {
-    "slug": "atlas",
-    "name": "Atlas",
-    "className": "Premium",
-    "chassis": "Prevost H3-45",
-    "bunks": 10,
-    "slideOuts": "Single Slide",
-    "rearConfig": "Sofa Lounge",
+    "slug": "outlaw",
+    "name": "Outlaw",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
+    "bunks": 12,
+    "slideOuts": "Single slide out",
+    "rearConfig": "",
     "amenities": [
-      "10 curtained sleeper bunks",
+      "12 curtained sleeper bunks",
       "Full galley with refrigeration and prep space",
       "Front lounge and private rear lounge",
       "Stand-up bathroom with onboard shower",
@@ -43,22 +43,22 @@
       "CDL-certified professional driver included"
     ],
     "dailyPrice": null,
-    "tagline": "Best Value",
-    "description": "Atlas is a custom Prevost H3-45 entertainer coach conversion configured with 10 bunks, a single slide layout and a sofa lounge at the rear. It carries a full galley, a front lounge, a stand-up bathroom with an onboard shower, and sleeps the crew while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch.",
+    "tagline": null,
+    "description": "Outlaw is a Prevost entertainer coach converted with twelve bunks and a single slide-out that widens the main lounge once the coach is parked. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
     "images": [
-      "/uploads/2026/05/Atlas-Entertainer-Coach-Prevost-1024x691.webp"
+      "/uploads/2026/05/Outlaw-Tour-Bus.webp"
     ],
     "featured": true,
     "displayOrder": 1
   },
   {
-    "slug": "thunder",
-    "name": "Thunder",
-    "className": "Premium",
-    "chassis": "Prevost H3-45",
+    "slug": "atlas",
+    "name": "Atlas",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
     "bunks": 12,
-    "slideOuts": "Double Slide",
-    "rearConfig": "Rear Lounge",
+    "slideOuts": "Single slide out",
+    "rearConfig": "",
     "amenities": [
       "12 curtained sleeper bunks",
       "Full galley with refrigeration and prep space",
@@ -69,74 +69,22 @@
       "CDL-certified professional driver included"
     ],
     "dailyPrice": null,
-    "tagline": "Flagship",
-    "description": "Thunder is a custom Prevost H3-45 entertainer coach conversion configured with 12 bunks, a double slide layout and a rear lounge at the rear. It carries a full galley, a front lounge, a stand-up bathroom with an onboard shower, and sleeps the crew while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch.",
+    "tagline": null,
+    "description": "Atlas is a Prevost entertainer coach converted with twelve bunks and a single slide-out that widens the main lounge once the coach is parked. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
     "images": [
-      "/uploads/2026/05/Thunder-Entertainer-Coach-Slide-1024x691.jpg"
+      "/uploads/2026/05/Atlas-Entertainer-Coach-Prevost.webp"
     ],
     "featured": true,
     "displayOrder": 2
   },
   {
-    "slug": "maverick",
-    "name": "Maverick",
-    "className": "Elite",
-    "chassis": "Prevost X3-45",
-    "bunks": 14,
-    "slideOuts": "Triple Slide",
-    "rearConfig": "Star Config",
-    "amenities": [
-      "14 curtained sleeper bunks",
-      "Full galley with refrigeration and prep space",
-      "Front lounge and private rear lounge",
-      "Stand-up bathroom with onboard shower",
-      "Entertainment system and onboard Wi-Fi",
-      "Independent climate control zones",
-      "CDL-certified professional driver included"
-    ],
-    "dailyPrice": null,
-    "tagline": "Star / VIP",
-    "description": "Maverick is a custom Prevost X3-45 entertainer coach conversion configured with 14 bunks, a triple slide layout and a star config at the rear. It carries a full galley, a front lounge, a stand-up bathroom with an onboard shower, and sleeps the crew while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch.",
-    "images": [
-      "/uploads/2026/05/Outlaw-Tour-Bus-1024x691.webp"
-    ],
-    "featured": false,
-    "displayOrder": 3
-  },
-  {
-    "slug": "pioneer",
-    "name": "Pioneer",
-    "className": "Standard",
-    "chassis": "Prevost H3-45",
-    "bunks": 8,
-    "slideOuts": "Single Slide",
-    "rearConfig": "Rear Lounge",
-    "amenities": [
-      "8 curtained sleeper bunks",
-      "Full galley with refrigeration and prep space",
-      "Front lounge and private rear lounge",
-      "Stand-up bathroom with onboard shower",
-      "Entertainment system and onboard Wi-Fi",
-      "Independent climate control zones",
-      "CDL-certified professional driver included"
-    ],
-    "dailyPrice": null,
-    "tagline": "Crew Ready",
-    "description": "Pioneer is a custom Prevost H3-45 entertainer coach conversion configured with 8 bunks, a single slide layout and a rear lounge at the rear. It carries a full galley, a front lounge, a stand-up bathroom with an onboard shower, and sleeps the crew while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch.",
-    "images": [
-      "/uploads/2026/05/Atlas-Entertainer-Coach-Prevost-1024x691.webp"
-    ],
-    "featured": false,
-    "displayOrder": 4
-  },
-  {
-    "slug": "summit",
-    "name": "Summit",
-    "className": "Premium",
-    "chassis": "Prevost H3-45",
+    "slug": "thunder",
+    "name": "Thunder",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
     "bunks": 12,
-    "slideOuts": "Double Slide",
-    "rearConfig": "Rear Suite",
+    "slideOuts": "Single slide out",
+    "rearConfig": "",
     "amenities": [
       "12 curtained sleeper bunks",
       "Full galley with refrigeration and prep space",
@@ -147,12 +95,454 @@
       "CDL-certified professional driver included"
     ],
     "dailyPrice": null,
-    "tagline": "Executive",
-    "description": "Summit is a custom Prevost H3-45 entertainer coach conversion configured with 12 bunks, a double slide layout and a rear suite at the rear. It carries a full galley, a front lounge, a stand-up bathroom with an onboard shower, and sleeps the crew while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch.",
+    "tagline": null,
+    "description": "Thunder is a Prevost entertainer coach converted with twelve bunks and a single slide-out that widens the main lounge once the coach is parked. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
     "images": [
-      "/uploads/2026/05/Thunder-Entertainer-Coach-Slide-1024x691.jpg"
+      "/uploads/2026/05/Thunder-Entertainer-Coach-Slide.jpg"
+    ],
+    "featured": false,
+    "displayOrder": 3
+  },
+  {
+    "slug": "cowboy",
+    "name": "Cowboy",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
+    "bunks": 12,
+    "slideOuts": "Single slide out",
+    "rearConfig": "",
+    "amenities": [
+      "12 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": null,
+    "description": "Cowboy is a Prevost entertainer coach converted with twelve bunks and a single slide-out that widens the main lounge once the coach is parked. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
+    "images": [
+      "/uploads/2026/05/Cowboy-Entertainer-Coach.webp"
+    ],
+    "featured": false,
+    "displayOrder": 4
+  },
+  {
+    "slug": "wicked",
+    "name": "Wicked",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
+    "bunks": 12,
+    "slideOuts": "Single slide out",
+    "rearConfig": "",
+    "amenities": [
+      "12 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": null,
+    "description": "Wicked is a Prevost entertainer coach converted with twelve bunks and a single slide-out that widens the main lounge once the coach is parked. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
+    "images": [
+      "/uploads/2026/05/Wicked-Entertainer-Coach.webp"
     ],
     "featured": false,
     "displayOrder": 5
+  },
+  {
+    "slug": "midnight",
+    "name": "Midnight",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
+    "bunks": 12,
+    "slideOuts": "Single slide out",
+    "rearConfig": "",
+    "amenities": [
+      "12 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": null,
+    "description": "Midnight is a Prevost entertainer coach converted with twelve bunks and a single slide-out that widens the main lounge once the coach is parked. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
+    "images": [
+      "/uploads/2026/05/Midnight-Tour-Bus-For-Lease.webp"
+    ],
+    "featured": false,
+    "displayOrder": 6
+  },
+  {
+    "slug": "twister",
+    "name": "Twister",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
+    "bunks": 12,
+    "slideOuts": "Single slide out",
+    "rearConfig": "",
+    "amenities": [
+      "12 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": null,
+    "description": "Twister is a Prevost entertainer coach converted with twelve bunks and a single slide-out that widens the main lounge once the coach is parked. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
+    "images": [
+      "/uploads/2026/05/Twister-Entertainer-Coach.webp"
+    ],
+    "featured": false,
+    "displayOrder": 7
+  },
+  {
+    "slug": "ruby",
+    "name": "Ruby",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
+    "bunks": 12,
+    "slideOuts": "Single slide out",
+    "rearConfig": "",
+    "amenities": [
+      "12 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": null,
+    "description": "Ruby is a Prevost entertainer coach converted with twelve bunks and a single slide-out that widens the main lounge once the coach is parked. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
+    "images": [
+      "/uploads/2026/05/Ruby-Entertainer-Coach-Slide.webp"
+    ],
+    "featured": false,
+    "displayOrder": 8
+  },
+  {
+    "slug": "raven",
+    "name": "Raven",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
+    "bunks": 12,
+    "slideOuts": "Single slide out",
+    "rearConfig": "",
+    "amenities": [
+      "12 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": null,
+    "description": "Raven is a Prevost entertainer coach converted with twelve bunks and a single slide-out that widens the main lounge once the coach is parked. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
+    "images": [
+      "/uploads/2026/05/Raven-Elite-Prevost-Entertainer-Coach.webp"
+    ],
+    "featured": false,
+    "displayOrder": 9
+  },
+  {
+    "slug": "betty",
+    "name": "Betty",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
+    "bunks": 12,
+    "slideOuts": "Single slide out",
+    "rearConfig": "",
+    "amenities": [
+      "12 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": null,
+    "description": "Betty is a Prevost entertainer coach converted with twelve bunks and a single slide-out that widens the main lounge once the coach is parked. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
+    "images": [
+      "/uploads/2026/05/Betty-Entertainer-Coach.webp"
+    ],
+    "featured": false,
+    "displayOrder": 10
+  },
+  {
+    "slug": "ike",
+    "name": "Ike",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
+    "bunks": 12,
+    "slideOuts": "Single slide out",
+    "rearConfig": "",
+    "amenities": [
+      "12 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": null,
+    "description": "Ike is a Prevost entertainer coach converted with twelve bunks and a single slide-out that widens the main lounge once the coach is parked. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
+    "images": [
+      "/uploads/2026/05/Ike-Entertainer-Coach-Rental-1.webp"
+    ],
+    "featured": false,
+    "displayOrder": 11
+  },
+  {
+    "slug": "jayhawk",
+    "name": "Jayhawk",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
+    "bunks": 12,
+    "slideOuts": "Single slide out",
+    "rearConfig": "",
+    "amenities": [
+      "12 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": null,
+    "description": "Jayhawk is a Prevost entertainer coach converted with twelve bunks and a single slide-out that widens the main lounge once the coach is parked. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
+    "images": [
+      "/uploads/2026/05/Jayhawk-Tour-Bus-For-Lease.webp"
+    ],
+    "featured": false,
+    "displayOrder": 12
+  },
+  {
+    "slug": "wildcat",
+    "name": "Wildcat",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
+    "bunks": 12,
+    "slideOuts": "Single slide out",
+    "rearConfig": "",
+    "amenities": [
+      "12 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": null,
+    "description": "Wildcat is a Prevost entertainer coach converted with twelve bunks and a single slide-out that widens the main lounge once the coach is parked. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
+    "images": [
+      "/uploads/2026/05/Wildcat-Entertainer-Coach.webp"
+    ],
+    "featured": false,
+    "displayOrder": 13
+  },
+  {
+    "slug": "tin-man",
+    "name": "Tin Man",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
+    "bunks": 12,
+    "slideOuts": "Single slide out",
+    "rearConfig": "",
+    "amenities": [
+      "12 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": null,
+    "description": "Tin Man is a Prevost entertainer coach converted with twelve bunks and a single slide-out that widens the main lounge once the coach is parked. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
+    "images": [
+      "/uploads/2026/05/Tin-Man-Entertainer-Coach.webp"
+    ],
+    "featured": false,
+    "displayOrder": 14
+  },
+  {
+    "slug": "toto",
+    "name": "Toto",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
+    "bunks": 12,
+    "slideOuts": "Single slide out",
+    "rearConfig": "",
+    "amenities": [
+      "12 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": null,
+    "description": "Toto is a Prevost entertainer coach converted with twelve bunks and a single slide-out that widens the main lounge once the coach is parked. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
+    "images": [
+      "/uploads/2026/05/Toto-Entertainer-Coach.webp"
+    ],
+    "featured": false,
+    "displayOrder": 15
+  },
+  {
+    "slug": "shocker",
+    "name": "Shocker",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
+    "bunks": 12,
+    "slideOuts": "Single slide out",
+    "rearConfig": "",
+    "amenities": [
+      "12 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": null,
+    "description": "Shocker is a Prevost entertainer coach converted with twelve bunks and a single slide-out that widens the main lounge once the coach is parked. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
+    "images": [
+      "/uploads/2026/05/Shocker-Entertainer-Coach.webp"
+    ],
+    "featured": false,
+    "displayOrder": 16
+  },
+  {
+    "slug": "wisdom",
+    "name": "Wisdom",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
+    "bunks": 12,
+    "slideOuts": "",
+    "rearConfig": "Optional star conversion",
+    "amenities": [
+      "12 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": null,
+    "description": "Wisdom is a Prevost entertainer coach converted with twelve bunks with an optional star conversion, so the rear can be run as bunks or opened up as a private star suite. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
+    "images": [
+      "/uploads/2026/05/Wisdom.webp"
+    ],
+    "featured": false,
+    "displayOrder": 17
+  },
+  {
+    "slug": "paladin",
+    "name": "Paladin",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
+    "bunks": 12,
+    "slideOuts": "Single slide out",
+    "rearConfig": "",
+    "amenities": [
+      "12 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": null,
+    "description": "Paladin is a Prevost entertainer coach converted with twelve bunks and a single slide-out that widens the main lounge once the coach is parked. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
+    "images": [
+      "/uploads/2026/05/Paladin-Entertainer-Coach.webp"
+    ],
+    "featured": false,
+    "displayOrder": 18
+  },
+  {
+    "slug": "brookland",
+    "name": "Brookland",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
+    "bunks": 12,
+    "slideOuts": "",
+    "rearConfig": "Optional star conversion",
+    "amenities": [
+      "12 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": null,
+    "description": "Brookland is a Prevost entertainer coach converted with twelve bunks with an optional star conversion, so the rear can be run as bunks or opened up as a private star suite. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
+    "images": [
+      "/uploads/2026/05/Brookland-Entertainer-Coach.webp"
+    ],
+    "featured": false,
+    "displayOrder": 19
+  },
+  {
+    "slug": "chief",
+    "name": "Chief",
+    "className": "Entertainer coach",
+    "chassis": "Prevost",
+    "bunks": 12,
+    "slideOuts": "",
+    "rearConfig": "Optional star conversion",
+    "amenities": [
+      "12 curtained sleeper bunks",
+      "Full galley with refrigeration and prep space",
+      "Front lounge and private rear lounge",
+      "Stand-up bathroom with onboard shower",
+      "Entertainment system and onboard Wi-Fi",
+      "Independent climate control zones",
+      "CDL-certified professional driver included"
+    ],
+    "dailyPrice": null,
+    "tagline": null,
+    "description": "Chief is a Prevost entertainer coach converted with twelve bunks with an optional star conversion, so the rear can be run as bunks or opened up as a private star suite. It carries a full galley, a front lounge and a private rear lounge, and a stand-up bathroom with an onboard shower, so the crew sleeps and eats on board while the coach moves between cities. Every booking includes a CDL-certified driver and 24/7 dispatch. Rates are quoted per tour against your routing and dates.",
+    "images": [
+      "/uploads/2026/05/Chief-Entertainer-Coach.webp"
+    ],
+    "featured": false,
+    "displayOrder": 20
   }
 ]

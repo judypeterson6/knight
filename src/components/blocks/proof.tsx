@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import type { BlockPropsMap } from '@/lib/blocks/schema'
 import { Card, CtaButton, Grid, Section, SectionHeading, sectionHeadingId, SmartImage, SmartLink } from '@/components/ui/primitives'
 import { Icon } from '@/components/ui/icon'
+import { StepsStepper } from '@/components/blocks/steps-stepper'
 
 /**
  * Stat counters.
@@ -104,25 +105,7 @@ export function StepsHowItWorksBlock({ props }: { props: BlockPropsMap['StepsHow
         align={props.align}
         className="mb-12"
       />
-      <ol className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {props.items.map((item, i) => (
-          <li key={item.title} className="rounded-card border border-line bg-surface-alt p-7">
-            <div className="mb-6 flex items-center justify-between">
-              <span className="relative flex h-16 w-16 items-center justify-center rounded-[18px] border border-line bg-surface text-primary">
-                <Icon name={item.icon} className="h-6 w-6" />
-                <span className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full border-[3px] border-surface bg-primary text-[0.75rem] font-extrabold text-primary-contrast">
-                  {i + 1}
-                </span>
-              </span>
-              <span aria-hidden className="text-[3.2rem] font-black leading-none text-line">
-                {String(i + 1).padStart(2, '0')}
-              </span>
-            </div>
-            <h3>{item.title}</h3>
-            <p className="mt-3 text-step--1 leading-relaxed text-muted">{item.description}</p>
-          </li>
-        ))}
-      </ol>
+      <StepsStepper items={props.items} />
       <CtaButton cta={props.cta} className="mt-10" />
     </Section>
   )

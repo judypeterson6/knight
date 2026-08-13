@@ -43,7 +43,7 @@ async function renderBlock(block: StoredBlock, ctx: BlockContext, first: boolean
     case 'ServiceStatement':
       return <ServiceStatementBlock props={p} />
     case 'QuoteForm':
-      return <QuoteFormBlock props={p} />
+      return <QuoteFormBlock props={p} ctx={ctx} />
     case 'TrustStrip':
       return <TrustStripBlock props={p} />
     case 'ServiceCards':

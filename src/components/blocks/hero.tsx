@@ -1,8 +1,11 @@
 import Image from 'next/image'
 import { getSettings } from '@/lib/settings'
 import { getForm } from '@/lib/forms'
+import { prisma } from '@/lib/prisma'
+import { publishedCoachWhere } from '@/lib/publish'
 import { cn, formatPhone, telHref } from '@/lib/utils'
 import type { BlockPropsMap } from '@/lib/blocks/schema'
+import type { BlockContext } from '@/lib/blocks/context'
 import { CtaButton, CtaRow, Prose, Section, SectionHeading, sectionHeadingId, SmartLink } from '@/components/ui/primitives'
 import { Icon } from '@/components/ui/icon'
 import { HeroVideo } from '@/components/ui/hero-video'
@@ -260,10 +263,31 @@ export function ServiceStatementBlock({ props }: { props: BlockPropsMap['Service
 }
 
 /** Standalone quote-form block for mid-page placement on service pages. */
-export async function QuoteFormBlock({ props }: { props: BlockPropsMap['QuoteForm'] }) {
+export async function QuoteFormBlock({
+  props,
+  ctx,
+}: {
+  props: BlockPropsMap['QuoteForm']
+  ctx?: BlockContext
+}) {
   const [{ organization }, form] = await Promise.all([getSettings(), getForm(props.formSlug)])
   const headingId = sectionHeadingId(props)
   if (!form) return null
+
+  // "Book Prowler" on a fleet card arrives as ?coach=prowler. Resolve it to the
+  // coach's real name and only prefill when the form actually offers that
+  // choice, so an unknown or stale slug simply opens an ordinary blank form.
+  const requested = typeof ctx?.searchParams?.coach === 'string' ? ctx.searchParams.coach : ''
+  let initialValues: Record<string, string> | undefined
+  if (requested) {
+    const field = form.fields.find((f) => f.name === 'coach')
+    if (field) {
+      const coach = await prisma.coach
+        .findFirst({ where: { ...publishedCoachWhere(), slug: requested }, select: { name: true } })
+        .catch(() => null)
+      if (coach && field.options.includes(coach.name)) initialValues = { coach: coach.name }
+    }
+  }
 
   return (
     <Section base={props} labelledBy={headingId}>
@@ -277,7 +301,7 @@ export async function QuoteFormBlock({ props }: { props: BlockPropsMap['QuoteFor
           align={props.align}
         />
         <div className="mt-8 rounded-block border border-line bg-surface p-6 shadow-card md:p-10">
-          <QuoteFormClient form={form} compact={props.compact} />
+          <QuoteFormClient form={form} compact={props.compact} initialValues={initialValues} />
         </div>
         {props.showPhone ? (
           <p className="mt-6 text-center text-step-0 text-muted">

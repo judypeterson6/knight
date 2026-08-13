@@ -63,9 +63,14 @@ export async function SiteFooter() {
           {columnKeys.map((key) => {
             const column = columns.get(key) ?? []
             const [first, ...rest] = column
-            // The first item in a footer column is its heading when it has children.
-            const heading = first?.children.length ? first : null
-            const links = heading ? heading.children : column
+            // The first item in a footer column is its heading, either because
+            // the links hang off it as children or because it carries no real
+            // destination of its own. Without the second test a heading row
+            // stored flat (url "#") rendered as a link that goes nowhere, and
+            // the column fell back to a generated "Links 1" title.
+            const isLabelOnly = Boolean(first) && (!first.url || first.url === '#')
+            const heading = first?.children.length || isLabelOnly ? first : null
+            const links = heading ? (heading.children.length ? heading.children : rest) : column
             const headingId = `footer-col-${key}`
             return (
               <nav key={key} aria-labelledby={headingId}>
@@ -73,7 +78,7 @@ export async function SiteFooter() {
                   {heading ? heading.label : `Links ${key}`}
                 </h2>
                 <ul className="flex flex-col gap-3.5">
-                  {(heading ? links : [...(first ? [first] : []), ...rest]).map((link) => (
+                  {(heading ? links : [...(first ? [first] : []), ...rest]).filter((link) => link.url && link.url !== '#').map((link) => (
                     <li key={link.id}>
                       <SmartLink
                         href={link.url}

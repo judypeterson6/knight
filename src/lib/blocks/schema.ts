@@ -199,7 +199,16 @@ const featureGrid = baseProps.extend({
 const stepsHowItWorks = baseProps.extend({
   ...heading,
   items: z
-    .array(z.object({ icon: z.string().default('check'), title: z.string(), description: z.string() }))
+    .array(
+      z.object({
+        icon: z.string().default('check'),
+        title: z.string(),
+        description: z.string(),
+        /** Where this step actually happens. Empty renders no link. */
+        url: z.string().default(''),
+        linkLabel: z.string().default(''),
+      }),
+    )
     .default([]),
   cta: ctaField,
 })

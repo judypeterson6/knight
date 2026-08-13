@@ -22,16 +22,24 @@ export function QuoteFormClient({
   form,
   compact = false,
   hideDescription = false,
+  initialValues,
 }: {
   form: PublicForm
   compact?: boolean
   /** Set when the surrounding block already says what the description says. */
   hideDescription?: boolean
+  /**
+   * Field values to open with, keyed by field name. Used when a "Book this
+   * coach" link arrives carrying which coach was clicked, so the visitor does
+   * not have to re-pick something they already chose. The value is still an
+   * ordinary editable control, not a locked one.
+   */
+  initialValues?: Record<string, string>
 }) {
   const [state, setState] = useState<'idle' | 'submitting' | 'sent' | 'error'>('idle')
   const [message, setMessage] = useState('')
   const [checked, setChecked] = useState<Record<string, boolean>>({})
-  const [values, setValues] = useState<Record<string, string>>({})
+  const [values, setValues] = useState<Record<string, string>>(initialValues ?? {})
   const [stepIndex, setStepIndex] = useState(0)
   const [invalid, setInvalid] = useState<string[]>([])
   const formRef = useRef<HTMLFormElement>(null)

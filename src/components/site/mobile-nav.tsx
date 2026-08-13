@@ -19,11 +19,14 @@ interface NavItem {
  */
 export function MobileNav({
   items,
+  ctaItems = [],
   phoneHref,
   phoneLabel,
   logo,
 }: {
   items: NavItem[]
+  /** The header's isCta menu items, which the desktop bar hides below lg. */
+  ctaItems?: NavItem[]
   phoneHref: string
   phoneLabel: string
   logo: { src: string; alt: string; width: number; height: number }
@@ -114,10 +117,27 @@ export function MobileNav({
           </ul>
         </nav>
 
+        {/* The desktop bar hides the CTAs below lg, so the mobile menu is the
+            only place they exist at small sizes. */}
+        {ctaItems.map((item, i) => (
+          <Link
+            key={item.id}
+            href={item.url}
+            onClick={close}
+            className={
+              i === 0
+                ? 'mt-7 block rounded-[12px] bg-surface-dark p-4 text-center font-extrabold text-on-dark'
+                : 'mt-3 block rounded-[12px] border-2 border-line p-[0.85rem] text-center font-extrabold text-ink'
+            }
+          >
+            {item.label}
+          </Link>
+        ))}
+
         <a
           href={phoneHref}
           onClick={close}
-          className="mt-7 flex items-center justify-center gap-2.5 rounded-[12px] bg-primary p-4 font-extrabold text-primary-contrast"
+          className="mt-3 flex items-center justify-center gap-2.5 rounded-[12px] bg-primary p-4 font-extrabold text-primary-contrast"
         >
           <Icon name="phone" className="h-4 w-4" />
           {phoneLabel}
