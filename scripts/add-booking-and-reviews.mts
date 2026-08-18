@@ -356,11 +356,14 @@ await withDb(async (prisma) => {
   if (header) {
     const maxOrder = Math.max(0, ...header.items.map((i) => i.order))
     const ctas = [
-      { label: 'Rent a bus', url: '/fleet' },
-      { label: 'Online reservation', url: '/reservation' },
+      { label: 'Rent a bus', url: '/reservation' },
+      { label: 'Online reservation', url: '/reservation#booking-form' },
     ]
     for (const [i, c] of ctas.entries()) {
-      const existing = header.items.find((x) => x.label === c.label || x.url === c.url)
+      // Match only against rows that are already actions. Matching on url alone
+      // once claimed the existing "Fleet" nav link, relabelled it "Rent a bus"
+      // and flipped it to a CTA, which silently removed Fleet from the nav.
+      const existing = header.items.find((x) => x.isCta && (x.label === c.label || x.url === c.url))
       if (existing) {
         await prisma.menuItem.update({ where: { id: existing.id }, data: { ...c, isCta: true, visible: true } })
       } else {

@@ -25,7 +25,7 @@ export function NavLinks({ items }: { items: NavLink[] }) {
   const pathname = usePathname()
 
   return (
-    <nav aria-label="Primary" className="hidden items-center gap-6 xl:flex xl:gap-8">
+    <nav aria-label="Primary" className="hidden flex-shrink-0 items-center xl:flex xl:gap-5 2xl:gap-7">
       {items.map((item) => {
         const active = pathname === item.url || (item.url !== '/' && pathname.startsWith(`${item.url}/`))
         return (
@@ -37,8 +37,8 @@ export function NavLinks({ items }: { items: NavLink[] }) {
             target={item.target ?? undefined}
             className={
               active
-                ? 'text-[0.94rem] font-bold text-primary-deep'
-                : 'text-[0.94rem] font-semibold text-ink transition hover:text-primary-deep'
+                ? 'whitespace-nowrap text-[0.9rem] font-bold text-primary-deep'
+                : 'whitespace-nowrap text-[0.9rem] font-semibold text-ink transition hover:text-primary-deep'
             }
           >
             {item.label}

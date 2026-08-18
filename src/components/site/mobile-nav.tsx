@@ -94,7 +94,11 @@ export function MobileNav({
         }`}
       >
         <div className="mb-7 flex items-center justify-between">
-          <Image src={logo.src} alt={logo.alt} width={logo.width} height={logo.height} className="h-[46px] w-auto" />
+          {/* A link, not a bare image: "Home" is no longer a menu row, so this
+              is the only way back to the homepage from inside the drawer. */}
+          <Link href="/" onClick={close} className="flex flex-shrink-0 items-center" aria-label="Home">
+            <Image src={logo.src} alt={logo.alt} width={logo.width} height={logo.height} className="h-[46px] w-auto" />
+          </Link>
           <button ref={closeRef} type="button" onClick={close} className="p-2 text-2xl text-primary">
             <span className="sr-only">Close menu</span>
             <span aria-hidden>&#10005;</span>
