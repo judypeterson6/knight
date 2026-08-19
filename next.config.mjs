@@ -4,6 +4,13 @@ import { fileURLToPath } from 'node:url'
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Next's own trailing-slash redirect runs ahead of middleware, so it was
+  // answering every slashed URL with a 308 before the middleware could see it.
+  // Two consequences: the middleware's 301 for old WordPress URLs never ran,
+  // and every retired /wp-.../ path cost two crawl requests instead of one —
+  // a 308 to the unslashed form, then the 410. Handing slash handling to the
+  // middleware lets it answer both in a single response.
+  skipTrailingSlashRedirect: true,
   poweredByHeader: false,
   // There is another package-lock.json in the user profile directory above this
   // project. Next walks up looking for one and picked that as the workspace

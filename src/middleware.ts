@@ -39,6 +39,24 @@ function canonicalHost(): { host: string } | null {
   }
 }
 
+/**
+ * Paths that belonged to the WordPress install and have no successor.
+ *
+ * Search Console shows crawl requests running at roughly 47% CSS and 32%
+ * JavaScript against 11% HTML, and almost all of that stylesheet traffic is
+ * Googlebot re-requesting Elementor and plugin assets from the old site. They
+ * were answering 404, which a crawler retries for months.
+ *
+ * 410 says the resource is deliberately gone, which drops it from the crawl
+ * queue far faster and stops it competing with the pages that matter.
+ *
+ * /wp-content/uploads is deliberately absent: those URLs still resolve to real
+ * images and are handled by their own route, which 301s them onto the file
+ * that replaced them.
+ */
+const LEGACY_WORDPRESS =
+  /^\/(?:wp-content\/(?:plugins|themes|cache|upgrade|languages)|wp-includes|wp-admin|wp-json|author|tag|category\/feed|comments\/feed|feed|wp-login\.php|wp-cron\.php|xmlrpc\.php|wp-signup\.php|wp-trackback\.php)(?:\/|$)/i
+
 export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl
 
@@ -52,6 +70,22 @@ export async function middleware(request: NextRequest) {
 
   if (pathname.startsWith('/_next') || pathname.startsWith('/api/internal')) {
     return NextResponse.next()
+  }
+
+  // --- 1b. Retired WordPress paths -----------------------------------------
+  //
+  // Answered before the slash normaliser, which was turning /wp-admin/ into a
+  // 308 onto another dead URL, and before the redirect lookup, so none of this
+  // traffic reaches the database.
+  if (LEGACY_WORDPRESS.test(pathname)) {
+    return new NextResponse(null, {
+      status: 410,
+      headers: {
+        'cache-control': 'public, max-age=86400',
+        'x-robots-tag': 'noindex',
+        'content-type': 'text/plain; charset=utf-8',
+      },
+    })
   }
 
   // --- 2. Canonical host and scheme ----------------------------------------
@@ -87,9 +121,17 @@ export async function middleware(request: NextRequest) {
 
   // --- 3. Trailing-slash normalisation -------------------------------------
   if (pathname.length > 1 && pathname.endsWith('/')) {
-    const url = request.nextUrl.clone()
+    // Built from request.url rather than nextUrl.clone(): NextURL carries an
+    // internal trailing-slash flag taken from the incoming request and re-applies
+    // it when the Location header is serialised, which turned this into a
+    // redirect from /fleet/ to /fleet/ — an infinite loop on every slashed URL.
+    const url = new URL(request.url)
     url.pathname = pathname.replace(/\/+$/, '')
-    return NextResponse.redirect(url, 301)
+    // 301 is the signal search engines should see for the old slashed URLs.
+    // A 301 may legally be replayed as GET though, which would silently drop a
+    // form body, so anything that is not a plain read keeps its method with 308.
+    const safeMethod = request.method === 'GET' || request.method === 'HEAD'
+    return NextResponse.redirect(url, safeMethod ? 301 : 308)
   }
 
   // --- 3. Database redirects ------------------------------------------------
